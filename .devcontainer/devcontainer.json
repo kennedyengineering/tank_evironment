@@ -1,0 +1,6 @@
+{
+    "image": "ubuntu:20.04",
+    "runArgs": [
+    "--network=host"
+    ]
+}
