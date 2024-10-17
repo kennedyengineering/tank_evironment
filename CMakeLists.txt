@@ -44,3 +44,7 @@ add_executable(test2 src/test_GLFW3.c)
 
 set(LIBS2 glfw OpenGL::GL)
 target_link_libraries(test2 ${LIBS2})
+
+
+add_executable(test3 src/test_draw.c)
+target_link_libraries(test3 ${LIBS} ${LIBS2})
