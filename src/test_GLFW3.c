@@ -19,6 +19,9 @@ int main(void)
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
+    /* Use VSYNC and reduce CPU useage */
+    glfwSwapInterval(1);
+
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {

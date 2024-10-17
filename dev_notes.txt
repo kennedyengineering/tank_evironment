@@ -51,3 +51,5 @@ cmake ..
 cmake --build .
 
 can you just use USER ubuntu? instead of creating a new one? YES!!! Thank you Ubuntu gods :)
+
+have to install a newer version of mesa driver to get rid of some random error messages. don't think they actually do anything though...

@@ -5,6 +5,11 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt update && apt upgrade -y
 
+# Update Mesa driver (optional)
+RUN apt install -y software-properties-common
+RUN add-apt-repository ppa:kisak/kisak-mesa
+RUN apt update && apt upgrade -y
+
 # Build packages
 RUN apt install -y \ 
     git \
@@ -17,7 +22,8 @@ RUN apt install -y \
 
 # Graphics packages (optional)
 RUN apt install -y \
-    xorg-dev
+    xorg-dev \
+    mesa-utils
 
 # Switch to non-root user
 USER ubuntu
