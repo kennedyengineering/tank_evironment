@@ -15,5 +15,9 @@ RUN apt install -y \
 RUN apt install -y \
     gdb
 
+# Graphics packages (optional)
+RUN apt install -y \
+    xorg-dev
+
 # Switch to non-root user
 USER ubuntu
