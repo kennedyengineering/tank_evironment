@@ -1,0 +1,53 @@
+notes on installing Box2D in development container:
+
+#####
+on ubuntu 20.04 image:
+# avoid interactive dialogue when installing packages
+DEBIAN_FRONTEND=noninteractive
+
+# install packages necessary to build box2d
+apt install gcc make cmake
+
+
+#####
+switched to ubuntu 24.04 for latest cmake:
+
+# install packages necessary to build box2d
+apt install git gcc g++ cmake
+
+(added "postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}" to .devcontainer, to fix "dubious ownership" issue)
+(but it requires git to be installed... have to go back and make a Dockerfile...)
+
+docker image prune -- remove dangling containers after rebuilding dev container
+
+(going back and adding a docker image did not fix the git issue)
+cloning the repo to /home/root did
+
+to build and install box2D (no samples):
+mkdir /home/root && cd /home/root
+git clone https://github.com/erincatto/box2d.git
+cd box2d
+mkdir build && cd build
+cmake -DBOX2D_SAMPLES=OFF ..
+cmake --build .
+cmake --install .
+
+to build and install with samples, do this before hand and dont use -DBOX2D_SAMPLES=OFF cmake flag:
+apt install libwayland-dev
+apt install xorg-dev
+apt install libxkbcommon-x11-dev
+apt install libegl1-mesa-dev
+
+to run samples:
+./build/bin/samples
+
+use FetchContent to include box2d? instead of installing it globally? yes! just need to figure out the user issue still...
+
+made a demo app in src/test.c
+compile with: gcc test.c -lbox2d -lm
+compile using cmake:
+cd build
+cmake ..
+cmake --build .
+
+can you just use USER ubuntu? instead of creating a new one? YES!!! Thank you Ubuntu gods :)
