@@ -11,6 +11,7 @@ NDC coordinates are transformed to screen-space coordinates via glViewport.
 */
 
 #include <GLFW/glfw3.h>
+
 #include <stdio.h>
 #include <stdbool.h>
 
@@ -108,13 +109,35 @@ void renderTriangle() {
         printf("ERROR, SHADER PROGRAM LINKING FAILED:\n %s", infoLog);
     }
 
-    // Activate program
-    glUseProgram(shaderProgram);
-
     // Delete shader objects after linking to program object
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
+    // Create a vertex array object
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+
+    // Drawing process
+    // ..:: Initialization code (done once (unless your object frequently changes)) :: ..
+    // 1. bind Vertex Array Object
+    glBindVertexArray(VAO);
+    // 2. copy our vertices array in a buffer for OpenGL to use
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    // 3. then set our vertex attributes pointers
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);  
+
+    // ..:: Drawing code (in render loop) :: ..
+    // 4. draw the object
+    glUseProgram(shaderProgram);
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    // Clean up
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteProgram(shaderProgram);
 }
 
 
@@ -157,6 +180,8 @@ int main()
         // render
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        renderTriangle();
 
         // check and call events and swap buffers
         glfwSwapBuffers(window);            // show output to screen
