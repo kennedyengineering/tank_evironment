@@ -25,5 +25,9 @@ RUN apt install -y \
     xorg-dev \
     mesa-utils
 
+# Glad packages (optional)
+RUN apt install -y \
+    python3-jinja2
+
 # Switch to non-root user
 USER ubuntu

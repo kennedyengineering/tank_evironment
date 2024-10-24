@@ -32,11 +32,25 @@ set(GLFW_BUILD_DOCS 0)
 FetchContent_MakeAvailable(glfw)
 
 
-# OpenGL
-find_package(OpenGL REQUIRED)
+# GLAD
+FetchContent_Declare(
+    glad
+    GIT_REPOSITORY https://github.com/Dav1dde/glad
+    GIT_TAG        v2.0.8
+    GIT_SHALLOW    TRUE
+    GIT_PROGRESS   TRUE
+)
+
+FetchContent_GetProperties(glad)
+if(NOT glad_POPULATED)
+    FetchContent_MakeAvailable(glad)
+
+    add_subdirectory("${glad_SOURCE_DIR}/cmake" glad_cmake)
+    glad_add_library(glad REPRODUCIBLE EXCLUDE_FROM_ALL LOADER API gl:core=4.5)
+endif()
 
 
 # Application
-add_executable(app src/main.c)
+add_executable(app src/main.c src/shader.c)
 target_include_directories(app PRIVATE include)
-target_link_libraries(app box2d m glfw OpenGL::GL)
+target_link_libraries(app box2d m glfw glad)

@@ -1,9 +1,13 @@
 // Tank Game (@kennedyengineering)
 
 /* Includes */
+#include <glad/gl.h>
 #include <GLFW/glfw3.h>
+
 #include <stdio.h>
 #include <stdbool.h>
+
+#include "shader.h"
 
 /* Defines */
 #define SCREEN_NAME   "Tank Game"
@@ -33,6 +37,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    // TODO: make window non-resizeable via configuration (in the future)
 
     // Create GLFW window object
     GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_NAME, NULL, NULL);
@@ -45,8 +50,29 @@ int main() {
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+    // Load OpenGL function pointers
+    if (gladLoadGL(glfwGetProcAddress) == 0)
+    {
+        fprintf(stderr, "Failed to initialize OpenGL context\n");
+        glfwTerminate();
+        return RETURN_ERROR;
+    }
+
+    // TODO: compile from file
     // Compile shader programs
-    // ...
+    const char *vertexShaderSource = "#version 450 core\n"
+        "layout (location = 0) in vec3 aPos;\n"
+        "void main()\n"
+        "{\n"
+        "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+        "}\0";
+    const char *fragmentShaderSource = "#version 450 core\n"
+        "out vec4 FragColor;\n"
+        "void main()\n"
+        "{\n"
+        "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+        "}\0";
+    createProgramFromStrings(vertexShaderSource, fragmentShaderSource);
 
     // Render loop
     while (!glfwWindowShouldClose(window))
@@ -83,6 +109,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 } 
 
+// TODO: replace with call back
+// TODO: add TODO extension
 void processInput(GLFWwindow *window)
 {
     // Query GLFW whether relevant keys are pressed/released this frame and react accordingly

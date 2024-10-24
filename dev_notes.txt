@@ -59,3 +59,4 @@ to check openGL library version: glxinfo | grep "OpenGL version"
 the Box2D sample program defined GLSL that I may be able to reuse
 
 add unity/gtest unit testing framework
+add clang-formatting
