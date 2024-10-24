@@ -58,21 +58,14 @@ int main() {
         return RETURN_ERROR;
     }
 
-    // TODO: compile from file
     // Compile shader programs
-    const char *vertexShaderSource = "#version 450 core\n"
-        "layout (location = 0) in vec3 aPos;\n"
-        "void main()\n"
-        "{\n"
-        "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-        "}\0";
-    const char *fragmentShaderSource = "#version 450 core\n"
-        "out vec4 FragColor;\n"
-        "void main()\n"
-        "{\n"
-        "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-        "}\0";
-    createProgramFromStrings(vertexShaderSource, fragmentShaderSource);
+    GLuint shaderProgram = createProgramFromFiles("../data/polygon.vs", "../data/polygon.fs");
+    if (shaderProgram == 0)
+    {
+        fprintf(stderr, "Failed to initialize OpenGL shaders\n");
+        glfwTerminate();
+        return RETURN_ERROR;
+    }
 
     // Render loop
     while (!glfwWindowShouldClose(window))
