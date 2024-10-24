@@ -88,6 +88,18 @@ int main() {
 
     float frameTime = 0.0;
 
+    // setup projection
+    // glMatrixMode(GL_PROJECTION);
+    // glLoadIdentity();
+    // glOrtho(0, 640, 0, 480, -1, 1);
+
+    float scale = 1 / 40.0f;
+
+    // setup scale
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glScalef(scale, scale, 1.0f);
+
     while ( !glfwWindowShouldClose( window ) )
 	{
         double time1 = glfwGetTime();
@@ -99,13 +111,14 @@ int main() {
         glClear( GL_COLOR_BUFFER_BIT );      // clear screen
 
         /* BOX2D START */
-        glPushMatrix();                                         // store pre-transform state
-        glScalef(40.0f / 640.0f, 40.0f / 480.0f, 1.0f);         // zoom out
-        glTranslatef(0.0f, -5.0f, 0.0f);                        // pan up
+
+        // glPushMatrix();                                         // store pre-transform state
+        // glScalef(40.0f / 640.0f, 40.0f / 480.0f, 1.0f);         // zoom out
+        // glTranslatef(0.0f, -5.0f, 0.0f);                        // pan up
 
         b2World_Draw(worldId, &debugDraw);                      // run drawing callbacks
 
-        glPopMatrix();                                          // restore state
+        // glPopMatrix();                                          // restore state
         /* BOX2D END */
 
         glfwSwapBuffers( window );

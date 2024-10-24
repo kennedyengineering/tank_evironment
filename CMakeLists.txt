@@ -48,3 +48,6 @@ target_link_libraries(test2 ${LIBS2})
 
 add_executable(test3 src/test_draw.c)
 target_link_libraries(test3 ${LIBS} ${LIBS2})
+
+add_executable(test4 src/test_gl_tutorial.c)
+target_link_libraries(test4 ${LIBS} ${LIBS2})
