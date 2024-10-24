@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 
+
 project(simple_simulator
         VERSION 0.1
         DESCRIPTION "A simple simulator"
@@ -18,12 +19,6 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(box2d)
 
 
-add_executable(test src/test.c)
-
-set(LIBS box2d m)
-target_link_libraries(test ${LIBS})
-
-
 # GLFW
 FetchContent_Declare(
     glfw
@@ -36,18 +31,11 @@ set(GLFW_BUILD_DOCS 0)
 
 FetchContent_MakeAvailable(glfw)
 
-# (required for rendering)
+
+# OpenGL
 find_package(OpenGL REQUIRED)
 
 
-add_executable(test2 src/test_GLFW3.c)
-
-set(LIBS2 glfw OpenGL::GL)
-target_link_libraries(test2 ${LIBS2})
-
-
-add_executable(test3 src/test_draw.c)
-target_link_libraries(test3 ${LIBS} ${LIBS2})
-
-add_executable(test4 src/test_gl_tutorial.c)
-target_link_libraries(test4 ${LIBS} ${LIBS2})
+# Application
+add_executable(app src/main.c)
+target_link_libraries(app box2d m glfw OpenGL::GL)

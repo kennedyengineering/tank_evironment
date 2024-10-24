@@ -57,3 +57,5 @@ have to install a newer version of mesa driver to get rid of some random error m
 to check openGL library version: glxinfo | grep "OpenGL version"
 
 the Box2D sample program defined GLSL that I may be able to reuse
+
+add unity/gtest unit testing framework
