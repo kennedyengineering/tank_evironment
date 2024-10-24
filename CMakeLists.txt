@@ -38,4 +38,5 @@ find_package(OpenGL REQUIRED)
 
 # Application
 add_executable(app src/main.c)
+target_include_directories(app PRIVATE include)
 target_link_libraries(app box2d m glfw OpenGL::GL)
