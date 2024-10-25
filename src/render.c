@@ -1,5 +1,8 @@
 // Tank Game (@kennedyengineering)
 
+// TODO: add rendering for circles
+// TODO: add move this file to renderPolygon, then add a meta render file that instantiates polygon and circle rendering
+
 #include "render.h"
 #include "shader.h"
 
@@ -53,7 +56,7 @@ void renderPolygon(GLfloat vertices[], GLfloat color[], GLsizei count)
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, 2*count*sizeof(GLfloat), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 2*count*sizeof(GLfloat), vertices, GL_STATIC_DRAW);   // TODO: pre-allocate buffer with a MAX_VERTICES_COUNT number of vertices in GL_DYNAMIC_DRAW memory
 
     GLint colorLocation = glGetUniformLocation(shaderProgram, "color");
     glProgramUniform3fv(shaderProgram, colorLocation, 1, color);
