@@ -8,9 +8,12 @@
 
 #include <stdio.h>
 #include <stddef.h>
+#include <math.h>
 
 #define VERTEX_SHADER_FILE    "../data/polygon.vs"
 #define FRAGMENT_SHADER_FILE  "../data/polygon.fs"
+
+#define CIRCLE_VERTICES       20
 
 static bool initialized = false;
 
@@ -67,6 +70,22 @@ void renderPolygon(GLfloat vertices[], GLfloat color[], GLsizei count)
     glUseProgram(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+}
+
+void renderCircle(GLfloat center[], GLfloat radius, GLfloat color[])
+{
+    // Render a circle
+    GLfloat vertices[2*CIRCLE_VERTICES] = {0};
+
+    float angle_increment = 2 * M_PI / CIRCLE_VERTICES;
+
+    for (int i = 0; i < CIRCLE_VERTICES; i++) {
+        float theta = i * angle_increment;
+        vertices[2 * i] = radius*cos(theta) + center[0];     // x coordinate
+        vertices[2 * i + 1] = radius*sin(theta) + center[1]; // y coordinate
+    }
+    
+    renderPolygon(vertices, color, CIRCLE_VERTICES);
 }
 
 void renderDestroy()

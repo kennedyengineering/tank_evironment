@@ -65,13 +65,11 @@ int main() {
         return RETURN_ERROR;
     }
 
-    GLfloat vertices[] = {
-         0.5f,  0.5f,  // top right
-         0.5f, -0.5f,  // bottom right
-        -0.5f, -0.5f,  // bottom left
-        -0.5f,  0.5f,  // top left
-        0.0f,  0.75f,  // tip
+    GLfloat center[] = {
+         0.5f, 0.0f,
     };
+
+    GLfloat radius = 0.5;
 
     GLfloat color[] = {
         1.0f, 0.0f, 0.0f,
@@ -85,7 +83,8 @@ int main() {
 
         // Render
         glClear(GL_COLOR_BUFFER_BIT);
-        renderPolygon(vertices, color, 5);
+        renderCircle(center, radius, color);
+        renderCircle((float[]){0,0}, 0.1, (float[]){0,1,0});
 
         // Update
         glfwSwapBuffers(window);

@@ -66,3 +66,6 @@ getting a small 56byte memory leak... don't think it is anything I am doing. App
 two options: either define the color with every vertex, or define the color as a `global variable` for all vertices -- that is what a uniform variable is in GLSL.
 
 output variable of vertex shader needs to have the same name as input variable in fragement shader.
+
+useful example of brace initialization in C:
+renderCircle((float[]){0,0}, 0.1, (float[]){0,1,0});
