@@ -30,6 +30,15 @@ bool renderInit()
         return initialized;
     }
 
+    glBindVertexArray(VAO);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat), NULL);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
     initialized = true;
 
     return initialized;
@@ -46,15 +55,12 @@ void renderPolygon(GLfloat vertices[], GLsizei count)
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, 2*count*sizeof(GLfloat), vertices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat), NULL);
-    glEnableVertexAttribArray(0);
-
     glUseProgram(shaderProgram);
     glDrawArrays(GL_TRIANGLE_FAN, 0, count);
 
+    glUseProgram(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-    glUseProgram(0);
 }
 
 void renderDestroy()
