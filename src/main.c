@@ -65,15 +65,27 @@ int main() {
         return RETURN_ERROR;
     }
 
-    GLfloat center[] = {
-         0.5f, 0.0f,
+    GLfloat vertices[] = {
+         0.5f,  0.5f,  // top right
+         0.5f, -0.5f,  // bottom right
+        -0.5f, -0.5f,  // bottom left
+        -0.5f,  0.5f,  // top left
+        0.0f,  0.75f,  // tip
     };
 
-    GLfloat radius = 0.5;
-
-    GLfloat color[] = {
+    GLfloat color_R[] = {
         1.0f, 0.0f, 0.0f,
     };
+
+    GLfloat color_G[] = {
+        0.0f, 1.0f, 0.0f,
+    };
+
+    GLfloat center[] = {
+        0.25f, 0.25f,
+    };
+
+    GLfloat radius = 0.2;
 
     // Render loop
     while (!glfwWindowShouldClose(window))
@@ -83,8 +95,8 @@ int main() {
 
         // Render
         glClear(GL_COLOR_BUFFER_BIT);
-        renderCircle(center, radius, color);
-        renderCircle((float[]){0,0}, 0.1, (float[]){0,1,0});
+        renderPolygon(vertices, color_R, 5);
+        renderCircle(center, radius, color_G);
 
         // Update
         glfwSwapBuffers(window);
