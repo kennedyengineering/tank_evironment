@@ -14,14 +14,12 @@ bool gameInit()
     if (initialized)
         return initialized;
 
-    // Initialize render method
     if (renderInit() == false)
     {
         fprintf(stderr, "Failed to initialize render method\n");
         return initialized;
     }
 
-    // Initialize physics engine
     if (engineInit() == false)
     {
         fprintf(stderr, "Failed to initialize physics engine\n");
