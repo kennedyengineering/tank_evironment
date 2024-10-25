@@ -65,12 +65,12 @@ int main() {
         return RETURN_ERROR;
     }
 
-    float vertices[] = {
-         0.5f,  0.5f, 0.0f,  // top right
-         0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f,  // top left
-        0.0f,  0.75f, 0.0f,  // tip
+    GLfloat vertices[] = {
+         0.5f,  0.5f,  // top right
+         0.5f, -0.5f,  // bottom right
+        -0.5f, -0.5f,  // bottom left
+        -0.5f,  0.5f,  // top left
+        0.0f,  0.75f,  // tip
     };
 
     // Render loop
