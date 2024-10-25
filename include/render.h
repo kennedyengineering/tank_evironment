@@ -8,7 +8,7 @@
 
 bool renderInit();
 
-void renderPolygon(float vertices[], float color[], int count);
+void renderPolygon(GLfloat vertices[], GLsizei count, GLfloat color[]);
 
 void renderCircle(GLfloat center[], GLfloat radius, GLfloat color[]);
 

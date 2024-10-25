@@ -95,7 +95,7 @@ int main() {
 
         // Render
         glClear(GL_COLOR_BUFFER_BIT);
-        renderPolygon(vertices, color_R, 5);
+        renderPolygon(vertices, 5, color_R);
         renderCircle(center, radius, color_G);
 
         // Update

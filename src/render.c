@@ -50,7 +50,7 @@ bool renderInit()
     return initialized;
 }
 
-void renderPolygon(GLfloat vertices[], GLfloat color[], GLsizei count)
+void renderPolygon(GLfloat vertices[], GLsizei count, GLfloat color[])
 {
     // Render a polygon
     if (!initialized)
@@ -85,7 +85,7 @@ void renderCircle(GLfloat center[], GLfloat radius, GLfloat color[])
         vertices[2 * i + 1] = radius*sin(theta) + center[1]; // y coordinate
     }
     
-    renderPolygon(vertices, color, CIRCLE_VERTICES);
+    renderPolygon(vertices, CIRCLE_VERTICES, color);
 }
 
 void renderDestroy()
