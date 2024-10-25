@@ -20,6 +20,13 @@ static bool initialized = false;
 static b2WorldId worldId;
 static b2DebugDraw debugDraw;
 
+typedef struct Tank
+{
+    b2BodyId bodyId, turrentId;
+} Tank;
+
+static Tank tank1, tank2;
+
 typedef struct RGBf
 {
 	float r, g, b;
@@ -46,14 +53,16 @@ static void DrawSolidPolygon (b2Transform transform, const b2Vec2* vertices, int
     renderPolygon(gl_vertices, vertexCount, (float[]){colorf.r, colorf.g, colorf.b});
 }
 
-static b2BodyId engineCreateTank(b2Vec2 position, float angle)
+static Tank engineCreateTank(b2Vec2 position, float angle)
 {
     // Create a tank
+    Tank tank;
+
     b2BodyDef bodyDef = b2DefaultBodyDef();
     bodyDef.type = b2_dynamicBody;
     bodyDef.position = position;
     bodyDef.rotation = b2MakeRot(angle);
-    b2BodyId bodyId = b2CreateBody(worldId, &bodyDef);
+    tank.bodyId = b2CreateBody(worldId, &bodyDef);
 
     b2ShapeDef shapeDef = b2DefaultShapeDef();
     shapeDef.customColor = b2_colorGreenYellow;
@@ -61,9 +70,9 @@ static b2BodyId engineCreateTank(b2Vec2 position, float angle)
     shapeDef.friction = 0.3f;
 
     b2Polygon centerPolygon = b2MakeBox(TANK_HEIGHT, TANK_WIDTH);
-    b2CreatePolygonShape(bodyId, &shapeDef, &centerPolygon);
+    b2CreatePolygonShape(tank.bodyId, &shapeDef, &centerPolygon);
 
-    return bodyId;
+    return tank;
 }
 
 bool engineInit()
@@ -86,7 +95,9 @@ bool engineInit()
     debugDraw.drawShapes = true;
     debugDraw.DrawSolidPolygon = &DrawSolidPolygon;
 
-    engineCreateTank((b2Vec2){1.0f, 0.0f}, 0.0f);
+    // Create tanks
+    tank1 = engineCreateTank((b2Vec2){0.0f, 0.0f}, 0.0f);
+    tank2 = engineCreateTank((b2Vec2){50.0f, 0.0f}, 0.0f);
     
     initialized = true;
 
@@ -107,8 +118,7 @@ void engineRender()
     // Render the physics engine
     if (!initialized)
         return;
-
-    // renderCircle((float[]){0.0f, 0.0f}, 0.2f, (float[]){0.5f, 0.2f, 0.0f});
+    
     b2World_Draw(worldId, &debugDraw);
 }
 
