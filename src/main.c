@@ -8,6 +8,7 @@
 #include <stdbool.h>
 
 #include "render.h"
+#include "engine.h"
 
 /* Defines */
 #define SCREEN_NAME   "Tank Game"
@@ -65,6 +66,15 @@ int main() {
         return RETURN_ERROR;
     }
 
+    // Initialize physics engine
+    if (engineInit() == false)
+    {
+        fprintf(stderr, "Failed to initialize physics engine\n");
+        renderDestroy();
+        glfwTerminate();
+        return RETURN_ERROR;
+    }
+
     GLfloat vertices[] = {
          0.5f,  0.5f,  // top right
          0.5f, -0.5f,  // bottom right
@@ -93,6 +103,9 @@ int main() {
         // Input
         processInput(window);
 
+        // Physics
+        engineStep();
+
         // Render
         glClear(GL_COLOR_BUFFER_BIT);
         renderPolygon(vertices, 5, color_R);
@@ -105,6 +118,7 @@ int main() {
 
     // Clean up
     renderDestroy();
+    engineDestroy();
 
     // Terminate
     glfwTerminate();

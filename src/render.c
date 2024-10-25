@@ -20,6 +20,7 @@ static GLuint VBO, VAO, shaderProgram;
 
 bool renderInit()
 {
+    // Allocate resources
     if (initialized)
         return initialized;
 
@@ -74,6 +75,9 @@ void renderPolygon(GLfloat vertices[], GLsizei count, GLfloat color[])
 void renderCircle(GLfloat center[], GLfloat radius, GLfloat color[])
 {
     // Render a circle
+    if (!initialized)
+        return;
+
     GLfloat vertices[2*CIRCLE_VERTICES] = {0};
 
     float angle_increment = 2 * M_PI / CIRCLE_VERTICES;
