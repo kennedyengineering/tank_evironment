@@ -73,3 +73,7 @@ renderCircle((float[]){0,0}, 0.1, (float[]){0,1,0});
 it might be possible to render a circle using GL_POINT, cross that bridge when you get to it.
 
 make a tank_game.c that uses render.c and engine.c, don't put render.c in engine.c
+
+Polygons in Box2D have a maximum of 8 vertices
+
+add a display.c to handle all the glfw stuff?

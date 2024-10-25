@@ -7,8 +7,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#include "render.h"
-#include "engine.h"
+#include "game.h"
 
 /* Defines */
 #define SCREEN_NAME   "Tank Game"
@@ -58,44 +57,13 @@ int main() {
         return RETURN_ERROR;
     }
 
-    // Initialize render method
-    if (renderInit() == false)
+    // Initialize game
+    if (gameInit() == false)
     {
-        fprintf(stderr, "Failed to initialize render method\n");
+        fprintf(stderr, "Failed to initialize game\n");
         glfwTerminate();
         return RETURN_ERROR;
     }
-
-    // Initialize physics engine
-    if (engineInit() == false)
-    {
-        fprintf(stderr, "Failed to initialize physics engine\n");
-        renderDestroy();
-        glfwTerminate();
-        return RETURN_ERROR;
-    }
-
-    GLfloat vertices[] = {
-         0.5f,  0.5f,  // top right
-         0.5f, -0.5f,  // bottom right
-        -0.5f, -0.5f,  // bottom left
-        -0.5f,  0.5f,  // top left
-        0.0f,  0.75f,  // tip
-    };
-
-    GLfloat color_R[] = {
-        1.0f, 0.0f, 0.0f,
-    };
-
-    GLfloat color_G[] = {
-        0.0f, 1.0f, 0.0f,
-    };
-
-    GLfloat center[] = {
-        0.25f, 0.25f,
-    };
-
-    GLfloat radius = 0.2;
 
     // Render loop
     while (!glfwWindowShouldClose(window))
@@ -104,12 +72,11 @@ int main() {
         processInput(window);
 
         // Physics
-        engineStep();
+        gameStep();
 
         // Render
         glClear(GL_COLOR_BUFFER_BIT);
-        renderPolygon(vertices, 5, color_R);
-        renderCircle(center, radius, color_G);
+        gameRender();
 
         // Update
         glfwSwapBuffers(window);
@@ -117,8 +84,7 @@ int main() {
     }
 
     // Clean up
-    renderDestroy();
-    engineDestroy();
+    gameDestroy();
 
     // Terminate
     glfwTerminate();
