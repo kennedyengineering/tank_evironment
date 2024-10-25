@@ -120,7 +120,7 @@ int main() {
 }
 
 /* Function definitions */
-void error_callback(int error, const char* description )
+void error_callback(int error, const char* description)
 {
     // Display errors
 	fprintf(stderr, "GLFW error occurred. Code: %d. Description: %s\n", error, description);

@@ -18,7 +18,8 @@ RUN apt install -y \
 
 # Debug packages (optional)
 RUN apt install -y \
-    gdb
+    gdb \
+    valgrind
 
 # Graphics packages (optional)
 RUN apt install -y \
