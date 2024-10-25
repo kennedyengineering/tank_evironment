@@ -69,3 +69,5 @@ output variable of vertex shader needs to have the same name as input variable i
 
 useful example of brace initialization in C:
 renderCircle((float[]){0,0}, 0.1, (float[]){0,1,0});
+
+it might be possible to render a circle using GL_POINT, cross that bridge when you get to it.
