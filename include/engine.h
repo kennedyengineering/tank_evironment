@@ -8,4 +8,6 @@ bool engineInit();
 
 void engineStep();
 
+void engineRender();
+
 void engineDestroy();
