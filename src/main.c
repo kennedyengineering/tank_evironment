@@ -73,6 +73,10 @@ int main() {
         0.0f,  0.75f,  // tip
     };
 
+    GLfloat color[] = {
+        1.0f, 0.0f, 0.0f,
+    };
+
     // Render loop
     while (!glfwWindowShouldClose(window))
     {
@@ -81,7 +85,7 @@ int main() {
 
         // Render
         glClear(GL_COLOR_BUFFER_BIT);
-        renderPolygon(vertices, 5);
+        renderPolygon(vertices, color, 5);
 
         // Update
         glfwSwapBuffers(window);

@@ -8,6 +8,6 @@
 
 bool renderInit();
 
-void renderPolygon(float *vertices, int count);
+void renderPolygon(float vertices[], float color[], int count);
 
 void renderDestroy();

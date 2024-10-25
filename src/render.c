@@ -35,7 +35,7 @@ bool renderInit()
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat), NULL);
-    
+
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
@@ -44,7 +44,7 @@ bool renderInit()
     return initialized;
 }
 
-void renderPolygon(GLfloat vertices[], GLsizei count)
+void renderPolygon(GLfloat vertices[], GLfloat color[], GLsizei count)
 {
     // Render a polygon
     if (!initialized)
@@ -54,6 +54,9 @@ void renderPolygon(GLfloat vertices[], GLsizei count)
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, 2*count*sizeof(GLfloat), vertices, GL_STATIC_DRAW);
+
+    GLint colorLocation = glGetUniformLocation(shaderProgram, "color");
+    glProgramUniform3fv(shaderProgram, colorLocation, 1, color);
 
     glUseProgram(shaderProgram);
     glDrawArrays(GL_TRIANGLE_FAN, 0, count);

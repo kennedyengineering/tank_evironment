@@ -62,3 +62,5 @@ add unity/gtest unit testing framework
 add clang-formatting
 
 getting a small 56byte memory leak... don't think it is anything I am doing. Apparently OpenGL is known for small leaks like this that the OS will clean up.
+
+two options: either define the color with every vertex, or define the color as a `global variable` for all vertices -- that is what a uniform variable is in GLSL.
