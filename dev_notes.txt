@@ -60,3 +60,5 @@ the Box2D sample program defined GLSL that I may be able to reuse
 
 add unity/gtest unit testing framework
 add clang-formatting
+
+getting a small 56byte memory leak... don't think it is anything I am doing. Apparently OpenGL is known for small leaks like this that the OS will clean up.
