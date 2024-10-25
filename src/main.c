@@ -37,7 +37,6 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    // TODO: make window non-resizeable via configuration (in the future)
 
     // Create GLFW window object
     GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_NAME, NULL, NULL);
@@ -132,8 +131,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 } 
 
-// TODO: replace with call back
-// TODO: add TODO extension
 void processInput(GLFWwindow *window)
 {
     // Query GLFW whether relevant keys are pressed/released this frame and react accordingly

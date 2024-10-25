@@ -5,8 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// TODO: add error checking to malloc statements
-
 static void sPrintShaderError(GLuint shader)
 {
     // Print OpenGL shader error
