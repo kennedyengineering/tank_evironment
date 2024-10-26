@@ -12,10 +12,12 @@
 #define ARENA_HEIGHT 48.8f   // football field (meters)
 #define ARENA_WIDTH  109.7f
 
+// TODO: refactor tank stuff into tank.h or something
 #define TANK_BODY_HEIGHT 7.93f   // m1-abrams (meters)
 #define TANK_BODY_WIDTH  3.66f
 #define TANK_GUN_HEIGHT  5.805f
 #define TANK_GUN_WIDTH   0.20f
+// TODO: add tank constants as definitions
 
 static bool initialized = false;
 
@@ -77,7 +79,6 @@ static Tank engineCreateTank(b2Vec2 position, float angle)
 
     // Create the body shape
     b2ShapeDef bodyShapeDef = b2DefaultShapeDef();
-    bodyShapeDef.density = 1.0f;
     bodyShapeDef.customColor = b2_colorGreenYellow;
     
     b2Polygon bodyPolygon = b2MakeBox(TANK_BODY_HEIGHT, TANK_BODY_WIDTH);
