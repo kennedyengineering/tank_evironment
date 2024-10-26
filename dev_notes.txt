@@ -79,3 +79,5 @@ Polygons in Box2D have a maximum of 8 vertices
 add a display.c to handle all the glfw stuff?
 
 motor joint sets desired angle, revolute joint sets desired speed. Select one for the type of control you want.
+
+box2d also support explosions... could use that on projectile strike!

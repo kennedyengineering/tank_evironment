@@ -34,8 +34,29 @@ static Tank tank1, tank2;
 
 static void RotateTankTurret(Tank tank, float angle)
 {
-    // Move the tank turret to a specific angle (in radians)
+    // Move the tank turret to a specific angle relative to the tank body (in radians)
     b2MotorJoint_SetAngularOffset(tank.motorId, angle);
+}
+
+static void RotateTankBody(Tank tank, float angular_velocity)
+{
+    // Rotate tank
+    return;
+}
+
+static void MoveTankBody(Tank tank, b2Vec2 linear_velocity)
+{
+    // Move tank
+    float mass = b2Body_GetMass(tank.bodyId) + b2Body_GetMass(tank.gunId);
+    b2Vec2 current_linear_velocity = b2Body_GetLinearVelocity(tank.bodyId);
+    b2Vec2 impulse = {
+        mass* (linear_velocity.x - current_linear_velocity.x),
+        mass* (linear_velocity.y - current_linear_velocity.y)
+    };
+
+    b2Body_ApplyLinearImpulseToCenter(tank.bodyId, impulse, true);
+
+    return;
 }
 
 typedef struct RGBf
@@ -129,7 +150,10 @@ bool engineInit()
     tank1 = engineCreateTank((b2Vec2){0.0f, 0.0f}, 0.0f);
     tank2 = engineCreateTank((b2Vec2){50.0f, 0.0f}, M_PI/4);
 
-    RotateTankTurret(tank1, 1.0f);
+    // RotateTankTurret(tank1, 1.0f);
+    // RotateTankTurret(tank2, -1.0f);
+
+    // MoveTankBody(tank1, (b2Vec2){2.1, 0.0});
     
     initialized = true;
 
