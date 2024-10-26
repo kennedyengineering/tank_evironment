@@ -81,3 +81,5 @@ add a display.c to handle all the glfw stuff?
 motor joint sets desired angle, revolute joint sets desired speed. Select one for the type of control you want.
 
 box2d also support explosions... could use that on projectile strike!
+
+motor joints only go 360deg, then they stop. so really the guns have +-180 deg motion, which is okay for a tank. Maybe limit the range to like 270 deg so the tank body has to rotate at some point.
