@@ -30,6 +30,12 @@ typedef struct Tank
 
 static Tank tank1, tank2;
 
+static void RotateTankTurret(Tank tank, float angle)
+{
+    // Move the tank turret to a specific angle (in radians)
+    b2MotorJoint_SetAngularOffset(tank.motorId, angle);
+}
+
 typedef struct RGBf
 {
 	float r, g, b;
@@ -121,6 +127,8 @@ bool engineInit()
     // Create tanks
     tank1 = engineCreateTank((b2Vec2){0.0f, 0.0f}, 0.0f);
     tank2 = engineCreateTank((b2Vec2){50.0f, 0.0f}, M_PI/4);
+
+    RotateTankTurret(tank1, 1.0f);
     
     initialized = true;
 
