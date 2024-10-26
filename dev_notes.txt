@@ -85,3 +85,5 @@ box2d also support explosions... could use that on projectile strike!
 motor joints only go 360deg, then they stop. so really the guns have +-180 deg motion, which is okay for a tank. Maybe limit the range to like 270 deg so the tank body has to rotate at some point.
 
 game.c should take care of game conditions, etc.
+
+to see how many lines of code you have written: cat src/* | wc -l
