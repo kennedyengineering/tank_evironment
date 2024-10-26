@@ -40,18 +40,24 @@ static void RotateTankTurret(Tank tank, float angle)
 
 static void RotateTankBody(Tank tank, float angular_velocity)
 {
-    // Rotate tank
+    // Rotate tank to desired angular velocity;
+    float rotational_inertia = b2Body_GetMassData(tank.bodyId).rotationalInertia + b2Body_GetMassData(tank.gunId).rotationalInertia;
+    float current_angular_velocity = b2Body_GetAngularVelocity(tank.bodyId);
+    float impulse = rotational_inertia * (angular_velocity - current_angular_velocity);
+
+    b2Body_ApplyAngularImpulse(tank.bodyId, impulse, true);
+
     return;
 }
 
 static void MoveTankBody(Tank tank, b2Vec2 linear_velocity)
 {
-    // Move tank
+    // Move tank to desired linear velocity
     float mass = b2Body_GetMass(tank.bodyId) + b2Body_GetMass(tank.gunId);
     b2Vec2 current_linear_velocity = b2Body_GetLinearVelocity(tank.bodyId);
     b2Vec2 impulse = {
-        mass* (linear_velocity.x - current_linear_velocity.x),
-        mass* (linear_velocity.y - current_linear_velocity.y)
+        mass * (linear_velocity.x - current_linear_velocity.x),
+        mass * (linear_velocity.y - current_linear_velocity.y)
     };
 
     b2Body_ApplyLinearImpulseToCenter(tank.bodyId, impulse, true);
@@ -154,6 +160,8 @@ bool engineInit()
     // RotateTankTurret(tank2, -1.0f);
 
     // MoveTankBody(tank1, (b2Vec2){2.1, 0.0});
+
+    // RotateTankBody(tank1, 2.0f);
     
     initialized = true;
 
