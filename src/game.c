@@ -24,13 +24,13 @@ bool gameInit()
     return initialized;
 }
 
-void gameStep()
+void gameStep(TankAction t1a, TankAction t2a)
 {
     // Step forward the game
     if (!initialized)
         return;
 
-    engineStep();
+    engineStep(t1a, t2a);
 }
 
 void gameRender()

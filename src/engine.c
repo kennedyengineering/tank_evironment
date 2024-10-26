@@ -32,9 +32,9 @@ typedef struct Tank
 
 static Tank tank1, tank2;
 
-static void RotateTankTurret(Tank tank, float angle)
+static void RotateTankGun(Tank tank, float angle)
 {
-    // Move the tank turret to a specific angle relative to the tank body (in radians)
+    // Move the tank gun to a specific angle relative to the tank body (in radians)
     b2MotorJoint_SetAngularOffset(tank.motorId, angle);
 }
 
@@ -156,8 +156,8 @@ bool engineInit()
     tank1 = engineCreateTank((b2Vec2){0.0f, 0.0f}, 0.0f);
     tank2 = engineCreateTank((b2Vec2){50.0f, 0.0f}, M_PI/4);
 
-    // RotateTankTurret(tank1, 1.0f);
-    // RotateTankTurret(tank2, -1.0f);
+    // RotateTankGun(tank1, 1.0f);
+    // RotateTankGun(tank2, -1.0f);
 
     // MoveTankBody(tank1, (b2Vec2){2.1, 0.0});
 
@@ -168,11 +168,20 @@ bool engineInit()
     return initialized;
 }
 
-void engineStep()
+void engineStep(TankAction tank1Action, TankAction tank2Action)
 {
     // Step forward the physics engine
     if (!initialized)
         return;
+
+    RotateTankGun(tank1, tank1Action.gun_angle);
+    RotateTankGun(tank2, tank2Action.gun_angle);
+
+    RotateTankBody(tank1, tank1Action.angular_velocity);
+    RotateTankBody(tank2, tank2Action.angular_velocity);
+
+    MoveTankBody(tank1, (b2Vec2){tank1Action.linear_velocity[0], tank1Action.linear_velocity[1]});
+    MoveTankBody(tank2, (b2Vec2){tank2Action.linear_velocity[0], tank2Action.linear_velocity[1]});
 
     b2World_Step(worldId, TIME_STEP, SUB_STEPS);
 }

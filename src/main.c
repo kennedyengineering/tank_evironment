@@ -8,6 +8,7 @@
 #include <stdbool.h>
 
 #include "game.h"
+#include "engine.h"
 
 /* Defines */
 #define SCREEN_NAME   "Tank Game"
@@ -16,6 +17,12 @@
 
 #define RETURN_ERROR -1
 #define RETURN_NORM   0
+
+#define TANK_MOVEMENT_SPEED 25.0f
+#define TANK_ROTATION_SPEED 2.5f
+#define TANK_GUN_ANGLE_INCREMENT 0.05f
+
+static TankAction t1a, t2a;
 
 /* Function declarations */
 void error_callback(int error, const char* description);
@@ -72,7 +79,7 @@ int main() {
         processInput(window);
 
         // Physics
-        gameStep();
+        gameStep(t1a, t2a);
 
         // Render
         glClear(GL_COLOR_BUFFER_BIT);
@@ -109,4 +116,49 @@ void processInput(GLFWwindow *window)
     // Query GLFW whether relevant keys are pressed/released this frame and react accordingly
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+    
+    // Tank 1 controls
+    t1a.linear_velocity[0] = 0.0f;
+    t1a.linear_velocity[1] = 0.0f;
+    if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        t1a.linear_velocity[1] += TANK_MOVEMENT_SPEED;
+    if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        t1a.linear_velocity[1] -= TANK_MOVEMENT_SPEED;
+    if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        t1a.linear_velocity[0] += TANK_MOVEMENT_SPEED;
+    if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        t1a.linear_velocity[0] -= TANK_MOVEMENT_SPEED;
+
+    t1a.angular_velocity = 0.0f;
+    if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+        t1a.angular_velocity += TANK_ROTATION_SPEED;
+    if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+        t1a.angular_velocity -= TANK_ROTATION_SPEED;
+
+    if(glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+        t1a.gun_angle += TANK_GUN_ANGLE_INCREMENT;
+    if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+        t1a.gun_angle -= TANK_GUN_ANGLE_INCREMENT;
+
+    t2a.linear_velocity[0] = 0.0f;
+    t2a.linear_velocity[1] = 0.0f;
+    if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+        t2a.linear_velocity[1] += TANK_MOVEMENT_SPEED;
+    if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+        t2a.linear_velocity[1] -= TANK_MOVEMENT_SPEED;
+    if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+        t2a.linear_velocity[0] += TANK_MOVEMENT_SPEED;
+    if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+        t2a.linear_velocity[0] -= TANK_MOVEMENT_SPEED;
+
+    t2a.angular_velocity = 0.0f;
+    if(glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
+        t2a.angular_velocity += TANK_ROTATION_SPEED;
+    if(glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+        t2a.angular_velocity -= TANK_ROTATION_SPEED;
+
+    if(glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS)
+        t2a.gun_angle += TANK_GUN_ANGLE_INCREMENT;
+    if(glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
+        t2a.gun_angle -= TANK_GUN_ANGLE_INCREMENT;
 }
