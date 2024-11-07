@@ -216,14 +216,32 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
     if (!initialized)
         return;
 
+    // TODO: remove code duplication by creating a helper method
+
     RotateTankGun(tank1, tank1Action.gun_angle);
     RotateTankGun(tank2, tank2Action.gun_angle);
 
-    RotateTankBody(tank1, tank1Action.angular_velocity);
-    RotateTankBody(tank2, tank2Action.angular_velocity);
+    switch (tank1Action.control_mode)
+    {
+        case MODE_FORCE_TREAD:
+            ForceTankTreads(tank1, tank1Action.tread_force[0], tank1Action.tread_force[1]); // TODO: clean up fn definition --> use vector as fn input, or 2x vars in TankAction struct
+            break;
+        case MODE_LIN_ROT_VELOCITY:
+            RotateTankBody(tank1, tank1Action.angular_velocity);
+            MoveTankBody(tank1, (b2Vec2){tank1Action.linear_velocity[0], tank1Action.linear_velocity[1]});
+            break;
+    };
 
-    MoveTankBody(tank1, (b2Vec2){tank1Action.linear_velocity[0], tank1Action.linear_velocity[1]});
-    MoveTankBody(tank2, (b2Vec2){tank2Action.linear_velocity[0], tank2Action.linear_velocity[1]});
+    switch (tank2Action.control_mode)
+    {
+        case MODE_FORCE_TREAD:
+            ForceTankTreads(tank2, tank2Action.tread_force[0], tank2Action.tread_force[1]);
+            break;
+        case MODE_LIN_ROT_VELOCITY:
+            RotateTankBody(tank2, tank2Action.angular_velocity);
+            MoveTankBody(tank2, (b2Vec2){tank2Action.linear_velocity[0], tank2Action.linear_velocity[1]});
+            break;
+    }    
 
     b2World_Step(worldId, TIME_STEP, SUB_STEPS);
 }
