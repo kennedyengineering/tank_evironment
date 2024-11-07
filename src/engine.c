@@ -17,6 +17,7 @@
 #define TANK_BODY_WIDTH  3.66f
 #define TANK_GUN_HEIGHT  5.805f
 #define TANK_GUN_WIDTH   0.20f
+#define TANK_TREAD_WIDTH 0.40f
 // TODO: add tank constants as definitions
 
 static bool initialized = false;
@@ -110,6 +111,20 @@ static Tank engineCreateTank(b2Vec2 position, float angle)
     
     b2Polygon bodyPolygon = b2MakeBox(TANK_BODY_HEIGHT, TANK_BODY_WIDTH);
     b2CreatePolygonShape(tank.bodyId, &bodyShapeDef, &bodyPolygon);
+
+    // Create the left tread shape
+    b2ShapeDef leftTreadShapeDef = b2DefaultShapeDef();
+    leftTreadShapeDef.customColor = b2_colorHotPink;
+
+    b2Polygon leftTreadPolygon = b2MakeOffsetBox(TANK_BODY_HEIGHT, TANK_TREAD_WIDTH, (b2Vec2){0, TANK_BODY_HEIGHT/2.0f}, 0);
+    b2CreatePolygonShape(tank.bodyId, &leftTreadShapeDef, &leftTreadPolygon);
+
+    // Create the right tread shape
+    b2ShapeDef rightTreadShapeDef = b2DefaultShapeDef();
+    rightTreadShapeDef.customColor = b2_colorHotPink;
+
+    b2Polygon rightTreadPolygon = b2MakeOffsetBox(TANK_BODY_HEIGHT, TANK_TREAD_WIDTH, (b2Vec2){0, -TANK_BODY_HEIGHT/2.0f}, 0);
+    b2CreatePolygonShape(tank.bodyId, &rightTreadShapeDef, &rightTreadPolygon);
 
     // Create the gun shape
     b2ShapeDef gunShapeDef = b2DefaultShapeDef();
