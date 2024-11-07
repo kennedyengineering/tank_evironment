@@ -51,6 +51,30 @@ static void RotateTankBody(Tank tank, float angular_velocity)
     return;
 }
 
+static void ForceTankTreads(Tank tank, float force_left, float force_right)
+{
+    // Apply force to tank treads
+    b2Vec2 leftTreadLocalPoint = {0, TANK_BODY_HEIGHT/2.0f};
+    b2Vec2 leftTreadLocalForce = {force_left, 0};
+
+    b2Vec2 leftTreadWorldPoint = b2Body_GetWorldPoint(tank.bodyId, leftTreadLocalPoint);
+    b2Vec2 leftTreadWorldForce = b2Body_GetWorldVector(tank.bodyId, leftTreadLocalForce);
+    b2Body_ApplyForce(tank.bodyId, leftTreadWorldForce, leftTreadWorldPoint, true);
+
+    // printf("left local point: %f %f, force: %fx %fy\n", leftTreadLocalPoint.x, leftTreadLocalPoint.y, leftTreadLocalForce.x, leftTreadLocalForce.y);
+    // printf("left world point: %f %f, force: %fx %fy\n", leftTreadWorldPoint.x, leftTreadWorldPoint.y, leftTreadWorldForce.x, leftTreadWorldForce.y);
+
+    b2Vec2 rightTreadLocalPoint = {0, -TANK_BODY_HEIGHT/2.0f};
+    b2Vec2 rightTreadLocalForce = {force_right, 0};
+
+    b2Vec2 rightTreadWorldPoint = b2Body_GetWorldPoint(tank.bodyId, rightTreadLocalPoint);
+    b2Vec2 rightTreadWorldForce = b2Body_GetWorldVector(tank.bodyId, rightTreadLocalForce);
+    b2Body_ApplyForce(tank.bodyId, rightTreadWorldForce, rightTreadWorldPoint, true);
+
+    // printf("right local point: %f %f, force: %fx %fy\n", rightTreadLocalPoint.x, rightTreadLocalPoint.y, rightTreadLocalForce.x, rightTreadLocalForce.y);
+    // printf("right world point: %f %f, force: %fx %fy\n", rightTreadWorldPoint.x, rightTreadWorldPoint.y, rightTreadWorldForce.x, rightTreadWorldForce.y);
+}
+
 static void MoveTankBody(Tank tank, b2Vec2 linear_velocity)
 {
     // Move tank to desired linear velocity
@@ -177,6 +201,9 @@ bool engineInit()
     // MoveTankBody(tank1, (b2Vec2){2.1, 0.0});
 
     // RotateTankBody(tank1, 2.0f);
+
+    // ForceTankTreads(tank1, 0.0f, 2000.0f);
+    // ForceTankTreads(tank2, 2000.0f, 2000.0f);
     
     initialized = true;
 
