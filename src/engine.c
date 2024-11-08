@@ -12,6 +12,9 @@
 #define ARENA_HEIGHT 48.8f   // football field (meters)
 #define ARENA_WIDTH  109.7f
 
+#define GROUND_FRICTION_COEF 0.3
+#define GRAVITY_ACCEL 9.8
+
 // TODO: refactor tank stuff into tank.h or something
 #define TANK_BODY_HEIGHT 7.93f   // m1-abrams (meters)
 #define TANK_BODY_WIDTH  3.66f
@@ -28,6 +31,7 @@ static b2DebugDraw debugDraw;
 typedef struct Tank
 {
     b2BodyId bodyId, gunId, leftTreadId, rightTreadId;
+    b2ShapeId leftTreadShapeId, rightTreadShapeId;
     b2JointId motorId;
 } Tank;
 
@@ -60,6 +64,25 @@ static void ForceTankTreads(Tank tank, float force_left, float force_right)
 
     b2Vec2 rightTreadWorldForce = b2Body_GetWorldVector(tank.bodyId, (b2Vec2){force_right, 0});
     b2Body_ApplyForceToCenter(tank.rightTreadId, rightTreadWorldForce, true);
+
+    // Apply friction force to tank treads
+    float mass = b2Body_GetMass(tank.bodyId) + b2Body_GetMass(tank.gunId) + b2Body_GetMass(tank.leftTreadId) + b2Body_GetMass(tank.rightTreadId);
+
+    float left_friction_coef = sqrtf(GROUND_FRICTION_COEF * b2Shape_GetFriction(tank.leftTreadShapeId));
+    float left_friction_force = left_friction_coef*mass*GRAVITY_ACCEL/2;    // divide by two because two treads share the load
+
+    b2Vec2 leftTreadWorldNormalizedLinearVelocity = b2Normalize(b2Body_GetLinearVelocity(tank.leftTreadId));
+    b2Vec2 leftTreadWorldFrictionForceVector = b2MulSV(left_friction_force, b2Neg(leftTreadWorldNormalizedLinearVelocity));
+
+    b2Body_ApplyForceToCenter(tank.leftTreadId, leftTreadWorldFrictionForceVector, true);
+
+    float right_friction_coef = sqrtf(GROUND_FRICTION_COEF * b2Shape_GetFriction(tank.rightTreadShapeId));
+    float right_friction_force = right_friction_coef*mass*GRAVITY_ACCEL/2;  // divide by two because two treads share the load
+
+    b2Vec2 rightTreadWorldNormalizedLinearVelocity = b2Normalize(b2Body_GetLinearVelocity(tank.rightTreadId));
+    b2Vec2 rightTreadWorldFrictionForceVector = b2MulSV(right_friction_force, b2Neg(rightTreadWorldNormalizedLinearVelocity));
+
+    b2Body_ApplyForceToCenter(tank.rightTreadId, rightTreadWorldFrictionForceVector, true);
 }
 
 static void MoveTankBody(Tank tank, b2Vec2 linear_velocity)
@@ -131,7 +154,7 @@ static Tank engineCreateTank(b2Vec2 position, float angle)
     leftTreadShapeDef.customColor = b2_colorHotPink;
 
     b2Polygon leftTreadPolygon = b2MakeOffsetBox(TANK_BODY_HEIGHT, TANK_TREAD_WIDTH, (b2Vec2){0, TANK_BODY_HEIGHT/2.0f}, 0);
-    b2CreatePolygonShape(tank.leftTreadId, &leftTreadShapeDef, &leftTreadPolygon);
+    tank.leftTreadShapeId = b2CreatePolygonShape(tank.leftTreadId, &leftTreadShapeDef, &leftTreadPolygon);
 
     b2WeldJointDef leftTreadJointDef = b2DefaultWeldJointDef();
     leftTreadJointDef.bodyIdA = tank.bodyId;
@@ -143,7 +166,7 @@ static Tank engineCreateTank(b2Vec2 position, float angle)
     rightTreadShapeDef.customColor = b2_colorHotPink;
 
     b2Polygon rightTreadPolygon = b2MakeOffsetBox(TANK_BODY_HEIGHT, TANK_TREAD_WIDTH, (b2Vec2){0, -TANK_BODY_HEIGHT/2.0f}, 0);
-    b2CreatePolygonShape(tank.rightTreadId, &rightTreadShapeDef, &rightTreadPolygon);
+    tank.rightTreadShapeId = b2CreatePolygonShape(tank.rightTreadId, &rightTreadShapeDef, &rightTreadPolygon);
 
     b2WeldJointDef rightTreadJointDef = b2DefaultWeldJointDef();
     rightTreadJointDef.bodyIdA = tank.bodyId;
