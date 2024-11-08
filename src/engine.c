@@ -242,7 +242,7 @@ bool engineInit()
     debugDraw.drawShapes = true;
     debugDraw.DrawSolidPolygon = &DrawSolidPolygon;
 
-    // TODO: create world boundaries
+    // TODO: create world boundaries using edgeShape
 
     // Create tanks
     tank1 = engineCreateTank((b2Vec2){0.0f, 0.0f}, 0.0f);
@@ -258,7 +258,8 @@ bool engineInit()
     // ForceTankTreads(tank1, 0.0f, 2000.0f);
     // ForceTankTreads(tank2, 2000.0f, 2000.0f);
 
-    FireTankGun(tank2);
+    // FireTankGun(tank1);
+    // FireTankGun(tank2);
     
     initialized = true;
 
@@ -287,6 +288,9 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
             break;
     };
 
+    if (tank1Action.fire_gun)
+        FireTankGun(tank1);
+
     switch (tank2Action.control_mode)
     {
         case MODE_FORCE_TREAD:
@@ -296,7 +300,10 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
             RotateTankBody(tank2, tank2Action.angular_velocity);
             MoveTankBody(tank2, (b2Vec2){tank2Action.linear_velocity[0], tank2Action.linear_velocity[1]});
             break;
-    }    
+    };
+
+    if (tank2Action.fire_gun)
+        FireTankGun(tank2);
 
     b2World_Step(worldId, TIME_STEP, SUB_STEPS);
 }

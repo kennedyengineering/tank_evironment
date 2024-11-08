@@ -138,6 +138,21 @@ void processInput(GLFWwindow *window)
     if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
         t1a.gun_angle -= TANK_GUN_ANGLE_INCREMENT;
 
+    static bool t1_fired = false;
+    if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        if (!t1_fired)
+        {
+            t1a.fire_gun = true;
+            t1_fired = true;
+        }
+        else
+            t1a.fire_gun = false;
+    if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE)
+    {
+        t1a.fire_gun = false;
+        t1_fired = false;
+    }
+
     // Tank 2 velocity controls
     t2a.control_mode = MODE_LIN_ROT_VELOCITY;
 

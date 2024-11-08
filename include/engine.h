@@ -13,6 +13,7 @@ typedef enum
 typedef struct TankAction
 {
     float gun_angle;
+    bool fire_gun;
     float angular_velocity;
     float linear_velocity[2];
     float tread_force[2];
