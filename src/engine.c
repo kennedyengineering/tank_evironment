@@ -15,6 +15,8 @@
 #define GROUND_FRICTION_COEF 0.3
 #define GRAVITY_ACCEL 9.8
 
+#define GUN_VELOCITY 15.0f
+
 // TODO: refactor tank stuff into tank.h or something
 #define TANK_BODY_HEIGHT 7.93f   // m1-abrams (meters)
 #define TANK_BODY_WIDTH  3.66f
@@ -86,6 +88,27 @@ static void ForceTankTreads(Tank tank, float force_left, float force_right)
 
     // TODO: make movement less slide-y and more wheel-like. Maybe decrease friction in local X axis of tread, and increase in Y axis? or just decrease in X axis due to rolly-ness?
     // TODO: use kinetic and static friction coefficients?
+}
+
+static void FireTankGun(Tank tank)
+{
+    // Launch a projectile
+    // TODO: make projectile delete itself
+
+    // Create body
+    b2BodyDef projectileBodyDef = b2DefaultBodyDef();
+    projectileBodyDef.type = b2_dynamicBody;
+    projectileBodyDef.position = b2Body_GetPosition(tank.gunId);
+    projectileBodyDef.rotation = b2Body_GetRotation(tank.gunId);
+    projectileBodyDef.linearVelocity = b2Body_GetWorldVector(tank.gunId, (b2Vec2){GUN_VELOCITY, 0.0f});
+    b2BodyId projectileBodyId = b2CreateBody(worldId, &projectileBodyDef);
+
+    // Create shape
+    b2ShapeDef projectileShapeDef = b2DefaultShapeDef();
+    projectileShapeDef.customColor = b2_colorGray;
+
+    b2Polygon projectilePolygon = b2MakeOffsetBox(TANK_GUN_WIDTH, TANK_GUN_WIDTH, (b2Vec2){TANK_GUN_HEIGHT*2+TANK_GUN_WIDTH, 0}, 0);
+    b2CreatePolygonShape(projectileBodyId, &projectileShapeDef, &projectilePolygon);
 }
 
 static void MoveTankBody(Tank tank, b2Vec2 linear_velocity)
@@ -217,6 +240,8 @@ bool engineInit()
     debugDraw.drawShapes = true;
     debugDraw.DrawSolidPolygon = &DrawSolidPolygon;
 
+    // TODO: create world boundaries
+
     // Create tanks
     tank1 = engineCreateTank((b2Vec2){0.0f, 0.0f}, 0.0f);
     tank2 = engineCreateTank((b2Vec2){50.0f, 0.0f}, M_PI/4);
@@ -230,6 +255,8 @@ bool engineInit()
 
     // ForceTankTreads(tank1, 0.0f, 2000.0f);
     // ForceTankTreads(tank2, 2000.0f, 2000.0f);
+
+    FireTankGun(tank2);
     
     initialized = true;
 
