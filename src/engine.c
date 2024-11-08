@@ -27,7 +27,7 @@ static b2DebugDraw debugDraw;
 
 typedef struct Tank
 {
-    b2BodyId bodyId, gunId;
+    b2BodyId bodyId, gunId, leftTreadId, rightTreadId;
     b2JointId motorId;
 } Tank;
 
@@ -128,6 +128,8 @@ static Tank engineCreateTank(b2Vec2 position, float angle)
     bodyDef.rotation = b2MakeRot(angle);
     tank.bodyId = b2CreateBody(worldId, &bodyDef);
     tank.gunId = b2CreateBody(worldId, &bodyDef);
+    tank.leftTreadId = b2CreateBody(worldId, &bodyDef);
+    tank.rightTreadId = b2CreateBody(worldId, &bodyDef);
 
     // Create the body shape
     b2ShapeDef bodyShapeDef = b2DefaultShapeDef();
@@ -141,14 +143,24 @@ static Tank engineCreateTank(b2Vec2 position, float angle)
     leftTreadShapeDef.customColor = b2_colorHotPink;
 
     b2Polygon leftTreadPolygon = b2MakeOffsetBox(TANK_BODY_HEIGHT, TANK_TREAD_WIDTH, (b2Vec2){0, TANK_BODY_HEIGHT/2.0f}, 0);
-    b2CreatePolygonShape(tank.bodyId, &leftTreadShapeDef, &leftTreadPolygon);
+    b2CreatePolygonShape(tank.leftTreadId, &leftTreadShapeDef, &leftTreadPolygon);
+
+    b2WeldJointDef leftTreadJointDef = b2DefaultWeldJointDef();
+    leftTreadJointDef.bodyIdA = tank.bodyId;
+    leftTreadJointDef.bodyIdB = tank.leftTreadId;
+    b2CreateWeldJoint(worldId, &leftTreadJointDef);
 
     // Create the right tread shape
     b2ShapeDef rightTreadShapeDef = b2DefaultShapeDef();
     rightTreadShapeDef.customColor = b2_colorHotPink;
 
     b2Polygon rightTreadPolygon = b2MakeOffsetBox(TANK_BODY_HEIGHT, TANK_TREAD_WIDTH, (b2Vec2){0, -TANK_BODY_HEIGHT/2.0f}, 0);
-    b2CreatePolygonShape(tank.bodyId, &rightTreadShapeDef, &rightTreadPolygon);
+    b2CreatePolygonShape(tank.rightTreadId, &rightTreadShapeDef, &rightTreadPolygon);
+
+    b2WeldJointDef rightTreadJointDef = b2DefaultWeldJointDef();
+    rightTreadJointDef.bodyIdA = tank.bodyId;
+    rightTreadJointDef.bodyIdB = tank.rightTreadId;
+    b2CreateWeldJoint(worldId, &rightTreadJointDef);
 
     // Create the gun shape
     b2ShapeDef gunShapeDef = b2DefaultShapeDef();
