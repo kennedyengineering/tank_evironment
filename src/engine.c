@@ -41,7 +41,8 @@ static void RotateTankGun(Tank tank, float angle)
 
 static void RotateTankBody(Tank tank, float angular_velocity)
 {
-    // Rotate tank to desired angular velocity;
+    // Rotate tank to desired angular velocity
+    // TODO: see how tank tread bodies affect rotational_inertia
     float rotational_inertia = b2Body_GetMassData(tank.bodyId).rotationalInertia + b2Body_GetMassData(tank.gunId).rotationalInertia;
     float current_angular_velocity = b2Body_GetAngularVelocity(tank.bodyId);
     float impulse = rotational_inertia * (angular_velocity - current_angular_velocity);
@@ -64,6 +65,7 @@ static void ForceTankTreads(Tank tank, float force_left, float force_right)
 static void MoveTankBody(Tank tank, b2Vec2 linear_velocity)
 {
     // Move tank to desired linear velocity
+    // TODO: see how tank tread bodies affect mass
     float mass = b2Body_GetMass(tank.bodyId) + b2Body_GetMass(tank.gunId);
     b2Vec2 current_linear_velocity = b2Body_GetLinearVelocity(tank.bodyId);
     b2Vec2 impulse = {
