@@ -17,6 +17,8 @@
 
 #define GUN_VELOCITY 15.0f
 
+#define LIDAR_POINTS 360
+
 // TODO: refactor tank stuff into tank.h or something
 #define TANK_BODY_HEIGHT 7.93f   // m1-abrams (meters)
 #define TANK_BODY_WIDTH  3.66f
@@ -111,6 +113,34 @@ static void FireTankGun(Tank tank)
     b2CreatePolygonShape(projectileBodyId, &projectileShapeDef, &projectilePolygon);
 
     // TODO: spawn projectile inside gun (no collision between projectile and gun -- would need to differentiate between my projectile and their projectile...)? or just keep it outside?
+}
+ 
+static float RayCastCallback(b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float fraction, void* context)
+{
+    *(b2Vec2*)context = point;
+    return fraction;
+}
+
+static void ScanTankLidar(Tank tank)
+{
+    // Update tank lidar information
+    // https://box2d.org/documentation/md_simulation.html#autotoc_md115
+
+    // Perform raycast
+    b2Vec2 origin = {0.0f, 0.0f};
+    b2Vec2 end = {ARENA_WIDTH, 0.0f};
+    b2Vec2 translation = b2Sub(end, origin);
+    b2Vec2 point = {0};
+    b2QueryFilter viewFilter = {.categoryBits=0xFFFFFFFF, .maskBits=0xFFFFFFFF};
+    b2World_CastRay(worldId, origin, translation, viewFilter, RayCastCallback, &point);
+
+    // Render lidar point
+    GLfloat center[2] = {point.x / ARENA_WIDTH, point.y / ARENA_HEIGHT};
+    printf("ORIG %f %f\n", point.x, point.y);
+    printf("GL %f %f\n", center[0], center[1]);
+    GLfloat radius = 0.01f;
+    GLfloat color[3] = {1.0f, 0.0f, 0.0f};
+    renderCircle(center, radius, color);
 }
 
 static void MoveTankBody(Tank tank, b2Vec2 linear_velocity)
@@ -309,6 +339,8 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
     if (tank1Action.fire_gun)
         FireTankGun(tank1);
 
+    // ScanTankLidar(tank1);
+
     switch (tank2Action.control_mode)
     {
         case MODE_FORCE_TREAD:
@@ -323,6 +355,8 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
     if (tank2Action.fire_gun)
         FireTankGun(tank2);
 
+    // ScanTankLidar(tank2);
+
     b2World_Step(worldId, TIME_STEP, SUB_STEPS);
 }
 
@@ -333,6 +367,8 @@ void engineRender()
         return;
     
     b2World_Draw(worldId, &debugDraw);
+
+    ScanTankLidar(tank1);   // TODO: create separate method to render lidar data points
 }
 
 void engineDestroy()
