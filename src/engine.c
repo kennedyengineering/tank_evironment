@@ -109,6 +109,8 @@ static void FireTankGun(Tank tank)
 
     b2Polygon projectilePolygon = b2MakeOffsetBox(TANK_GUN_WIDTH, TANK_GUN_WIDTH, (b2Vec2){TANK_GUN_HEIGHT*2+TANK_GUN_WIDTH, 0}, 0);
     b2CreatePolygonShape(projectileBodyId, &projectileShapeDef, &projectilePolygon);
+
+    // TODO: spawn projectile inside gun (no collision between projectile and gun -- would need to differentiate between my projectile and their projectile...)? or just keep it outside?
 }
 
 static void MoveTankBody(Tank tank, b2Vec2 linear_velocity)
