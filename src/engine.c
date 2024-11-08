@@ -127,8 +127,9 @@ static void ScanTankLidar(Tank tank)
     // https://box2d.org/documentation/md_simulation.html#autotoc_md115
 
     // Perform raycast
-    b2Vec2 origin = {0.0f, 0.0f};
-    b2Vec2 end = {ARENA_WIDTH, 0.0f};
+    b2Vec2 bodyPosition = b2Body_GetPosition(tank.bodyId);
+    b2Vec2 origin = b2Add(bodyPosition, (b2Vec2){TANK_GUN_HEIGHT*2, 0});
+    b2Vec2 end = {ARENA_WIDTH, bodyPosition.y};
     b2Vec2 translation = b2Sub(end, origin);
     b2Vec2 point = {0};
     b2QueryFilter viewFilter = {.categoryBits=0xFFFFFFFF, .maskBits=0xFFFFFFFF};
