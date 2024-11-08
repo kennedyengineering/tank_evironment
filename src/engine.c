@@ -85,6 +85,7 @@ static void ForceTankTreads(Tank tank, float force_left, float force_right)
     b2Body_ApplyForceToCenter(tank.rightTreadId, rightTreadWorldFrictionForceVector, true);
 
     // TODO: make movement less slide-y and more wheel-like. Maybe decrease friction in local X axis of tread, and increase in Y axis? or just decrease in X axis due to rolly-ness?
+    // TODO: use kinetic and static friction coefficients?
 }
 
 static void MoveTankBody(Tank tank, b2Vec2 linear_velocity)
