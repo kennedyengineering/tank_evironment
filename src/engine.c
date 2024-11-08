@@ -9,8 +9,8 @@
 #define TIME_STEP   1.0f / 60.0f
 #define SUB_STEPS   4.0f
 
-#define ARENA_HEIGHT 48.8f   // football field (meters)
-#define ARENA_WIDTH  109.7f
+#define ARENA_WIDTH  100    // maintain aspect ratio of screen (meters)
+#define ARENA_HEIGHT 75
 
 #define GROUND_FRICTION_COEF 0.3
 #define GRAVITY_ACCEL 9.8
@@ -242,7 +242,25 @@ bool engineInit()
     debugDraw.drawShapes = true;
     debugDraw.DrawSolidPolygon = &DrawSolidPolygon;
 
-    // TODO: create world boundaries using edgeShape
+    // Create boundaries
+    b2BodyDef boundaryBodyDef = b2DefaultBodyDef();
+    boundaryBodyDef.type = b2_staticBody;
+    b2BodyId boundaryBodyId = b2CreateBody(worldId, &boundaryBodyDef);
+
+    b2ShapeDef boundaryShapeDef = b2DefaultShapeDef();
+    b2Polygon projectilePolygon;
+
+    projectilePolygon = b2MakeOffsetBox(0, ARENA_HEIGHT, (b2Vec2){-ARENA_WIDTH, 0}, 0); // left wall
+    b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &projectilePolygon);
+
+    projectilePolygon = b2MakeOffsetBox(0, ARENA_HEIGHT, (b2Vec2){ARENA_WIDTH, 0}, 0);  // right wall
+    b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &projectilePolygon);
+
+    projectilePolygon = b2MakeOffsetBox(ARENA_WIDTH, 0, (b2Vec2){0, ARENA_HEIGHT}, 0);  // top wall
+    b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &projectilePolygon);
+
+    projectilePolygon = b2MakeOffsetBox(ARENA_WIDTH, 0, (b2Vec2){0, -ARENA_HEIGHT}, 0);  // bottom wall
+    b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &projectilePolygon);
 
     // Create tanks
     tank1 = engineCreateTank((b2Vec2){0.0f, 0.0f}, 0.0f);
