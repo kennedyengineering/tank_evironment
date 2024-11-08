@@ -138,6 +138,7 @@ void processInput(GLFWwindow *window)
     if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
         t1a.gun_angle -= TANK_GUN_ANGLE_INCREMENT;
 
+    // Tank 1 gun firing controls
     static bool t1_fired = false;
     if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
         if (!t1_fired)
@@ -178,4 +179,20 @@ void processInput(GLFWwindow *window)
         t2a.gun_angle += TANK_GUN_ANGLE_INCREMENT;
     if(glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
         t2a.gun_angle -= TANK_GUN_ANGLE_INCREMENT;
+
+    // Tank 2 gun firing controls
+    static bool t2_fired = false;
+    if(glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS)
+        if (!t2_fired)
+        {
+            t2a.fire_gun = true;
+            t2_fired = true;
+        }
+        else
+            t2a.fire_gun = false;
+    if(glfwGetKey(window, GLFW_KEY_B) == GLFW_RELEASE)
+    {
+        t2a.fire_gun = false;
+        t2_fired = false;
+    }
 }
