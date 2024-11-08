@@ -126,6 +126,9 @@ static void ScanTankLidar(Tank tank)
     // Update tank lidar information
     // https://box2d.org/documentation/md_simulation.html#autotoc_md115
 
+    // TODO: create LIDAR_POINTS number of casts
+    // TODO: make scans relative to orientation of tank
+
     // Perform raycast
     b2Vec2 bodyPosition = b2Body_GetPosition(tank.bodyId);
     b2Vec2 origin = b2Add(bodyPosition, (b2Vec2){TANK_GUN_HEIGHT*2, 0});
