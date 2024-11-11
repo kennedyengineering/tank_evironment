@@ -150,23 +150,6 @@ static void ScanTankLidar(Tank *tank)
     }
 }
 
-static void RenderTankLidar(Tank tank)
-{
-    // Rander tank lidar scan memory buffer 
-
-    for (size_t cast_num = 0; cast_num < LIDAR_POINTS; cast_num++)
-    {
-        // Retrieve lidar point
-        b2Vec2 point = tank.lidarPoints[cast_num];
-
-         // Render lidar point
-        GLfloat center[2] = {point.x / ARENA_WIDTH, point.y / ARENA_HEIGHT};
-        GLfloat radius = 0.01f;
-        GLfloat color[3] = {1.0f, 0.0f, 0.0f};
-        renderCircle(center, radius, color);
-    }
-}
-
 static void MoveTankBody(Tank tank, b2Vec2 linear_velocity)
 {
     // Move tank to desired linear velocity
@@ -208,6 +191,24 @@ static void DrawSolidPolygon (b2Transform transform, const b2Vec2* vertices, int
     RGBf colorf = MakeRGBf(color);
 
     renderPolygon(gl_vertices, vertexCount, (float[]){colorf.r, colorf.g, colorf.b});
+}
+
+static void RenderTankLidar(Tank tank, b2HexColor color)
+{
+    // Rander tank lidar scan memory buffer 
+
+    RGBf colorf = MakeRGBf(color);
+    GLfloat radius = 0.01f;
+
+    for (size_t cast_num = 0; cast_num < LIDAR_POINTS; cast_num++)
+    {
+        // Retrieve lidar point
+        b2Vec2 point = tank.lidarPoints[cast_num];
+
+         // Render lidar point
+        GLfloat center[2] = {point.x / ARENA_WIDTH, point.y / ARENA_HEIGHT};
+        renderCircle(center, radius, (float[]){colorf.r, colorf.g, colorf.b});
+    }
 }
 
 static Tank engineCreateTank(b2Vec2 position, float angle)
@@ -346,8 +347,8 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
 
     // TODO: remove code duplication by creating a helper method
 
+    // Tank 1 controls
     RotateTankGun(tank1, tank1Action.gun_angle);
-    RotateTankGun(tank2, tank2Action.gun_angle);
 
     switch (tank1Action.control_mode)
     {
@@ -365,6 +366,9 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
 
     ScanTankLidar(&tank1);
 
+    // Tank 2 controls
+    RotateTankGun(tank2, tank2Action.gun_angle);
+
     switch (tank2Action.control_mode)
     {
         case MODE_FORCE_TREAD:
@@ -379,8 +383,9 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
     if (tank2Action.fire_gun)
         FireTankGun(tank2);
 
-    // ScanTankLidar(tank2);
+    ScanTankLidar(&tank2);
 
+    // Step physics engine
     b2World_Step(worldId, TIME_STEP, SUB_STEPS);
 }
 
@@ -392,7 +397,8 @@ void engineRender()
     
     b2World_Draw(worldId, &debugDraw);
 
-    RenderTankLidar(tank1);
+    RenderTankLidar(tank1, b2_colorMediumBlue); // TODO: put color choice in tank struct?
+    RenderTankLidar(tank2, b2_colorOrange);
 }
 
 void engineDestroy()
