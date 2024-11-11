@@ -37,6 +37,7 @@ typedef struct Tank
     b2BodyId bodyId, gunId, leftTreadId, rightTreadId;
     b2ShapeId leftTreadShapeId, rightTreadShapeId;
     b2JointId motorId;
+    b2Vec2 lidarPoints[LIDAR_POINTS];
 } Tank;
 
 static Tank tank1, tank2;
@@ -121,10 +122,12 @@ static float RayCastCallback(b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, flo
     return fraction;
 }
 
-static void ScanTankLidar(Tank tank)
+static void ScanTankLidar(Tank *tank)
 {
     // Update tank lidar information
     // https://box2d.org/documentation/md_simulation.html#autotoc_md115
+
+    // TODO: make ray start within tank
 
     for (size_t cast_num = 0; cast_num < LIDAR_POINTS; cast_num++)
     {
@@ -134,15 +137,29 @@ static void ScanTankLidar(Tank tank)
         b2Rot rot = b2MakeRot(angle);
 
         // Perform ray-cast
-        b2Vec2 start = b2Body_GetWorldPoint(tank.bodyId, b2RotateVector(rot, (b2Vec2){TANK_GUN_HEIGHT*2, 0}));
-        b2Vec2 end = b2Body_GetWorldPoint(tank.bodyId, b2RotateVector(rot, (b2Vec2){ARENA_WIDTH*2, 0}));
+        b2Vec2 start = b2Body_GetWorldPoint(tank->bodyId, b2RotateVector(rot, (b2Vec2){TANK_GUN_HEIGHT*2, 0}));
+        b2Vec2 end = b2Body_GetWorldPoint(tank->bodyId, b2RotateVector(rot, (b2Vec2){ARENA_WIDTH*2, 0}));
         b2Vec2 translation = b2Sub(end, start);
 
         b2Vec2 point = {0};
         b2QueryFilter viewFilter = {.categoryBits=0xFFFFFFFF, .maskBits=0xFFFFFFFF};
         b2World_CastRay(worldId, start, translation, viewFilter, RayCastCallback, &point);
 
-        // Render lidar point
+        // Update tank memory
+        tank->lidarPoints[cast_num] = point;
+    }
+}
+
+static void RenderTankLidar(Tank tank)
+{
+    // Rander tank lidar scan memory buffer 
+
+    for (size_t cast_num = 0; cast_num < LIDAR_POINTS; cast_num++)
+    {
+        // Retrieve lidar point
+        b2Vec2 point = tank.lidarPoints[cast_num];
+
+         // Render lidar point
         GLfloat center[2] = {point.x / ARENA_WIDTH, point.y / ARENA_HEIGHT};
         GLfloat radius = 0.01f;
         GLfloat color[3] = {1.0f, 0.0f, 0.0f};
@@ -196,7 +213,7 @@ static void DrawSolidPolygon (b2Transform transform, const b2Vec2* vertices, int
 static Tank engineCreateTank(b2Vec2 position, float angle)
 {
     // Create a tank
-    Tank tank;
+    Tank tank = {0};
 
     b2BodyDef bodyDef = b2DefaultBodyDef();
     bodyDef.type = b2_dynamicBody;
@@ -346,7 +363,7 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
     if (tank1Action.fire_gun)
         FireTankGun(tank1);
 
-    // ScanTankLidar(tank1);
+    ScanTankLidar(&tank1);
 
     switch (tank2Action.control_mode)
     {
@@ -375,7 +392,7 @@ void engineRender()
     
     b2World_Draw(worldId, &debugDraw);
 
-    ScanTankLidar(tank1);   // TODO: create separate method to render lidar data points
+    RenderTankLidar(tank1);
 }
 
 void engineDestroy()
