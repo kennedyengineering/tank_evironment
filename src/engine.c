@@ -126,25 +126,28 @@ static void ScanTankLidar(Tank tank)
     // Update tank lidar information
     // https://box2d.org/documentation/md_simulation.html#autotoc_md115
 
-    // TODO: create LIDAR_POINTS number of casts
-    // TODO: make scans relative to orientation of tank
+    for (size_t cast_num = 0; cast_num < LIDAR_POINTS; cast_num++)
+    {
+        // Compute angle
+        float d_angle = 2*b2_pi/LIDAR_POINTS;
+        float angle = d_angle*cast_num;
+        b2Rot rot = b2MakeRot(angle);
 
-    // Perform raycast
-    b2Vec2 bodyPosition = b2Body_GetPosition(tank.bodyId);
-    b2Vec2 origin = b2Add(bodyPosition, (b2Vec2){TANK_GUN_HEIGHT*2, 0});
-    b2Vec2 end = {ARENA_WIDTH, bodyPosition.y};
-    b2Vec2 translation = b2Sub(end, origin);
-    b2Vec2 point = {0};
-    b2QueryFilter viewFilter = {.categoryBits=0xFFFFFFFF, .maskBits=0xFFFFFFFF};
-    b2World_CastRay(worldId, origin, translation, viewFilter, RayCastCallback, &point);
+        // Perform ray-cast
+        b2Vec2 start = b2Body_GetWorldPoint(tank.bodyId, b2RotateVector(rot, (b2Vec2){TANK_GUN_HEIGHT*2, 0}));
+        b2Vec2 end = b2Body_GetWorldPoint(tank.bodyId, b2RotateVector(rot, (b2Vec2){ARENA_WIDTH*2, 0}));
+        b2Vec2 translation = b2Sub(end, start);
 
-    // Render lidar point
-    GLfloat center[2] = {point.x / ARENA_WIDTH, point.y / ARENA_HEIGHT};
-    printf("ORIG %f %f\n", point.x, point.y);
-    printf("GL %f %f\n", center[0], center[1]);
-    GLfloat radius = 0.01f;
-    GLfloat color[3] = {1.0f, 0.0f, 0.0f};
-    renderCircle(center, radius, color);
+        b2Vec2 point = {0};
+        b2QueryFilter viewFilter = {.categoryBits=0xFFFFFFFF, .maskBits=0xFFFFFFFF};
+        b2World_CastRay(worldId, start, translation, viewFilter, RayCastCallback, &point);
+
+        // Render lidar point
+        GLfloat center[2] = {point.x / ARENA_WIDTH, point.y / ARENA_HEIGHT};
+        GLfloat radius = 0.01f;
+        GLfloat color[3] = {1.0f, 0.0f, 0.0f};
+        renderCircle(center, radius, color);
+    }
 }
 
 static void MoveTankBody(Tank tank, b2Vec2 linear_velocity)
@@ -298,7 +301,7 @@ bool engineInit()
 
     // Create tanks
     tank1 = engineCreateTank((b2Vec2){0.0f, 0.0f}, 0.0f);
-    tank2 = engineCreateTank((b2Vec2){50.0f, 0.0f}, M_PI/4);
+    tank2 = engineCreateTank((b2Vec2){50.0f, 0.0f}, b2_pi/4);
 
     // RotateTankGun(tank1, 1.0f);
     // RotateTankGun(tank2, -1.0f);
