@@ -140,7 +140,7 @@ static void ScanTankLidar(Tank *tank)
 
         // Perform ray-cast
         b2Vec2 start = b2Body_GetWorldPoint(tank->bodyId, b2RotateVector(rot, (b2Vec2){TANK_GUN_HEIGHT*2, 0}));
-        b2Vec2 end = b2Body_GetWorldPoint(tank->bodyId, b2RotateVector(rot, (b2Vec2){ARENA_WIDTH*2, 0}));
+        b2Vec2 end = b2Body_GetWorldPoint(tank->bodyId, b2RotateVector(rot, (b2Vec2){ARENA_WIDTH*ARENA_HEIGHT, 0}));
         b2Vec2 translation = b2Sub(end, start);
 
         b2Vec2 point = {0};
