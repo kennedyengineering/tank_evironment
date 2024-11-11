@@ -6,6 +6,8 @@
 #include <box2d/box2d.h>
 #include <stdio.h>
 
+// TODO: figure out how to return a rendered frame to python (as a type of observation, or to just let python handle window management)
+
 #define TIME_STEP   1.0f / 60.0f
 #define SUB_STEPS   4.0f
 
