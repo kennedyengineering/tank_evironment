@@ -29,13 +29,13 @@
 #define TANK_TREAD_WIDTH 0.40f
 // TODO: add tank constants as definitions
 
-enum EntityCategories
+typedef enum 
 {
     PROJECTILE = 0x00000008,
     WALL       = 0x00000004,
     TANK1      = 0x00000002,
     TANK2      = 0x00000001,
-};
+} entityCategoryBits;
 
 static bool initialized = false;
 
@@ -223,7 +223,7 @@ static void RenderTankLidar(Tank tank, b2HexColor color)
     }
 }
 
-static Tank engineCreateTank(b2Vec2 position, float angle, uint32_t categoryBits)
+static Tank engineCreateTank(b2Vec2 position, float angle, entityCategoryBits categoryBits)
 {
     // Create a tank
     Tank tank = {0};
