@@ -29,6 +29,12 @@
 #define TANK_TREAD_WIDTH 0.40f
 // TODO: add tank constants as definitions
 
+// TODO: convert into uint32_t enum, or a datatype or something. make it so you don't have to (uint32_t) cast everytime you use it.
+#define CATEGORY_PROJECTILE 0b1000
+#define CATEGORY_WALL       0b0100
+#define CATEGORY_TANK1      0b0010
+#define CATEGORY_TANK2      0b0001
+
 static bool initialized = false;
 
 static b2WorldId worldId;
@@ -40,6 +46,7 @@ typedef struct Tank
     b2ShapeId leftTreadShapeId, rightTreadShapeId;
     b2JointId motorId;
     b2Vec2 lidarPoints[LIDAR_POINTS];
+    uint32_t categoryBits;
 } Tank;
 
 static Tank tank1, tank2;
@@ -111,6 +118,7 @@ static void FireTankGun(Tank tank)
     // Create shape
     b2ShapeDef projectileShapeDef = b2DefaultShapeDef();
     projectileShapeDef.customColor = b2_colorGray;
+    projectileShapeDef.filter.categoryBits = (uint32_t)CATEGORY_PROJECTILE;
 
     b2Polygon projectilePolygon = b2MakeOffsetBox(TANK_GUN_WIDTH, TANK_GUN_WIDTH, (b2Vec2){TANK_GUN_HEIGHT*2+TANK_GUN_WIDTH, 0}, 0);
     b2CreatePolygonShape(projectileBodyId, &projectileShapeDef, &projectilePolygon);
@@ -129,8 +137,6 @@ static void ScanTankLidar(Tank *tank)
     // Update tank lidar information
     // https://box2d.org/documentation/md_simulation.html#autotoc_md115
 
-    // TODO: make ray start within tank
-
     for (size_t cast_num = 0; cast_num < LIDAR_POINTS; cast_num++)
     {
         // Compute angle
@@ -139,12 +145,14 @@ static void ScanTankLidar(Tank *tank)
         b2Rot rot = b2MakeRot(angle);
 
         // Perform ray-cast
-        b2Vec2 start = b2Body_GetWorldPoint(tank->bodyId, b2RotateVector(rot, (b2Vec2){TANK_GUN_HEIGHT*2, 0}));
+        b2Vec2 start = b2Body_GetPosition(tank->bodyId);
         b2Vec2 end = b2Body_GetWorldPoint(tank->bodyId, b2RotateVector(rot, (b2Vec2){ARENA_WIDTH*ARENA_HEIGHT, 0}));
         b2Vec2 translation = b2Sub(end, start);
 
         b2Vec2 point = {0};
-        b2QueryFilter viewFilter = {.categoryBits=0xFFFFFFFF, .maskBits=0xFFFFFFFF};
+        // TODO: clean up this long statement
+        uint32_t maskBits = (uint32_t) CATEGORY_PROJECTILE | (uint32_t)CATEGORY_WALL | (tank->categoryBits == (uint32_t)CATEGORY_TANK1 ? (uint32_t)CATEGORY_TANK2 : (uint32_t)CATEGORY_TANK1);
+        b2QueryFilter viewFilter = {.categoryBits=0xFFFFFFFF, .maskBits=maskBits}; // CATAGORY_WALL | CATAGORY_TANK2
         b2World_CastRay(worldId, start, translation, viewFilter, RayCastCallback, &point);
 
         // Update tank memory
@@ -213,10 +221,12 @@ static void RenderTankLidar(Tank tank, b2HexColor color)
     }
 }
 
-static Tank engineCreateTank(b2Vec2 position, float angle)
+static Tank engineCreateTank(b2Vec2 position, float angle, uint32_t categoryBits)
 {
     // Create a tank
     Tank tank = {0};
+
+    tank.categoryBits = categoryBits;
 
     b2BodyDef bodyDef = b2DefaultBodyDef();
     bodyDef.type = b2_dynamicBody;
@@ -230,6 +240,7 @@ static Tank engineCreateTank(b2Vec2 position, float angle)
     // Create the body shape
     b2ShapeDef bodyShapeDef = b2DefaultShapeDef();
     bodyShapeDef.customColor = b2_colorGreenYellow;
+    bodyShapeDef.filter.categoryBits = categoryBits;
     
     b2Polygon bodyPolygon = b2MakeBox(TANK_BODY_HEIGHT, TANK_BODY_WIDTH);
     b2CreatePolygonShape(tank.bodyId, &bodyShapeDef, &bodyPolygon);
@@ -237,6 +248,7 @@ static Tank engineCreateTank(b2Vec2 position, float angle)
     // Create the left tread shape
     b2ShapeDef leftTreadShapeDef = b2DefaultShapeDef();
     leftTreadShapeDef.customColor = b2_colorHotPink;
+    leftTreadShapeDef.filter.categoryBits = categoryBits;
 
     b2Polygon leftTreadPolygon = b2MakeOffsetBox(TANK_BODY_HEIGHT, TANK_TREAD_WIDTH, (b2Vec2){0, TANK_BODY_HEIGHT/2.0f}, 0);
     tank.leftTreadShapeId = b2CreatePolygonShape(tank.leftTreadId, &leftTreadShapeDef, &leftTreadPolygon);
@@ -249,6 +261,7 @@ static Tank engineCreateTank(b2Vec2 position, float angle)
     // Create the right tread shape
     b2ShapeDef rightTreadShapeDef = b2DefaultShapeDef();
     rightTreadShapeDef.customColor = b2_colorHotPink;
+    rightTreadShapeDef.filter.categoryBits = categoryBits;
 
     b2Polygon rightTreadPolygon = b2MakeOffsetBox(TANK_BODY_HEIGHT, TANK_TREAD_WIDTH, (b2Vec2){0, -TANK_BODY_HEIGHT/2.0f}, 0);
     tank.rightTreadShapeId = b2CreatePolygonShape(tank.rightTreadId, &rightTreadShapeDef, &rightTreadPolygon);
@@ -262,6 +275,7 @@ static Tank engineCreateTank(b2Vec2 position, float angle)
     b2ShapeDef gunShapeDef = b2DefaultShapeDef();
     gunShapeDef.density = 0.001f;
     gunShapeDef.customColor = b2_colorGreen;
+    gunShapeDef.filter.categoryBits = categoryBits;
 
     b2Polygon gunPolygon = b2MakeOffsetBox(TANK_GUN_HEIGHT, TANK_GUN_WIDTH, (b2Vec2){TANK_GUN_HEIGHT, 0}, 0);
     b2CreatePolygonShape(tank.gunId, &gunShapeDef, &gunPolygon);
@@ -305,6 +319,8 @@ bool engineInit()
     b2BodyId boundaryBodyId = b2CreateBody(worldId, &boundaryBodyDef);
 
     b2ShapeDef boundaryShapeDef = b2DefaultShapeDef();
+    boundaryShapeDef.filter.categoryBits = CATEGORY_WALL;
+
     b2Polygon projectilePolygon;
 
     projectilePolygon = b2MakeOffsetBox(0, ARENA_HEIGHT, (b2Vec2){-ARENA_WIDTH, 0}, 0); // left wall
@@ -320,8 +336,8 @@ bool engineInit()
     b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &projectilePolygon);
 
     // Create tanks
-    tank1 = engineCreateTank((b2Vec2){0.0f, 0.0f}, 0.0f);
-    tank2 = engineCreateTank((b2Vec2){50.0f, 0.0f}, b2_pi/4);
+    tank1 = engineCreateTank((b2Vec2){0.0f, 0.0f}, 0.0f, (uint32_t)CATEGORY_TANK1);
+    tank2 = engineCreateTank((b2Vec2){50.0f, 0.0f}, b2_pi/4, (uint32_t)CATEGORY_TANK2);
 
     // RotateTankGun(tank1, 1.0f);
     // RotateTankGun(tank2, -1.0f);
