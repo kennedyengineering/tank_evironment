@@ -29,11 +29,13 @@
 #define TANK_TREAD_WIDTH 0.40f
 // TODO: add tank constants as definitions
 
-// TODO: convert into uint32_t enum, or a datatype or something. make it so you don't have to (uint32_t) cast everytime you use it.
-#define CATEGORY_PROJECTILE 0b1000
-#define CATEGORY_WALL       0b0100
-#define CATEGORY_TANK1      0b0010
-#define CATEGORY_TANK2      0b0001
+enum EntityCategories
+{
+    PROJECTILE = 0x00000008,
+    WALL       = 0x00000004,
+    TANK1      = 0x00000002,
+    TANK2      = 0x00000001,
+};
 
 static bool initialized = false;
 
@@ -118,7 +120,7 @@ static void FireTankGun(Tank tank)
     // Create shape
     b2ShapeDef projectileShapeDef = b2DefaultShapeDef();
     projectileShapeDef.customColor = b2_colorGray;
-    projectileShapeDef.filter.categoryBits = (uint32_t)CATEGORY_PROJECTILE;
+    projectileShapeDef.filter.categoryBits = PROJECTILE;
 
     b2Polygon projectilePolygon = b2MakeOffsetBox(TANK_GUN_WIDTH, TANK_GUN_WIDTH, (b2Vec2){TANK_GUN_HEIGHT*2+TANK_GUN_WIDTH, 0}, 0);
     b2CreatePolygonShape(projectileBodyId, &projectileShapeDef, &projectilePolygon);
@@ -151,8 +153,8 @@ static void ScanTankLidar(Tank *tank)
 
         b2Vec2 point = {0};
         // TODO: clean up this long statement
-        uint32_t maskBits = (uint32_t) CATEGORY_PROJECTILE | (uint32_t)CATEGORY_WALL | (tank->categoryBits == (uint32_t)CATEGORY_TANK1 ? (uint32_t)CATEGORY_TANK2 : (uint32_t)CATEGORY_TANK1);
-        b2QueryFilter viewFilter = {.categoryBits=0xFFFFFFFF, .maskBits=maskBits}; // CATAGORY_WALL | CATAGORY_TANK2
+        uint32_t maskBits = PROJECTILE | WALL | (tank->categoryBits == TANK1 ? TANK2 : TANK1);
+        b2QueryFilter viewFilter = {.categoryBits=0xFFFFFFFF, .maskBits=maskBits};
         b2World_CastRay(worldId, start, translation, viewFilter, RayCastCallback, &point);
 
         // Update tank memory
@@ -319,7 +321,7 @@ bool engineInit()
     b2BodyId boundaryBodyId = b2CreateBody(worldId, &boundaryBodyDef);
 
     b2ShapeDef boundaryShapeDef = b2DefaultShapeDef();
-    boundaryShapeDef.filter.categoryBits = CATEGORY_WALL;
+    boundaryShapeDef.filter.categoryBits = WALL;
 
     b2Polygon projectilePolygon;
 
@@ -336,8 +338,8 @@ bool engineInit()
     b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &projectilePolygon);
 
     // Create tanks
-    tank1 = engineCreateTank((b2Vec2){0.0f, 0.0f}, 0.0f, (uint32_t)CATEGORY_TANK1);
-    tank2 = engineCreateTank((b2Vec2){50.0f, 0.0f}, b2_pi/4, (uint32_t)CATEGORY_TANK2);
+    tank1 = engineCreateTank((b2Vec2){0.0f, 0.0f}, 0.0f, TANK1);
+    tank2 = engineCreateTank((b2Vec2){50.0f, 0.0f}, b2_pi/4, TANK2);
 
     // RotateTankGun(tank1, 1.0f);
     // RotateTankGun(tank2, -1.0f);
