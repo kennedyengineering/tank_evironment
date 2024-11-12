@@ -29,13 +29,13 @@
 #define TANK_TREAD_WIDTH 0.40f
 // TODO: add tank constants as definitions
 
-typedef enum 
+enum CategoryBits
 {
     PROJECTILE = 0x00000008,
     WALL       = 0x00000004,
     TANK1      = 0x00000002,
     TANK2      = 0x00000001,
-} entityCategoryBits;
+};
 
 static bool initialized = false;
 
@@ -152,7 +152,6 @@ static void ScanTankLidar(Tank *tank)
         b2Vec2 translation = b2Sub(end, start);
 
         b2Vec2 point = {0};
-        // TODO: clean up this long statement
         uint32_t maskBits = PROJECTILE | WALL | (tank->categoryBits == TANK1 ? TANK2 : TANK1);
         b2QueryFilter viewFilter = {.categoryBits=0xFFFFFFFF, .maskBits=maskBits};
         b2World_CastRay(worldId, start, translation, viewFilter, RayCastCallback, &point);
@@ -223,7 +222,7 @@ static void RenderTankLidar(Tank tank, b2HexColor color)
     }
 }
 
-static Tank engineCreateTank(b2Vec2 position, float angle, entityCategoryBits categoryBits)
+static Tank engineCreateTank(b2Vec2 position, float angle, uint32_t categoryBits)
 {
     // Create a tank
     Tank tank = {0};
