@@ -139,6 +139,8 @@ static void ScanTankLidar(Tank *tank)
     // Update tank lidar information
     // https://box2d.org/documentation/md_simulation.html#autotoc_md115
 
+    // TODO: move loop invariant statements outside of loop
+
     for (size_t cast_num = 0; cast_num < LIDAR_POINTS; cast_num++)
     {
         // Compute angle
