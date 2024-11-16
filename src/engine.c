@@ -427,17 +427,11 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
         }
 
         // Collision logic
-        b2BodyId bodyIdA = b2Shape_GetBody(shapeIdA);
-        b2Vec2 shapeAPos = b2Body_GetPosition(bodyIdA);
-
-        b2BodyId bodyIdB = b2Shape_GetBody(shapeIdB);
-        b2Vec2 shapeBPos = b2Body_GetPosition(bodyIdB);
-
         switch (categoryBitsA)
         {
             case PROJECTILE :
                 // Remove projectile from world
-                b2DestroyBody(bodyIdA);
+                b2DestroyBody(b2Shape_GetBody(shapeIdA));
                 break;
 
             case TANK1 :
@@ -460,7 +454,7 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
         {
             case PROJECTILE :
                 // Remove projectile from world
-                b2DestroyBody(bodyIdB);
+                b2DestroyBody(b2Shape_GetBody(shapeIdB));
                 break;
 
             case TANK1 :
