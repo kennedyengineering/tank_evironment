@@ -107,8 +107,6 @@ static void ForceTankTreads(Tank tank, float force_left, float force_right)
 static void FireTankGun(Tank tank)
 {
     // Launch a projectile
-    // TODO: make projectile delete itself
-    // TODO: make projectile not able to hit the shooting tank -- contact filter?
 
     // Create body
     b2BodyDef projectileBodyDef = b2DefaultBodyDef();
@@ -122,6 +120,8 @@ static void FireTankGun(Tank tank)
     b2ShapeDef projectileShapeDef = b2DefaultShapeDef();
     projectileShapeDef.customColor = b2_colorGray;
     projectileShapeDef.filter.categoryBits = PROJECTILE;
+    uint32_t maskBits = PROJECTILE | WALL | (tank.categoryBits == TANK1 ? TANK2 : TANK1);
+    projectileShapeDef.filter.maskBits = maskBits;
 
     b2Polygon projectilePolygon = b2MakeOffsetBox(TANK_GUN_WIDTH, TANK_GUN_WIDTH, (b2Vec2){TANK_GUN_HEIGHT*2+TANK_GUN_WIDTH, 0}, 0);
     b2CreatePolygonShape(projectileBodyId, &projectileShapeDef, &projectilePolygon);
@@ -472,11 +472,6 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
                 printf("other hit");
                 break;
         };
-    }
-
-    if (contactEvents.beginCount > 0)
-    {
-        printf("begin\n");
     }
 
     // Step physics engine
