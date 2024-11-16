@@ -427,11 +427,17 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
         }
 
         // Collision logic
+        b2BodyId bodyIdA = b2Shape_GetBody(shapeIdA);
+        b2Vec2 shapeAPos = b2Body_GetPosition(bodyIdA);
+
+        b2BodyId bodyIdB = b2Shape_GetBody(shapeIdB);
+        b2Vec2 shapeBPos = b2Body_GetPosition(bodyIdB);
+
         switch (categoryBitsA)
         {
             case PROJECTILE :
                 // Remove projectile from world
-                b2DestroyBody(b2Shape_GetBody(shapeIdA));
+                b2DestroyBody(bodyIdA);
                 break;
 
             case TANK1 :
@@ -446,7 +452,7 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
 
             default :
                 // Something else has been hit by projectile
-                printf("other hit");
+                printf("other hit\n");
                 break;
         };
 
@@ -454,22 +460,22 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
         {
             case PROJECTILE :
                 // Remove projectile from world
-                b2DestroyBody(b2Shape_GetBody(shapeIdB));
+                b2DestroyBody(bodyIdB);
                 break;
 
             case TANK1 :
                 // Tank 1 has been hit by projectile
-                printf("tank1 hit");
+                printf("tank1 hit\n");
                 break;
 
             case TANK2 :
                 // Tank 2 has been hit by projectile
-                printf("tank2 hit");
+                printf("tank2 hit\n");
                 break;
 
             default :
                 // Something else has been hit by projectile
-                printf("other hit");
+                printf("other hit\n");
                 break;
         };
     }
