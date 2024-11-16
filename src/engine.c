@@ -108,6 +108,7 @@ static void FireTankGun(Tank tank)
 {
     // Launch a projectile
     // TODO: make projectile delete itself
+    // TODO: make projectile not able to hit the shooting tank -- contact filter?
 
     // Create body
     b2BodyDef projectileBodyDef = b2DefaultBodyDef();
@@ -405,6 +406,78 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
         FireTankGun(tank2);
 
     ScanTankLidar(&tank2);
+
+    // TODO: add collision filters so this method only returns when a projectile collides with something
+    b2ContactEvents contactEvents = b2World_GetContactEvents(worldId);
+    for (int count = 0; count < contactEvents.beginCount; count++)
+    {
+        // Retrieve contacting shape information
+        b2ContactBeginTouchEvent* beginEvent = contactEvents.beginEvents + count;
+
+        b2ShapeId shapeIdA = beginEvent->shapeIdA;
+        uint32_t categoryBitsA = b2Shape_GetFilter(shapeIdA).categoryBits;
+
+        b2ShapeId shapeIdB = beginEvent->shapeIdB;
+        uint32_t categoryBitsB = b2Shape_GetFilter(shapeIdB).categoryBits;
+
+        // Determine if a projectile was involved
+        if (categoryBitsA != PROJECTILE && categoryBitsB != PROJECTILE)
+        {
+            continue;
+        }
+
+        // Collision logic
+        switch (categoryBitsA)
+        {
+            case PROJECTILE :
+                // Remove projectile from world
+                b2DestroyBody(b2Shape_GetBody(shapeIdA));
+                break;
+
+            case TANK1 :
+                // Tank 1 has been hit by projectile
+                printf("tank1 hit\n");
+                break;
+
+            case TANK2 :
+                // Tank 2 has been hit by projectile
+                printf("tank2 hit\n");
+                break;
+
+            default :
+                // Something else has been hit by projectile
+                printf("other hit");
+                break;
+        };
+
+        switch (categoryBitsB)
+        {
+            case PROJECTILE :
+                // Remove projectile from world
+                b2DestroyBody(b2Shape_GetBody(shapeIdB));
+                break;
+
+            case TANK1 :
+                // Tank 1 has been hit by projectile
+                printf("tank1 hit");
+                break;
+
+            case TANK2 :
+                // Tank 2 has been hit by projectile
+                printf("tank2 hit");
+                break;
+
+            default :
+                // Something else has been hit by projectile
+                printf("other hit");
+                break;
+        };
+    }
+
+    if (contactEvents.beginCount > 0)
+    {
+        printf("begin\n");
+    }
 
     // Step physics engine
     b2World_Step(worldId, TIME_STEP, SUB_STEPS);
