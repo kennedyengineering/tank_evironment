@@ -6,8 +6,7 @@
 #include <box2d/box2d.h>
 #include <stdio.h>
 
-// TODO: figure out how to return a rendered frame to python
-
+/* Simulation Constants */
 #define TIME_STEP   1.0f / 60.0f
 #define SUB_STEPS   4.0f
 
@@ -21,13 +20,11 @@
 
 #define LIDAR_POINTS 360
 
-// TODO: refactor tank stuff into tank.h or something
 #define TANK_BODY_HEIGHT 7.93f   // m1-abrams (meters)
 #define TANK_BODY_WIDTH  3.66f
 #define TANK_GUN_HEIGHT  5.805f
 #define TANK_GUN_WIDTH   0.20f
 #define TANK_TREAD_WIDTH 0.40f
-// TODO: add tank constants as definitions
 
 enum CategoryBits
 {
