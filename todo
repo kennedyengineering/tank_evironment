@@ -3,7 +3,7 @@ TODO: fix TODO's in code
 
 TODO: make entirely force based
 
-FIXME: find segfault (occurs when driving a tank into another tank then firing, something to do with deletion order?)
+FIXME: find segfault (occurs when driving a tank into another tank then firing, something to do with deletion order? occurs when two simultaneous collisions?)
 
 Structural:
 TODO: create base and development docker container (dev container run on dev docker image)
