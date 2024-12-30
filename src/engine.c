@@ -50,13 +50,13 @@ typedef struct Tank
 
 static Tank tank1, tank2;
 
-static void RotateTankGun(Tank tank, float angle)
+static void tankRotateGun(Tank tank, float angle)
 {
     // Move the tank gun to a specific angle relative to the tank body (in radians)
     b2MotorJoint_SetAngularOffset(tank.motorId, angle);
 }
 
-static void ForceTankTreads(Tank tank, float force_left, float force_right)
+static void tankForceTreads(Tank tank, float force_left, float force_right)
 {
     // TODO: make movement less slide-y and more wheel-like.
 
@@ -87,7 +87,7 @@ static void ForceTankTreads(Tank tank, float force_left, float force_right)
     b2Body_ApplyForceToCenter(tank.rightTreadId, rightTreadWorldFrictionForceVector, true);    
 }
 
-static void FireTankGun(Tank tank)
+static void tankFireGun(Tank tank)
 {
     // Launch a projectile
 
@@ -118,7 +118,7 @@ static float RayCastCallback(b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, flo
     return fraction;
 }
 
-static void ScanTankLidar(Tank *tank)
+static void tankScanLidar(Tank *tank)
 {
     // Update tank lidar information
     // https://box2d.org/documentation/md_simulation.html#autotoc_md115
@@ -174,7 +174,7 @@ static void DrawSolidPolygon (b2Transform transform, const b2Vec2* vertices, int
     renderPolygon(gl_vertices, vertexCount, (float[]){colorf.r, colorf.g, colorf.b});
 }
 
-static void RenderTankLidar(Tank tank, b2HexColor color)
+static void tankRenderLidar(Tank tank, b2HexColor color)
 {
     // Rander tank lidar scan memory buffer 
 
@@ -310,18 +310,18 @@ bool engineInit()
     tank1 = engineCreateTank((b2Vec2){0.0f, 0.0f}, 0.0f, TANK1);
     tank2 = engineCreateTank((b2Vec2){50.0f, 0.0f}, b2_pi/4, TANK2);
 
-    // RotateTankGun(tank1, 1.0f);
-    // RotateTankGun(tank2, -1.0f);
+    // tankRotateGun(tank1, 1.0f);
+    // tankRotateGun(tank2, -1.0f);
 
     // MoveTankBody(tank1, (b2Vec2){2.1, 0.0});
 
     // RotateTankBody(tank1, 2.0f);
 
-    // ForceTankTreads(tank1, 0.0f, 2000.0f);
-    // ForceTankTreads(tank2, 2000.0f, 2000.0f);
+    // tankForceTreads(tank1, 0.0f, 2000.0f);
+    // tankForceTreads(tank2, 2000.0f, 2000.0f);
 
-    // FireTankGun(tank1);
-    // FireTankGun(tank2);
+    // tankFireGun(tank1);
+    // tankFireGun(tank2);
     
     initialized = true;
 
@@ -337,24 +337,24 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
     // TODO: remove code duplication by creating a helper method
 
     // Tank 1 controls
-    RotateTankGun(tank1, tank1Action.gun_angle);
+    tankRotateGun(tank1, tank1Action.gun_angle);
 
-    ForceTankTreads(tank1, tank1Action.tread_force[0], tank1Action.tread_force[1]); // TODO: clean up fn definition --> use vector as fn input, or 2x vars in TankAction struct
+    tankForceTreads(tank1, tank1Action.tread_force[0], tank1Action.tread_force[1]); // TODO: clean up fn definition --> use vector as fn input, or 2x vars in TankAction struct
 
     if (tank1Action.fire_gun)
-        FireTankGun(tank1);
+        tankFireGun(tank1);
 
-    ScanTankLidar(&tank1);  // TODO: fix scan location? here, the scan is always 1 step behind due to the physics engine step being called right after
+    tankScanLidar(&tank1);  // TODO: fix scan location? here, the scan is always 1 step behind due to the physics engine step being called right after
 
     // Tank 2 controls
-    RotateTankGun(tank2, tank2Action.gun_angle);
+    tankRotateGun(tank2, tank2Action.gun_angle);
 
-    ForceTankTreads(tank2, tank2Action.tread_force[0], tank2Action.tread_force[1]);
+    tankForceTreads(tank2, tank2Action.tread_force[0], tank2Action.tread_force[1]);
 
     if (tank2Action.fire_gun)
-        FireTankGun(tank2);
+        tankFireGun(tank2);
 
-    ScanTankLidar(&tank2);
+    tankScanLidar(&tank2);
 
     // Collision logic
     b2ContactEvents contactEvents = b2World_GetContactEvents(worldId);
@@ -437,8 +437,8 @@ void engineRender()
     
     b2World_Draw(worldId, &debugDraw);
 
-    RenderTankLidar(tank1, b2_colorMediumBlue); // TODO: put color choice in tank struct?
-    RenderTankLidar(tank2, b2_colorOrange);
+    tankRenderLidar(tank1, b2_colorMediumBlue); // TODO: put color choice in tank struct?
+    tankRenderLidar(tank2, b2_colorOrange);
 }
 
 void engineDestroy()
