@@ -4,7 +4,6 @@
 
 #include <stdbool.h>
 
-// TODO: change gun_angle to be gun_force
 typedef struct TankAction
 {
     float gun_angle;
