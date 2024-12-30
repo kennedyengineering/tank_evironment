@@ -205,8 +205,6 @@ static void tankForceTreads(Tank tank, float force_left, float force_right)
 
 static void tankFireGun(Tank tank)
 {
-    // TODO: Initialize projectile inside of gun?
-
     // Create body
     b2BodyDef projectileBodyDef = b2DefaultBodyDef();
     projectileBodyDef.type = b2_dynamicBody;
@@ -280,6 +278,8 @@ static void tankRenderLidar(Tank tank, b2HexColor color)
 /* Engine Methods */
 bool engineInit()
 {
+    // TODO: Pass initial tank positions and orientations
+
     // Allocate resources
     if (initialized)
         return initialized;
@@ -321,8 +321,8 @@ bool engineInit()
     b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &boundaryPolygon);
 
     // Create tanks
-    tank1 = tankCreateNew((b2Vec2){0.0f, 0.0f}, 0.0f, TANK1);    // TODO: pass in initial position and angle as arguments
-    tank2 = tankCreateNew((b2Vec2){50.0f, 0.0f}, b2_pi/4, TANK2);
+    tank1 = tankCreateNew((b2Vec2){-50.0f, 0.0f}, -b2_pi/2, TANK1);
+    tank2 = tankCreateNew((b2Vec2){50.0f, 0.0f}, b2_pi/2, TANK2);
     
     initialized = true;
 
