@@ -436,7 +436,7 @@ void engineRender()
     
     b2World_Draw(worldId, &debugDraw);
 
-    tankRenderLidar(tank1, b2_colorMediumBlue); // TODO: put color choice in tank struct?
+    tankRenderLidar(tank1, b2_colorMediumBlue);
     tankRenderLidar(tank2, b2_colorOrange);
 }
 

@@ -4,7 +4,7 @@
 
 #include <stdbool.h>
 
-typedef struct TankAction
+typedef struct
 {
     float gun_angle;
     bool fire_gun;
