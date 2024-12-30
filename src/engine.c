@@ -6,148 +6,57 @@
 #include <box2d/box2d.h>
 #include <stdio.h>
 
+
 /* Simulation Constants */
 #define TIME_STEP   1.0f / 60.0f
 #define SUB_STEPS   4.0f
 
+
+/* Arena Constants */
 #define ARENA_WIDTH  100    // maintain aspect ratio of screen (meters)
 #define ARENA_HEIGHT 75
 
 #define GROUND_FRICTION_COEF 0.3
+
 #define GRAVITY_ACCEL 9.8
 
-#define GUN_VELOCITY 15.0f
 
-#define LIDAR_POINTS 360
-
+/* Tank Constants */
 #define TANK_BODY_HEIGHT 7.93f   // m1-abrams (meters)
 #define TANK_BODY_WIDTH  3.66f
 #define TANK_GUN_HEIGHT  5.805f
 #define TANK_GUN_WIDTH   0.20f
 #define TANK_TREAD_WIDTH 0.40f
 
-enum CategoryBits
+#define TANK_PROJECTILE_VELOCITY 15.0f
+
+#define TANK_LIDAR_POINTS 360
+
+
+/* Global Variables*/
+static bool initialized = false;
+
+static b2WorldId worldId;
+
+static b2DebugDraw debugDraw;
+
+typedef enum
 {
     PROJECTILE = 0x00000008,
     WALL       = 0x00000004,
     TANK1      = 0x00000002,
     TANK2      = 0x00000001,
-};
+} CategoryBits;
 
-static bool initialized = false;
 
-static b2WorldId worldId;
-static b2DebugDraw debugDraw;
-
-typedef struct Tank
-{
-    b2BodyId bodyId, gunId, leftTreadId, rightTreadId;
-    b2ShapeId leftTreadShapeId, rightTreadShapeId;
-    b2JointId motorId;
-    b2Vec2 lidarPoints[LIDAR_POINTS];
-    uint32_t categoryBits;
-} Tank;
-
-static Tank tank1, tank2;
-
-static void tankRotateGun(Tank tank, float angle)
-{
-    // Move the tank gun to a specific angle relative to the tank body (in radians)
-    b2MotorJoint_SetAngularOffset(tank.motorId, angle);
-}
-
-static void tankForceTreads(Tank tank, float force_left, float force_right)
-{
-    // TODO: Make movement less slide-y and more wheel-like.
-
-    // Apply force to tank treads
-    b2Vec2 leftTreadWorldForce = b2Body_GetWorldVector(tank.bodyId, (b2Vec2){force_left, 0});
-    b2Body_ApplyForceToCenter(tank.leftTreadId, leftTreadWorldForce, true);
-
-    b2Vec2 rightTreadWorldForce = b2Body_GetWorldVector(tank.bodyId, (b2Vec2){force_right, 0});
-    b2Body_ApplyForceToCenter(tank.rightTreadId, rightTreadWorldForce, true);
-
-    // Apply friction force to tank treads
-    float mass = b2Body_GetMass(tank.bodyId) + b2Body_GetMass(tank.gunId) + b2Body_GetMass(tank.leftTreadId) + b2Body_GetMass(tank.rightTreadId);
-
-    float left_friction_coef = sqrtf(GROUND_FRICTION_COEF * b2Shape_GetFriction(tank.leftTreadShapeId));
-    float left_friction_force = left_friction_coef*mass*GRAVITY_ACCEL/2;    // divide by two because two treads share the load
-
-    b2Vec2 leftTreadWorldNormalizedLinearVelocity = b2Normalize(b2Body_GetLinearVelocity(tank.leftTreadId));
-    b2Vec2 leftTreadWorldFrictionForceVector = b2MulSV(left_friction_force, b2Neg(leftTreadWorldNormalizedLinearVelocity));
-
-    b2Body_ApplyForceToCenter(tank.leftTreadId, leftTreadWorldFrictionForceVector, true);
-
-    float right_friction_coef = sqrtf(GROUND_FRICTION_COEF * b2Shape_GetFriction(tank.rightTreadShapeId));
-    float right_friction_force = right_friction_coef*mass*GRAVITY_ACCEL/2;  // divide by two because two treads share the load
-
-    b2Vec2 rightTreadWorldNormalizedLinearVelocity = b2Normalize(b2Body_GetLinearVelocity(tank.rightTreadId));
-    b2Vec2 rightTreadWorldFrictionForceVector = b2MulSV(right_friction_force, b2Neg(rightTreadWorldNormalizedLinearVelocity));
-
-    b2Body_ApplyForceToCenter(tank.rightTreadId, rightTreadWorldFrictionForceVector, true);    
-}
-
-static void tankFireGun(Tank tank)
-{
-    // TODO: Initialize projectile inside of gun?
-
-    // Create body
-    b2BodyDef projectileBodyDef = b2DefaultBodyDef();
-    projectileBodyDef.type = b2_dynamicBody;
-    projectileBodyDef.position = b2Body_GetPosition(tank.gunId);
-    projectileBodyDef.rotation = b2Body_GetRotation(tank.gunId);
-    projectileBodyDef.linearVelocity = b2Body_GetWorldVector(tank.gunId, (b2Vec2){GUN_VELOCITY, 0.0f});
-    b2BodyId projectileBodyId = b2CreateBody(worldId, &projectileBodyDef);
-
-    // Create shape
-    b2ShapeDef projectileShapeDef = b2DefaultShapeDef();
-    projectileShapeDef.customColor = b2_colorGray;
-    projectileShapeDef.filter.categoryBits = PROJECTILE;
-    uint32_t maskBits = PROJECTILE | WALL | (tank.categoryBits == TANK1 ? TANK2 : TANK1);
-    projectileShapeDef.filter.maskBits = maskBits;
-
-    b2Polygon projectilePolygon = b2MakeOffsetBox(TANK_GUN_WIDTH, TANK_GUN_WIDTH, (b2Vec2){TANK_GUN_HEIGHT*2+TANK_GUN_WIDTH, 0}, 0);
-    b2CreatePolygonShape(projectileBodyId, &projectileShapeDef, &projectilePolygon);
-}
- 
-static float RayCastCallback(b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float fraction, void* context)
-{
-    *(b2Vec2*)context = point;
-    return fraction;
-}
-
-static void tankScanLidar(Tank *tank)
-{
-    // Update tank lidar information
-    // https://box2d.org/documentation/md_simulation.html#autotoc_md115
-
-    for (size_t cast_num = 0; cast_num < LIDAR_POINTS; cast_num++)
-    {
-        // Compute angle
-        float d_angle = 2*b2_pi/LIDAR_POINTS;
-        float angle = d_angle*cast_num;
-        b2Rot rot = b2MakeRot(angle);
-
-        // Perform ray-cast
-        b2Vec2 start = b2Body_GetPosition(tank->bodyId);
-        b2Vec2 end = b2Body_GetWorldPoint(tank->bodyId, b2RotateVector(rot, (b2Vec2){ARENA_WIDTH*ARENA_HEIGHT, 0}));
-        b2Vec2 translation = b2Sub(end, start);
-
-        b2Vec2 point = {0};
-        uint32_t maskBits = PROJECTILE | WALL | (tank->categoryBits == TANK1 ? TANK2 : TANK1);
-        b2QueryFilter viewFilter = {.categoryBits=0xFFFFFFFF, .maskBits=maskBits};
-        b2World_CastRay(worldId, start, translation, viewFilter, RayCastCallback, &point);
-
-        // Update tank memory
-        tank->lidarPoints[cast_num] = point;
-    }
-}
-
-typedef struct RGBf
+/* Engine Render Variables */
+typedef struct
 {
 	float r, g, b;
 } RGBf;
 
+
+/* Engine Render Methods */
 static inline RGBf MakeRGBf(b2HexColor c)
 {
     // Convert a box2d color to RGBf struct
@@ -170,25 +79,22 @@ static void DrawSolidPolygon (b2Transform transform, const b2Vec2* vertices, int
     renderPolygon(gl_vertices, vertexCount, (float[]){colorf.r, colorf.g, colorf.b});
 }
 
-static void tankRenderLidar(Tank tank, b2HexColor color)
+
+/* Tank Variables */
+typedef struct
 {
-    // Rander tank lidar scan memory buffer 
+    b2BodyId bodyId, gunId, leftTreadId, rightTreadId;
+    b2ShapeId leftTreadShapeId, rightTreadShapeId;
+    b2JointId motorId;
+    b2Vec2 lidarPoints[TANK_LIDAR_POINTS];
+    uint32_t categoryBits;
+} Tank;
 
-    RGBf colorf = MakeRGBf(color);
-    GLfloat radius = 0.01f;
+static Tank tank1, tank2;
 
-    for (size_t cast_num = 0; cast_num < LIDAR_POINTS; cast_num++)
-    {
-        // Retrieve lidar point
-        b2Vec2 point = tank.lidarPoints[cast_num];
 
-         // Render lidar point
-        GLfloat center[2] = {point.x / ARENA_WIDTH, point.y / ARENA_HEIGHT};
-        renderCircle(center, radius, (float[]){colorf.r, colorf.g, colorf.b});
-    }
-}
-
-static Tank engineCreateTank(b2Vec2 position, float angle, uint32_t categoryBits)
+/* Tank Methods */
+static Tank tankCreateNew(b2Vec2 position, float angle, uint32_t categoryBits)
 {
     // Create a tank
     Tank tank = {0};
@@ -260,6 +166,118 @@ static Tank engineCreateTank(b2Vec2 position, float angle, uint32_t categoryBits
     return tank;
 }
 
+static void tankRotateGun(Tank tank, float angle)
+{
+    // Move the tank gun to a specific angle relative to the tank body (in radians)
+    b2MotorJoint_SetAngularOffset(tank.motorId, angle);
+}
+
+static void tankForceTreads(Tank tank, float force_left, float force_right)
+{
+    // TODO: Make movement less slide-y and more wheel-like.
+
+    // Apply force to tank treads
+    b2Vec2 leftTreadWorldForce = b2Body_GetWorldVector(tank.bodyId, (b2Vec2){force_left, 0});
+    b2Body_ApplyForceToCenter(tank.leftTreadId, leftTreadWorldForce, true);
+
+    b2Vec2 rightTreadWorldForce = b2Body_GetWorldVector(tank.bodyId, (b2Vec2){force_right, 0});
+    b2Body_ApplyForceToCenter(tank.rightTreadId, rightTreadWorldForce, true);
+
+    // Apply friction force to tank treads
+    float mass = b2Body_GetMass(tank.bodyId) + b2Body_GetMass(tank.gunId) + b2Body_GetMass(tank.leftTreadId) + b2Body_GetMass(tank.rightTreadId);
+
+    float left_friction_coef = sqrtf(GROUND_FRICTION_COEF * b2Shape_GetFriction(tank.leftTreadShapeId));
+    float left_friction_force = left_friction_coef*mass*GRAVITY_ACCEL/2;    // divide by two because two treads share the load
+
+    b2Vec2 leftTreadWorldNormalizedLinearVelocity = b2Normalize(b2Body_GetLinearVelocity(tank.leftTreadId));
+    b2Vec2 leftTreadWorldFrictionForceVector = b2MulSV(left_friction_force, b2Neg(leftTreadWorldNormalizedLinearVelocity));
+
+    b2Body_ApplyForceToCenter(tank.leftTreadId, leftTreadWorldFrictionForceVector, true);
+
+    float right_friction_coef = sqrtf(GROUND_FRICTION_COEF * b2Shape_GetFriction(tank.rightTreadShapeId));
+    float right_friction_force = right_friction_coef*mass*GRAVITY_ACCEL/2;  // divide by two because two treads share the load
+
+    b2Vec2 rightTreadWorldNormalizedLinearVelocity = b2Normalize(b2Body_GetLinearVelocity(tank.rightTreadId));
+    b2Vec2 rightTreadWorldFrictionForceVector = b2MulSV(right_friction_force, b2Neg(rightTreadWorldNormalizedLinearVelocity));
+
+    b2Body_ApplyForceToCenter(tank.rightTreadId, rightTreadWorldFrictionForceVector, true);    
+}
+
+static void tankFireGun(Tank tank)
+{
+    // TODO: Initialize projectile inside of gun?
+
+    // Create body
+    b2BodyDef projectileBodyDef = b2DefaultBodyDef();
+    projectileBodyDef.type = b2_dynamicBody;
+    projectileBodyDef.position = b2Body_GetPosition(tank.gunId);
+    projectileBodyDef.rotation = b2Body_GetRotation(tank.gunId);
+    projectileBodyDef.linearVelocity = b2Body_GetWorldVector(tank.gunId, (b2Vec2){TANK_PROJECTILE_VELOCITY, 0.0f});
+    b2BodyId projectileBodyId = b2CreateBody(worldId, &projectileBodyDef);
+
+    // Create shape
+    b2ShapeDef projectileShapeDef = b2DefaultShapeDef();
+    projectileShapeDef.customColor = b2_colorGray;
+    projectileShapeDef.filter.categoryBits = PROJECTILE;
+    uint32_t maskBits = PROJECTILE | WALL | (tank.categoryBits == TANK1 ? TANK2 : TANK1);
+    projectileShapeDef.filter.maskBits = maskBits;
+
+    b2Polygon projectilePolygon = b2MakeOffsetBox(TANK_GUN_WIDTH, TANK_GUN_WIDTH, (b2Vec2){TANK_GUN_HEIGHT*2+TANK_GUN_WIDTH, 0}, 0);
+    b2CreatePolygonShape(projectileBodyId, &projectileShapeDef, &projectilePolygon);
+}
+ 
+static float __rayCastCallback(b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float fraction, void* context)
+{
+    *(b2Vec2*)context = point;
+    return fraction;
+}
+
+static void tankScanLidar(Tank *tank)
+{
+    // Update tank lidar information
+    // https://box2d.org/documentation/md_simulation.html#autotoc_md115
+
+    for (size_t cast_num = 0; cast_num < TANK_LIDAR_POINTS; cast_num++)
+    {
+        // Compute angle
+        float d_angle = 2*b2_pi/TANK_LIDAR_POINTS;
+        float angle = d_angle*cast_num;
+        b2Rot rot = b2MakeRot(angle);
+
+        // Perform ray-cast
+        b2Vec2 start = b2Body_GetPosition(tank->bodyId);
+        b2Vec2 end = b2Body_GetWorldPoint(tank->bodyId, b2RotateVector(rot, (b2Vec2){ARENA_WIDTH*ARENA_HEIGHT, 0}));
+        b2Vec2 translation = b2Sub(end, start);
+
+        b2Vec2 point = {0};
+        uint32_t maskBits = PROJECTILE | WALL | (tank->categoryBits == TANK1 ? TANK2 : TANK1);
+        b2QueryFilter viewFilter = {.categoryBits=0xFFFFFFFF, .maskBits=maskBits};
+        b2World_CastRay(worldId, start, translation, viewFilter, __rayCastCallback, &point);
+
+        // Update tank memory
+        tank->lidarPoints[cast_num] = point;
+    }
+}
+
+static void tankRenderLidar(Tank tank, b2HexColor color)
+{
+    // Rander tank lidar scan memory buffer 
+    RGBf colorf = MakeRGBf(color);
+    GLfloat radius = 0.01f;
+
+    for (size_t cast_num = 0; cast_num < TANK_LIDAR_POINTS; cast_num++)
+    {
+        // Retrieve lidar point
+        b2Vec2 point = tank.lidarPoints[cast_num];
+
+         // Render lidar point
+        GLfloat center[2] = {point.x / ARENA_WIDTH, point.y / ARENA_HEIGHT};
+        renderCircle(center, radius, (float[]){colorf.r, colorf.g, colorf.b});
+    }
+}
+
+
+/* Engine Methods */
 bool engineInit()
 {
     // Allocate resources
@@ -303,8 +321,8 @@ bool engineInit()
     b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &boundaryPolygon);
 
     // Create tanks
-    tank1 = engineCreateTank((b2Vec2){0.0f, 0.0f}, 0.0f, TANK1);    // TODO: pass in initial position and angle as arguments
-    tank2 = engineCreateTank((b2Vec2){50.0f, 0.0f}, b2_pi/4, TANK2);
+    tank1 = tankCreateNew((b2Vec2){0.0f, 0.0f}, 0.0f, TANK1);    // TODO: pass in initial position and angle as arguments
+    tank2 = tankCreateNew((b2Vec2){50.0f, 0.0f}, b2_pi/4, TANK2);
     
     initialized = true;
 
