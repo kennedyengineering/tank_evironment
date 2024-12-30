@@ -58,6 +58,8 @@ static void RotateTankGun(Tank tank, float angle)
 
 static void ForceTankTreads(Tank tank, float force_left, float force_right)
 {
+    // TODO: make movement less slide-y and more wheel-like.
+
     // Apply force to tank treads
     b2Vec2 leftTreadWorldForce = b2Body_GetWorldVector(tank.bodyId, (b2Vec2){force_left, 0});
     b2Body_ApplyForceToCenter(tank.leftTreadId, leftTreadWorldForce, true);
@@ -82,10 +84,7 @@ static void ForceTankTreads(Tank tank, float force_left, float force_right)
     b2Vec2 rightTreadWorldNormalizedLinearVelocity = b2Normalize(b2Body_GetLinearVelocity(tank.rightTreadId));
     b2Vec2 rightTreadWorldFrictionForceVector = b2MulSV(right_friction_force, b2Neg(rightTreadWorldNormalizedLinearVelocity));
 
-    b2Body_ApplyForceToCenter(tank.rightTreadId, rightTreadWorldFrictionForceVector, true);
-
-    // TODO: make movement less slide-y and more wheel-like. Maybe decrease friction in local X axis of tread, and increase in Y axis? or just decrease in X axis due to rolly-ness?
-    // TODO: use kinetic and static friction coefficients?
+    b2Body_ApplyForceToCenter(tank.rightTreadId, rightTreadWorldFrictionForceVector, true);    
 }
 
 static void FireTankGun(Tank tank)
