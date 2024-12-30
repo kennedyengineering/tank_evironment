@@ -343,8 +343,6 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
     if (tank1Action.fire_gun)
         tankFireGun(tank1);
 
-    tankScanLidar(&tank1);  // TODO: fix scan location? here, the scan is always 1 step behind due to the physics engine step being called right after
-
     // Tank 2 controls
     tankRotateGun(tank2, tank2Action.gun_angle);
 
@@ -352,8 +350,6 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
 
     if (tank2Action.fire_gun)
         tankFireGun(tank2);
-
-    tankScanLidar(&tank2);
 
     // Collision logic
     b2ContactEvents contactEvents = b2World_GetContactEvents(worldId);
@@ -426,6 +422,10 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
 
     // Step physics engine
     b2World_Step(worldId, TIME_STEP, SUB_STEPS);
+
+    // Update sensors
+    tankScanLidar(&tank1);
+    tankScanLidar(&tank2);
 }
 
 void engineRender()
