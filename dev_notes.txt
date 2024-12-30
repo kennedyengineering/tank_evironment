@@ -89,3 +89,5 @@ game.c should take care of game conditions, etc.
 to see how many lines of code you have written: cat src/* | wc -l
 
 create tank.h and engine_render.h?
+
+the issue with removing the motor joint from the turret is that rotating the tank does not rotate the turret. Not sure what the desired behavior is so just going to leave it.
