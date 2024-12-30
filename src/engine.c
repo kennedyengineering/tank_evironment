@@ -58,7 +58,7 @@ static void tankRotateGun(Tank tank, float angle)
 
 static void tankForceTreads(Tank tank, float force_left, float force_right)
 {
-    // TODO: make movement less slide-y and more wheel-like.
+    // TODO: Make movement less slide-y and more wheel-like.
 
     // Apply force to tank treads
     b2Vec2 leftTreadWorldForce = b2Body_GetWorldVector(tank.bodyId, (b2Vec2){force_left, 0});
@@ -89,8 +89,6 @@ static void tankForceTreads(Tank tank, float force_left, float force_right)
 
 static void tankFireGun(Tank tank)
 {
-    // Launch a projectile
-
     // TODO: Initialize projectile inside of gun?
 
     // Create body
@@ -122,8 +120,6 @@ static void tankScanLidar(Tank *tank)
 {
     // Update tank lidar information
     // https://box2d.org/documentation/md_simulation.html#autotoc_md115
-
-    // TODO: move loop invariant statements outside of loop
 
     for (size_t cast_num = 0; cast_num < LIDAR_POINTS; cast_num++)
     {
