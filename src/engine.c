@@ -2,6 +2,7 @@
 
 #include "engine.h"
 #include "render.h"
+#include "buf.h"
 
 #include <box2d/box2d.h>
 #include <stdio.h>
@@ -275,6 +276,57 @@ static void tankRenderLidar(Tank tank, b2HexColor color)
 }
 
 
+/* Collision Variables */
+typedef struct
+{
+    b2ShapeId projectileShapeId;
+    b2ShapeId* contactList;
+} CollisionTableEntry;
+
+
+/* Collision Methods */
+static bool isIdenticalShapeId(b2ShapeId shapeIdA, b2ShapeId shapeIdB)
+{
+    // Check if two shapeIds are identical
+    if (shapeIdA.index1 == shapeIdB.index1 &&
+        shapeIdA.world0 == shapeIdB.world0 &&
+        shapeIdA.revision == shapeIdB.revision)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+static bool inCollisionTable(CollisionTableEntry* CollisionTable, b2ShapeId projectileShapeId)
+{
+    // Check if a projectile shapeId is in the table
+    for (int i = 0; i < buf_size(CollisionTable); i++)
+    {
+        if (isIdenticalShapeId(CollisionTable[i].projectileShapeId, projectileShapeId))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+static bool inContactList(b2ShapeId* contactList, uint32_t categoryBits)
+{
+    // Check if a categoryBits is in the contact list
+    for (int i = 0; i < buf_size(contactList); i++)
+    {
+        if (b2Shape_GetFilter(contactList[i]).categoryBits == categoryBits)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
 /* Engine Methods */
 bool engineInit()
 {
@@ -321,12 +373,146 @@ bool engineInit()
     b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &boundaryPolygon);
 
     // Create tanks
-    tank1 = tankCreateNew((b2Vec2){-50.0f, 0.0f}, -b2_pi/2, TANK1);
-    tank2 = tankCreateNew((b2Vec2){50.0f, 0.0f}, b2_pi/2, TANK2);
+    tank1 = tankCreateNew((b2Vec2){-50.0f, TANK_BODY_WIDTH}, 0, TANK1);
+    tank2 = tankCreateNew((b2Vec2){50.0f, 0.0f}, b2_pi, TANK2);
+
+    tankFireGun(tank1);
     
     initialized = true;
 
     return initialized;
+}
+
+static void engineHandleCollisions()
+{
+    // Collision logic
+    b2ContactEvents contactEvents = b2World_GetContactEvents(worldId);
+
+    // Initialize table
+    CollisionTableEntry* CollisionTable = 0;
+
+    // Construct table
+    for (int count = 0; count < contactEvents.beginCount; count++)
+    {
+        // Retrieve contacting shape information
+        b2ContactBeginTouchEvent* beginEvent = contactEvents.beginEvents + count;
+
+        b2ShapeId shapeIdA = beginEvent->shapeIdA;
+        uint32_t categoryBitsA = b2Shape_GetFilter(shapeIdA).categoryBits;
+
+        b2ShapeId shapeIdB = beginEvent->shapeIdB;
+        uint32_t categoryBitsB = b2Shape_GetFilter(shapeIdB).categoryBits;
+
+        // Determine if a projectile was involved
+        if (categoryBitsA != PROJECTILE && categoryBitsB != PROJECTILE)
+        {
+            continue;
+        }
+
+        // Handle first shape being a projectile
+        if (categoryBitsA == PROJECTILE)
+        {
+            // Create new entry if needed
+            if (!inCollisionTable(CollisionTable, shapeIdA))
+            {
+                CollisionTableEntry entry = {0};
+                entry.projectileShapeId = shapeIdA;
+                entry.contactList = 0;
+                buf_push(CollisionTable, entry);
+            }
+
+            // Add contact to contact list
+            for (int i = 0; i < buf_size(CollisionTable); i++)
+            {
+                // Locate table entry with matching projectile shape id
+                if (isIdenticalShapeId(CollisionTable[i].projectileShapeId, shapeIdA))
+                {
+                    // Check if unique contact category
+                    if (inContactList(CollisionTable[i].contactList, categoryBitsB))
+                    {
+                        continue;
+                    }
+
+                    buf_push(CollisionTable[i].contactList, shapeIdB);
+                    break;
+                }
+            }
+        }
+
+        // Handle second shape being a projectile
+        if (categoryBitsB == PROJECTILE)
+        {
+            // Create new entry if needed
+            if (!inCollisionTable(CollisionTable, shapeIdB))
+            {
+                CollisionTableEntry entry = {0};
+                entry.projectileShapeId = shapeIdB;
+                entry.contactList = 0;
+                buf_push(CollisionTable, entry);
+            }
+
+            // Add contact to contact list
+            for (int i = 0; i < buf_size(CollisionTable); i++)
+            {
+                // Locate table entry with matching projectile shape id
+                if (isIdenticalShapeId(CollisionTable[i].projectileShapeId, shapeIdB))
+                {
+                    // Check if unique contact category
+                    if (inContactList(CollisionTable[i].contactList, categoryBitsA))
+                    {
+                        continue;
+                    }
+
+                    buf_push(CollisionTable[i].contactList, shapeIdA);
+                    break;
+                }
+            }
+        }
+    }
+
+    // Handle collision effects
+    for (int i = 0; i < buf_size(CollisionTable); i++)
+    {
+        b2ShapeId* contactList = CollisionTable[i].contactList;
+
+        for (int j = 0; j < buf_size(contactList); j++)
+        {
+            b2ShapeId contactShapeId = contactList[j];
+            uint32_t categoryBits = b2Shape_GetFilter(contactShapeId).categoryBits;
+
+            switch (categoryBits)
+            {
+                case TANK1 :
+                    // Tank 1 has been hit by projectile
+                    printf("tank1 hit\n");
+                    break;
+
+                case TANK2 :
+                    // Tank 2 has been hit by projectile
+                    printf("tank2 hit\n");
+                    break;
+
+                default :
+                    // Something else has been hit by projectile
+                    printf("other hit\n");
+                    break;
+            };
+        }
+    }
+    
+    // Delete projectiles
+    for (int i = 0; i < buf_size(CollisionTable); i++)
+    {
+        b2DestroyBody(b2Shape_GetBody(CollisionTable[i].projectileShapeId));
+    }
+
+    // Delete table
+    for (int i = 0; i < buf_size(CollisionTable); i++)
+    {
+        buf_free(CollisionTable[i].contactList);
+    }
+
+    buf_free(CollisionTable);
 }
 
 void engineStep(TankAction tank1Action, TankAction tank2Action)
@@ -351,74 +537,8 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
     if (tank2Action.fire_gun)
         tankFireGun(tank2);
 
-    // Collision logic
-    b2ContactEvents contactEvents = b2World_GetContactEvents(worldId);
-    for (int count = 0; count < contactEvents.beginCount; count++)
-    {
-        // Retrieve contacting shape information
-        b2ContactBeginTouchEvent* beginEvent = contactEvents.beginEvents + count;
-
-        b2ShapeId shapeIdA = beginEvent->shapeIdA;
-        uint32_t categoryBitsA = b2Shape_GetFilter(shapeIdA).categoryBits;
-
-        b2ShapeId shapeIdB = beginEvent->shapeIdB;
-        uint32_t categoryBitsB = b2Shape_GetFilter(shapeIdB).categoryBits;
-
-        // Determine if a projectile was involved
-        if (categoryBitsA != PROJECTILE && categoryBitsB != PROJECTILE)
-        {
-            continue;
-        }
-
-        // TODO: check if projectile is already removed?
-
-        // Collision logic
-        switch (categoryBitsA)
-        {
-            case PROJECTILE :
-                // Remove projectile from world
-                b2DestroyBody(b2Shape_GetBody(shapeIdA));
-                break;
-
-            case TANK1 :
-                // Tank 1 has been hit by projectile
-                printf("tank1 hit\n");
-                break;
-
-            case TANK2 :
-                // Tank 2 has been hit by projectile
-                printf("tank2 hit\n");
-                break;
-
-            default :
-                // Something else has been hit by projectile
-                printf("other hit\n");
-                break;
-        };
-
-        switch (categoryBitsB)
-        {
-            case PROJECTILE :
-                // Remove projectile from world
-                b2DestroyBody(b2Shape_GetBody(shapeIdB));
-                break;
-
-            case TANK1 :
-                // Tank 1 has been hit by projectile
-                printf("tank1 hit\n");
-                break;
-
-            case TANK2 :
-                // Tank 2 has been hit by projectile
-                printf("tank2 hit\n");
-                break;
-
-            default :
-                // Something else has been hit by projectile
-                printf("other hit\n");
-                break;
-        };
-    }
+    // Handle collisions
+    engineHandleCollisions();
 
     // Step physics engine
     b2World_Step(worldId, TIME_STEP, SUB_STEPS);
