@@ -307,21 +307,8 @@ bool engineInit()
     b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &projectilePolygon);
 
     // Create tanks
-    tank1 = engineCreateTank((b2Vec2){0.0f, 0.0f}, 0.0f, TANK1);
+    tank1 = engineCreateTank((b2Vec2){0.0f, 0.0f}, 0.0f, TANK1);    // TODO: pass in initial position and angle as arguments
     tank2 = engineCreateTank((b2Vec2){50.0f, 0.0f}, b2_pi/4, TANK2);
-
-    // tankRotateGun(tank1, 1.0f);
-    // tankRotateGun(tank2, -1.0f);
-
-    // MoveTankBody(tank1, (b2Vec2){2.1, 0.0});
-
-    // RotateTankBody(tank1, 2.0f);
-
-    // tankForceTreads(tank1, 0.0f, 2000.0f);
-    // tankForceTreads(tank2, 2000.0f, 2000.0f);
-
-    // tankFireGun(tank1);
-    // tankFireGun(tank2);
     
     initialized = true;
 
@@ -333,8 +320,6 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
     // Step forward the physics engine
     if (!initialized)
         return;
-
-    // TODO: remove code duplication by creating a helper method
 
     // Tank 1 controls
     tankRotateGun(tank1, tank1Action.gun_angle);
