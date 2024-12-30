@@ -29,7 +29,7 @@
 #define TANK_GUN_WIDTH   0.20f
 #define TANK_TREAD_WIDTH 0.40f
 
-#define TANK_PROJECTILE_VELOCITY 15.0f
+#define TANK_PROJECTILE_VELOCITY 30.0f
 
 #define TANK_LIDAR_POINTS 360
 
@@ -212,6 +212,7 @@ static void tankFireGun(Tank tank)
     projectileBodyDef.position = b2Body_GetPosition(tank.gunId);
     projectileBodyDef.rotation = b2Body_GetRotation(tank.gunId);
     projectileBodyDef.linearVelocity = b2Body_GetWorldVector(tank.gunId, (b2Vec2){TANK_PROJECTILE_VELOCITY, 0.0f});
+    projectileBodyDef.isBullet = true;
     b2BodyId projectileBodyId = b2CreateBody(worldId, &projectileBodyDef);
 
     // Create shape
