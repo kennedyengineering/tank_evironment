@@ -91,6 +91,8 @@ static void tankFireGun(Tank tank)
 {
     // Launch a projectile
 
+    // TODO: Initialize projectile inside of gun?
+
     // Create body
     b2BodyDef projectileBodyDef = b2DefaultBodyDef();
     projectileBodyDef.type = b2_dynamicBody;
@@ -108,8 +110,6 @@ static void tankFireGun(Tank tank)
 
     b2Polygon projectilePolygon = b2MakeOffsetBox(TANK_GUN_WIDTH, TANK_GUN_WIDTH, (b2Vec2){TANK_GUN_HEIGHT*2+TANK_GUN_WIDTH, 0}, 0);
     b2CreatePolygonShape(projectileBodyId, &projectileShapeDef, &projectilePolygon);
-
-    // TODO: spawn projectile inside gun (no collision between projectile and gun -- would need to differentiate between my projectile and their projectile...)? or just keep it outside?
 }
  
 static float RayCastCallback(b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float fraction, void* context)
