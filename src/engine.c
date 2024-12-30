@@ -292,19 +292,19 @@ bool engineInit()
     b2ShapeDef boundaryShapeDef = b2DefaultShapeDef();
     boundaryShapeDef.filter.categoryBits = WALL;
 
-    b2Polygon projectilePolygon;
+    b2Polygon boundaryPolygon;
 
-    projectilePolygon = b2MakeOffsetBox(0, ARENA_HEIGHT, (b2Vec2){-ARENA_WIDTH, 0}, 0); // left wall
-    b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &projectilePolygon);
+    boundaryPolygon = b2MakeOffsetBox(0, ARENA_HEIGHT, (b2Vec2){-ARENA_WIDTH, 0}, 0); // left wall
+    b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &boundaryPolygon);
 
-    projectilePolygon = b2MakeOffsetBox(0, ARENA_HEIGHT, (b2Vec2){ARENA_WIDTH, 0}, 0);  // right wall
-    b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &projectilePolygon);
+    boundaryPolygon = b2MakeOffsetBox(0, ARENA_HEIGHT, (b2Vec2){ARENA_WIDTH, 0}, 0); // right wall
+    b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &boundaryPolygon);
 
-    projectilePolygon = b2MakeOffsetBox(ARENA_WIDTH, 0, (b2Vec2){0, ARENA_HEIGHT}, 0);  // top wall
-    b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &projectilePolygon);
+    boundaryPolygon = b2MakeOffsetBox(ARENA_WIDTH, 0, (b2Vec2){0, ARENA_HEIGHT}, 0); // top wall
+    b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &boundaryPolygon);
 
-    projectilePolygon = b2MakeOffsetBox(ARENA_WIDTH, 0, (b2Vec2){0, -ARENA_HEIGHT}, 0);  // bottom wall
-    b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &projectilePolygon);
+    boundaryPolygon = b2MakeOffsetBox(ARENA_WIDTH, 0, (b2Vec2){0, -ARENA_HEIGHT}, 0); // bottom wall
+    b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &boundaryPolygon);
 
     // Create tanks
     tank1 = engineCreateTank((b2Vec2){0.0f, 0.0f}, 0.0f, TANK1);    // TODO: pass in initial position and angle as arguments
