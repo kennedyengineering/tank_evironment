@@ -330,7 +330,7 @@ static bool inContactList(b2ShapeId* contactList, uint32_t categoryBits)
 /* Engine Methods */
 bool engineInit()
 {
-    // TODO: Pass initial tank positions and orientations
+    // TODO: Pass initial tank positions and orientations.
 
     // Allocate resources
     if (initialized)
