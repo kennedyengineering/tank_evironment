@@ -119,7 +119,6 @@ void processInput(GLFWwindow *window)
         glfwSetWindowShouldClose(window, true);
     
     // Tank 1 force controls
-    t1a.control_mode = MODE_FORCE_TREAD;
 
     t1a.tread_force[1] = 0.0f;
     if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
@@ -154,26 +153,19 @@ void processInput(GLFWwindow *window)
         t1_fired = false;
     }
 
-    // Tank 2 velocity controls
-    t2a.control_mode = MODE_LIN_ROT_VELOCITY;
+    // Tank 2 force controls
 
-    t2a.linear_velocity[0] = 0.0f;
-    if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-        t2a.linear_velocity[0] += TANK_MOVEMENT_SPEED;
-    if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-        t2a.linear_velocity[0] -= TANK_MOVEMENT_SPEED;
-
-    t2a.linear_velocity[1] = 0.0f;
+    t2a.tread_force[1] = 0.0f;
     if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-        t2a.linear_velocity[1] += TANK_MOVEMENT_SPEED;
+        t2a.tread_force[1] += TANK_TREAD_FORCE;
     if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-        t2a.linear_velocity[1] -= TANK_MOVEMENT_SPEED;
+        t2a.tread_force[1] -= TANK_TREAD_FORCE;
 
-    t2a.angular_velocity = 0.0f;
-    if(glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
-        t2a.angular_velocity += TANK_ROTATION_SPEED;
-    if(glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
-        t2a.angular_velocity -= TANK_ROTATION_SPEED;
+    t2a.tread_force[0] = 0.0f;
+    if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+        t2a.tread_force[0] += TANK_TREAD_FORCE;
+    if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+        t2a.tread_force[0] -= TANK_TREAD_FORCE;
 
     if(glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS)
         t2a.gun_angle += TANK_GUN_ANGLE_INCREMENT;

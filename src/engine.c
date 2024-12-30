@@ -56,19 +56,6 @@ static void RotateTankGun(Tank tank, float angle)
     b2MotorJoint_SetAngularOffset(tank.motorId, angle);
 }
 
-static void RotateTankBody(Tank tank, float angular_velocity)
-{
-    // Rotate tank to desired angular velocity
-    // TODO: see how tank tread bodies affect rotational_inertia
-    float rotational_inertia = b2Body_GetMassData(tank.bodyId).rotationalInertia + b2Body_GetMassData(tank.gunId).rotationalInertia;
-    float current_angular_velocity = b2Body_GetAngularVelocity(tank.bodyId);
-    float impulse = rotational_inertia * (angular_velocity - current_angular_velocity);
-
-    b2Body_ApplyAngularImpulse(tank.bodyId, impulse, true);
-
-    return;
-}
-
 static void ForceTankTreads(Tank tank, float force_left, float force_right)
 {
     // Apply force to tank treads
@@ -159,22 +146,6 @@ static void ScanTankLidar(Tank *tank)
         // Update tank memory
         tank->lidarPoints[cast_num] = point;
     }
-}
-
-static void MoveTankBody(Tank tank, b2Vec2 linear_velocity)
-{
-    // Move tank to desired linear velocity
-    // TODO: see how tank tread bodies affect mass
-    float mass = b2Body_GetMass(tank.bodyId) + b2Body_GetMass(tank.gunId);
-    b2Vec2 current_linear_velocity = b2Body_GetLinearVelocity(tank.bodyId);
-    b2Vec2 impulse = {
-        mass * (linear_velocity.x - current_linear_velocity.x),
-        mass * (linear_velocity.y - current_linear_velocity.y)
-    };
-
-    b2Body_ApplyLinearImpulseToCenter(tank.bodyId, impulse, true);
-
-    return;
 }
 
 typedef struct RGBf
@@ -369,16 +340,7 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
     // Tank 1 controls
     RotateTankGun(tank1, tank1Action.gun_angle);
 
-    switch (tank1Action.control_mode)
-    {
-        case MODE_FORCE_TREAD:
-            ForceTankTreads(tank1, tank1Action.tread_force[0], tank1Action.tread_force[1]); // TODO: clean up fn definition --> use vector as fn input, or 2x vars in TankAction struct
-            break;
-        case MODE_LIN_ROT_VELOCITY:
-            RotateTankBody(tank1, tank1Action.angular_velocity);
-            MoveTankBody(tank1, (b2Vec2){tank1Action.linear_velocity[0], tank1Action.linear_velocity[1]});
-            break;
-    };
+    ForceTankTreads(tank1, tank1Action.tread_force[0], tank1Action.tread_force[1]); // TODO: clean up fn definition --> use vector as fn input, or 2x vars in TankAction struct
 
     if (tank1Action.fire_gun)
         FireTankGun(tank1);
@@ -388,16 +350,7 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
     // Tank 2 controls
     RotateTankGun(tank2, tank2Action.gun_angle);
 
-    switch (tank2Action.control_mode)
-    {
-        case MODE_FORCE_TREAD:
-            ForceTankTreads(tank2, tank2Action.tread_force[0], tank2Action.tread_force[1]);
-            break;
-        case MODE_LIN_ROT_VELOCITY:
-            RotateTankBody(tank2, tank2Action.angular_velocity);
-            MoveTankBody(tank2, (b2Vec2){tank2Action.linear_velocity[0], tank2Action.linear_velocity[1]});
-            break;
-    };
+    ForceTankTreads(tank2, tank2Action.tread_force[0], tank2Action.tread_force[1]);
 
     if (tank2Action.fire_gun)
         FireTankGun(tank2);
