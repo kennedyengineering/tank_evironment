@@ -87,3 +87,5 @@ motor joints only go 360deg, then they stop. so really the guns have +-180 deg m
 game.c should take care of game conditions, etc.
 
 to see how many lines of code you have written: cat src/* | wc -l
+
+create tank.h and engine_render.h?

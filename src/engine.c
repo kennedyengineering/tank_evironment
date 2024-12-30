@@ -357,7 +357,6 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
 
     ScanTankLidar(&tank2);
 
-    // TODO: add collision filters so this method only returns when a projectile collides with something
     b2ContactEvents contactEvents = b2World_GetContactEvents(worldId);
     for (int count = 0; count < contactEvents.beginCount; count++)
     {
