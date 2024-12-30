@@ -373,10 +373,8 @@ bool engineInit()
     b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &boundaryPolygon);
 
     // Create tanks
-    tank1 = tankCreateNew((b2Vec2){-50.0f, TANK_BODY_WIDTH}, 0, TANK1);
-    tank2 = tankCreateNew((b2Vec2){50.0f, 0.0f}, b2_pi, TANK2);
-
-    tankFireGun(tank1);
+    tank1 = tankCreateNew((b2Vec2){-50.0f, 0.0f}, -b2_pi/2, TANK1);
+    tank2 = tankCreateNew((b2Vec2){50.0f, 0.0f}, b2_pi/2, TANK2);
     
     initialized = true;
 
