@@ -338,7 +338,7 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
     // Tank 1 controls
     tankRotateGun(tank1, tank1Action.gun_angle);
 
-    tankForceTreads(tank1, tank1Action.tread_force[0], tank1Action.tread_force[1]); // TODO: clean up fn definition --> use vector as fn input, or 2x vars in TankAction struct
+    tankForceTreads(tank1, tank1Action.tread_force[0], tank1Action.tread_force[1]);
 
     if (tank1Action.fire_gun)
         tankFireGun(tank1);
