@@ -49,21 +49,21 @@ typedef enum
 } CategoryBits;
 
 
-/* Engine Render Variables */
+/* Render Variables */
 typedef struct
 {
 	float r, g, b;
 } RGBf;
 
 
-/* Engine Render Methods */
+/* Render Methods */
 static inline RGBf MakeRGBf(b2HexColor c)
 {
     // Convert a box2d color to RGBf struct
 	return (RGBf){(float)((( c >> 16) & 0xFF) / 255.0f), (float)(((c >> 8) & 0xFF) / 255.0f), (float)((c & 0xFF) / 255.0f)};
 }
 
-static void DrawSolidPolygon (b2Transform transform, const b2Vec2* vertices, int vertexCount, float radius, b2HexColor color, void* context)
+static void DrawSolidPolygon(b2Transform transform, const b2Vec2* vertices, int vertexCount, float radius, b2HexColor color, void* context)
 {
     // Render a box2d polygon
     GLfloat gl_vertices[vertexCount*2];
