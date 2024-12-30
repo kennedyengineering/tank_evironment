@@ -51,6 +51,6 @@ endif()
 
 
 # Application
-add_executable(app src/main.c src/shader.c src/render.c src/engine.c src/game.c)
+add_executable(app src/main.c src/shader.c src/render.c src/engine.c)
 target_include_directories(app PRIVATE include)
 target_link_libraries(app box2d m glfw glad)

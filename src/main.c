@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#include "game.h"
 #include "engine.h"
 
 /* Defines */
@@ -64,7 +63,7 @@ int main() {
     }
 
     // Initialize game
-    if (gameInit() == false)
+    if (engineInit() == false)
     {
         fprintf(stderr, "Failed to initialize game\n");
         glfwTerminate();
@@ -78,11 +77,11 @@ int main() {
         processInput(window);
 
         // Physics
-        gameStep(t1a, t2a);
+        engineStep(t1a, t2a);
 
         // Render
         glClear(GL_COLOR_BUFFER_BIT);
-        gameRender();
+        engineRender();
 
         // Update
         glfwSwapBuffers(window);
@@ -90,7 +89,7 @@ int main() {
     }
 
     // Clean up
-    gameDestroy();
+    engineDestroy();
 
     // Terminate
     glfwTerminate();
