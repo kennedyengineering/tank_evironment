@@ -30,5 +30,9 @@ RUN apt install -y \
 RUN apt install -y \
     python3-jinja2
 
+# PyBind11 packages
+RUN apt install -y \
+    python3-dev
+
 # Switch to non-root user
 USER ubuntu
