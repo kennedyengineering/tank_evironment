@@ -3,7 +3,11 @@
 #include "engine.h"
 #include "buf.h"
 
+#include <glad/gl.h>
+#include <GLFW/glfw3.h>
+
 #include <box2d/box2d.h>
+
 #include <stdio.h>
 
 
@@ -31,6 +35,12 @@
 #define TANK_PROJECTILE_VELOCITY 30.0f
 
 #define TANK_LIDAR_POINTS 360
+
+
+/* GLFW Constants */
+#define SCREEN_WIDTH  800
+#define SCREEN_HEIGHT 600
+#define SCREEN_NAME   "Tank Game"
 
 
 /* Global Variables*/
@@ -285,6 +295,13 @@ static bool inContactList(b2ShapeId* contactList, uint32_t categoryBits)
     return false;
 }
 
+/* GLFW Methods */
+void glfwErrorCallback(int error, const char* description)
+{
+    // Display errors
+	fprintf(stderr, "GLFW error occurred. Code: %d. Description: %s\n", error, description);
+}
+
 
 /* Engine Methods */
 bool engineInit()
@@ -295,6 +312,39 @@ bool engineInit()
     if (initialized)
         return initialized;
 
+    // Initialize GLFW
+    glfwSetErrorCallback(glfwErrorCallback);
+     if (glfwInit() == GLFW_FALSE)
+	{
+		fprintf(stderr, "Failed to initialize GLFW\n");
+		return initialized;
+	}
+
+    // Configure GLFW
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+
+    // Create GLFW window object
+    GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_NAME, NULL, NULL);
+    if (window == NULL)
+    {
+        fprintf(stderr, "Failed to create GLFW window\n");
+        glfwTerminate();
+        return initialized;
+    }
+    glfwMakeContextCurrent(window);
+
+    // Load OpenGL function pointers
+    if (gladLoadGL(glfwGetProcAddress) == 0)
+    {
+        fprintf(stderr, "Failed to initialize OpenGL context\n");
+        glfwTerminate();
+        return initialized;
+    }
+
+    // Initialize Box2d
     b2WorldDef worldDef = b2DefaultWorldDef();
     worldDef.gravity = (b2Vec2){0.0f, 0.0f};
 
@@ -501,6 +551,8 @@ void engineDestroy()
     // Deallocate resources
     if (!initialized)
         return;
+
+    glfwTerminate();
 
     b2DestroyWorld(worldId);
 

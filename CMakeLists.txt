@@ -50,6 +50,8 @@ FetchContent_Declare(
     GIT_PROGRESS   TRUE
 )
 
+set( CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -fPIC" )
+
 FetchContent_GetProperties(glad)
 if(NOT glad_POPULATED)
     FetchContent_MakeAvailable(glad)
