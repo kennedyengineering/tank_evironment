@@ -13,8 +13,8 @@ include(FetchContent)
 # Box2D
 FetchContent_Declare(
     box2d
-    GIT_REPOSITORY  https://github.com/erincatto/box2d.git
-    GIT_TAG         8e7a17c5c942dbf2fdea8b9d09983410dcc0429d    # release v3.0.0
+    GIT_REPOSITORY  https://github.com/erincatto/box2d
+    GIT_TAG         v3.0.0
 )
 FetchContent_MakeAvailable(box2d)
 
