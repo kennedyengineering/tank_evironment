@@ -2,7 +2,12 @@
 
 #pragma once
 
+#include <glad/gl.h>
+
 #include <stdbool.h>
+
+#define SCREEN_WIDTH  800
+#define SCREEN_HEIGHT 600
 
 typedef struct
 {
@@ -15,5 +20,7 @@ typedef struct
 bool engineInit();
 
 void engineStep(TankAction t1a, TankAction t2a);
+
+GLubyte *engineRender();
 
 void engineDestroy();

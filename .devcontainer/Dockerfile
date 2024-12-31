@@ -32,7 +32,13 @@ RUN apt install -y \
 
 # PyBind11 packages
 RUN apt install -y \
-    python3-dev
+    python3-dev \
+    python3-numpy
+
+# Convenience packages
+RUN apt install -y \
+    python3-pip \
+    python3-full
 
 # Switch to non-root user
 USER ubuntu

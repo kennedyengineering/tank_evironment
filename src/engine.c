@@ -1,6 +1,7 @@
 // Tank Game (@kennedyengineering)
 
 #include "engine.h"
+#include "render.h"
 #include "buf.h"
 
 #include <glad/gl.h>
@@ -38,8 +39,6 @@
 
 
 /* GLFW Constants */
-#define SCREEN_WIDTH  800
-#define SCREEN_HEIGHT 600
 #define SCREEN_NAME   "Tank Game"
 
 
@@ -64,6 +63,30 @@ typedef struct
 {
 	float r, g, b;
 } RGBf;
+
+
+/* Render Methods */
+static inline RGBf MakeRGBf(b2HexColor c)
+{
+    // Convert a box2d color to RGBf struct
+	return (RGBf){(float)((( c >> 16) & 0xFF) / 255.0f), (float)(((c >> 8) & 0xFF) / 255.0f), (float)((c & 0xFF) / 255.0f)};
+}
+
+static void DrawSolidPolygon(b2Transform transform, const b2Vec2* vertices, int vertexCount, float radius, b2HexColor color, void* context)
+{
+    // Render a box2d polygon
+    GLfloat gl_vertices[vertexCount*2];
+
+    for (int i = 0; i < vertexCount; i++) {
+        b2Vec2 transformedPoint = b2TransformPoint(transform, vertices[i]);
+        gl_vertices[2 * i] = transformedPoint.x / ARENA_WIDTH;
+        gl_vertices[2 * i + 1] = transformedPoint.y / ARENA_HEIGHT;
+    }
+
+    RGBf colorf = MakeRGBf(color);
+
+    renderPolygon(gl_vertices, vertexCount, (float[]){colorf.r, colorf.g, colorf.b});
+}
 
 
 /* Tank Variables */
@@ -244,6 +267,23 @@ static void tankScanLidar(Tank *tank)
     }
 }
 
+static void tankRenderLidar(Tank tank, b2HexColor color)
+{
+    // Rander tank lidar scan memory buffer 
+    RGBf colorf = MakeRGBf(color);
+    GLfloat radius = 0.01f;
+
+    for (size_t cast_num = 0; cast_num < TANK_LIDAR_POINTS; cast_num++)
+    {
+        // Retrieve lidar point
+        b2Vec2 point = tank.lidarPoints[cast_num];
+
+         // Render lidar point
+        GLfloat center[2] = {point.x / ARENA_WIDTH, point.y / ARENA_HEIGHT};
+        renderCircle(center, radius, (float[]){colorf.r, colorf.g, colorf.b});
+    }
+}
+
 
 /* Collision Variables */
 typedef struct
@@ -349,6 +389,9 @@ bool engineInit()
     worldDef.gravity = (b2Vec2){0.0f, 0.0f};
 
     worldId = b2CreateWorld(&worldDef);
+
+    debugDraw.drawShapes = true;
+    debugDraw.DrawSolidPolygon = &DrawSolidPolygon;
 
     // Create boundaries
     b2BodyDef boundaryBodyDef = b2DefaultBodyDef();
@@ -544,6 +587,42 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
     // Update sensors
     tankScanLidar(&tank1);
     tankScanLidar(&tank2);
+}
+
+GLubyte *engineRender()
+{
+    // Render the physics engine
+    if (!initialized)
+        return NULL;
+
+    GLuint framebuffer, texture;
+    
+    // Set up FBO
+    glGenFramebuffers(1, &framebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    
+    // Set up texture to capture the output
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+
+    glClear(GL_COLOR_BUFFER_BIT);
+    
+    b2World_Draw(worldId, &debugDraw);
+
+    tankRenderLidar(tank1, b2_colorMediumBlue);
+    tankRenderLidar(tank2, b2_colorOrange);
+
+    // Read pixels from the framebuffer
+    GLubyte *pixels = (GLubyte*)malloc(3 * SCREEN_WIDTH * SCREEN_HEIGHT);
+    glReadPixels(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+    // Clean up
+    glDeleteFramebuffers(1, &framebuffer);
+    glDeleteTextures(1, &texture);
+
+    return pixels;
 }
 
 void engineDestroy()

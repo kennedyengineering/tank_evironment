@@ -62,6 +62,6 @@ endif()
 
 
 # Python Bindings
-pybind11_add_module(tank_game src/binding.cpp src/engine.c)
+pybind11_add_module(tank_game src/binding.cpp src/engine.c src/render.c src/shader.c)
 target_include_directories(tank_game PRIVATE include)
 target_link_libraries(tank_game PRIVATE box2d m glfw glad)

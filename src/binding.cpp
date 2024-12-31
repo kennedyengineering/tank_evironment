@@ -1,4 +1,5 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
 
 namespace py = pybind11;
 
@@ -22,6 +23,9 @@ PYBIND11_MODULE(tank_game, handle) {
 
     /* engineStep */
     handle.def("engineStep", &engineStep);
+
+    /* engineRender */
+    handle.def("engineRender", [](){ py::array_t<uint8_t> arr({SCREEN_HEIGHT, SCREEN_WIDTH, 3}, engineRender()); return arr; }, py::return_value_policy::take_ownership);
 
     /* engineDestroy*/
     handle.def("engineDestroy", &engineDestroy);
