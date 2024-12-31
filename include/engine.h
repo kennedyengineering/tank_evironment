@@ -15,6 +15,4 @@ bool engineInit();
 
 void engineStep(TankAction t1a, TankAction t2a);
 
-void engineRender();
-
 void engineDestroy();

@@ -2,7 +2,11 @@
 
 namespace py = pybind11;
 
+extern "C" {
+    #include "engine.h"
+}
+
 PYBIND11_MODULE(tank_game, handle) {
     handle.doc() = "Tank Game Environment";
-    handle.def("test", []() { return "Hello, World!"; });
+    handle.def("engineInit", &engineInit);
 }
