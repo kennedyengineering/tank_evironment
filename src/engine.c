@@ -472,7 +472,7 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
     // Tank 1 controls
     tankRotateGun(tank1, tank1Action.gun_angle);
 
-    tankForceTreads(tank1, tank1Action.tread_force[0], tank1Action.tread_force[1]);
+    tankForceTreads(tank1, tank1Action.left_tread_force, tank1Action.right_tread_force);
 
     if (tank1Action.fire_gun)
         tankFireGun(tank1);
@@ -480,7 +480,7 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
     // Tank 2 controls
     tankRotateGun(tank2, tank2Action.gun_angle);
 
-    tankForceTreads(tank2, tank2Action.tread_force[0], tank2Action.tread_force[1]);
+    tankForceTreads(tank2, tank2Action.left_tread_force, tank2Action.right_tread_force);
 
     if (tank2Action.fire_gun)
         tankFireGun(tank2);

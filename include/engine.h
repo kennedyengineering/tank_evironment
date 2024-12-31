@@ -8,7 +8,8 @@ typedef struct
 {
     float gun_angle;
     bool fire_gun;
-    float tread_force[2];
+    float left_tread_force;
+    float right_tread_force;
 } TankAction;
 
 bool engineInit();
