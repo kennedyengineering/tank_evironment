@@ -9,7 +9,8 @@
         "vscode": {
             "extensions": [
                 "ms-vscode.cpptools-extension-pack",
-                "gruntfuggly.todo-tree"
+                "gruntfuggly.todo-tree",
+                "ms-python.python"
             ]
         }
     }
