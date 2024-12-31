@@ -384,6 +384,14 @@ bool engineInit()
         return initialized;
     }
 
+    // Initialize rendering
+    if (renderInit() == false)
+    {
+        fprintf(stderr, "Failed to initialize rendering\n");
+        glfwTerminate();
+        return initialized;
+    }
+
     // Initialize Box2d
     b2WorldDef worldDef = b2DefaultWorldDef();
     worldDef.gravity = (b2Vec2){0.0f, 0.0f};
