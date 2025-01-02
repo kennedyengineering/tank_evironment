@@ -25,7 +25,12 @@ PYBIND11_MODULE(tank_game, handle) {
     handle.def("engineStep", &engineStep);
 
     /* engineRender */
-    handle.def("engineRender", [](){ py::array_t<uint8_t> arr({SCREEN_HEIGHT, SCREEN_WIDTH, 3}, engineRender()); return arr; }, py::return_value_policy::take_ownership);
+    handle.def("engineRender", []() {
+        uint8_t* pixels = engineRender();
+        auto free_pixels = [](void* p) { free(p); };
+        py::capsule free_when_done(pixels, free_pixels);
+        return py::array_t<uint8_t>({SCREEN_HEIGHT, SCREEN_WIDTH, 3}, pixels, free_when_done);
+    });
 
     /* engineDestroy*/
     handle.def("engineDestroy", &engineDestroy);
