@@ -34,5 +34,9 @@ RUN apt install -y \
 RUN apt install -y \
     python3-dev
 
+# libGD packages
+RUN apt install -y \
+    libgd-dev
+
 # Switch to non-root user
 USER ubuntu
