@@ -7,6 +7,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../buil
 import tank_game
 import numpy as np
 from PIL import Image
+import time
 
 print(dir(tank_game))
 
@@ -23,6 +24,7 @@ print(tank_game.engineStep(action, action))
 frame = tank_game.engineRender()
 print(frame)
 print(frame.shape)
+time.sleep(5)
 
 im = Image.fromarray(frame)
 im.save("frame.png")

@@ -10,7 +10,7 @@
 #include <box2d/box2d.h>
 
 #include <stdio.h>
-
+#include <string.h>
 
 /* Simulation Constants */
 #define TIME_STEP   1.0f / 60.0f
@@ -45,6 +45,8 @@
 /* Global Variables*/
 static bool initialized = false;
 
+static bool isVisible = true;
+
 static b2WorldId worldId;
 
 static b2DebugDraw debugDraw;
@@ -63,6 +65,8 @@ typedef struct
 {
 	float r, g, b;
 } RGBf;
+
+GLFWwindow* window;
 
 
 /* Render Methods */
@@ -354,7 +358,7 @@ bool engineInit()
 
     // Initialize GLFW
     glfwSetErrorCallback(glfwErrorCallback);
-     if (glfwInit() == GLFW_FALSE)
+    if (glfwInit() == GLFW_FALSE)
 	{
 		fprintf(stderr, "Failed to initialize GLFW\n");
 		return initialized;
@@ -364,10 +368,13 @@ bool engineInit()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+    if (!isVisible)
+    {
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+    }
 
     // Create GLFW window object
-    GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_NAME, NULL, NULL);
+    window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_NAME, NULL, NULL);
     if (window == NULL)
     {
         fprintf(stderr, "Failed to create GLFW window\n");
@@ -597,38 +604,26 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
     tankScanLidar(&tank2);
 }
 
-GLubyte *engineRender()
+uint8_t *engineRender()
 {
     // Render the physics engine
-    if (!initialized)
-        return NULL;
-
-    GLuint framebuffer, texture;
-    
-    // Set up FBO
-    glGenFramebuffers(1, &framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-    
-    // Set up texture to capture the output
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+    //if (!initialized)
+    //    return NULL;
 
     glClear(GL_COLOR_BUFFER_BIT);
     
     b2World_Draw(worldId, &debugDraw);
-
     tankRenderLidar(tank1, b2_colorMediumBlue);
     tankRenderLidar(tank2, b2_colorOrange);
 
-    // Read pixels from the framebuffer
-    GLubyte *pixels = (GLubyte*)malloc(3 * SCREEN_WIDTH * SCREEN_HEIGHT);
+    if (isVisible)
+    {
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+    
+    uint8_t *pixels = malloc(3 * SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(uint8_t));
     glReadPixels(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-
-    // Clean up
-    glDeleteFramebuffers(1, &framebuffer);
-    glDeleteTextures(1, &texture);
 
     return pixels;
 }

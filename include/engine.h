@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include <glad/gl.h>
-
 #include <stdbool.h>
+#include <stdint.h>
 
 #define SCREEN_WIDTH  800
 #define SCREEN_HEIGHT 600
@@ -21,6 +20,6 @@ bool engineInit();
 
 void engineStep(TankAction t1a, TankAction t2a);
 
-GLubyte *engineRender();
+uint8_t *engineRender();
 
 void engineDestroy();
