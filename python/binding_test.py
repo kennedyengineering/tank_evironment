@@ -14,9 +14,9 @@ print(dir(tank_game))
 print(tank_game.engineInit())
 
 action = tank_game.TankAction()
-action.gun_angle = 0
+action.gun_angle = 10
 action.fire_gun = False
-action.left_tread_force = 0
+action.left_tread_force = 50
 action.right_tread_force = 0
 
 print(tank_game.engineStep(action, action))
@@ -24,7 +24,16 @@ print(tank_game.engineStep(action, action))
 frame = tank_game.engineRender()
 print(frame)
 print(frame.shape)
-time.sleep(5)
+
+steps = 500
+start = time.time()
+for i in range(steps):
+    tank_game.engineStep(action, action)
+    tank_game.engineRender()
+stop = time.time()
+
+print("Time taken: ", stop - start)
+print("FPS: ", steps / (stop - start))
 
 im = Image.fromarray(frame)
 im.save("frame.png")
