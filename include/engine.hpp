@@ -4,12 +4,14 @@
 
 #include <box2d/box2d.h>
 
+#include "config.hpp"
+
 namespace TankGame
 {
     class Engine
     {
     public:
-        Engine();
+        Engine(const Config& config);
         ~Engine();
 
         void step();

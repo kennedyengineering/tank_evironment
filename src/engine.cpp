@@ -5,7 +5,7 @@
 
 using namespace TankGame;
 
-Engine::Engine()
+Engine::Engine(const Config& config)
 {
     /* Create the engine */
 
@@ -14,13 +14,27 @@ Engine::Engine()
     worldDef.gravity = (b2Vec2){0.0f, 0.0f};
     mWorldId = b2CreateWorld(&worldDef);
 
-    // Create boundaries
+    // Create arena boundaries
     b2BodyDef boundaryBodyDef = b2DefaultBodyDef();
     boundaryBodyDef.type = b2_staticBody;
     b2BodyId boundaryBodyId = b2CreateBody(mWorldId, &boundaryBodyDef);
 
     b2ShapeDef boundaryShapeDef = b2DefaultShapeDef();
     boundaryShapeDef.filter.categoryBits = CategoryBits::WALL;
+
+    b2Polygon boundaryPolygon;
+
+    boundaryPolygon = b2MakeOffsetBox(0, config.arenaHeight, (b2Vec2){(float)-config.arenaWidth, 0}, 0); // left wall
+    b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &boundaryPolygon);
+
+    boundaryPolygon = b2MakeOffsetBox(0, config.arenaHeight, (b2Vec2){(float)config.arenaWidth, 0}, 0); // right wall
+    b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &boundaryPolygon);
+
+    boundaryPolygon = b2MakeOffsetBox(config.arenaWidth, 0, (b2Vec2){0, (float)config.arenaHeight}, 0); // top wall
+    b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &boundaryPolygon);
+
+    boundaryPolygon = b2MakeOffsetBox(config.arenaWidth, 0, (b2Vec2){0, (float)-config.arenaHeight}, 0); // bottom wall
+    b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &boundaryPolygon);
 }
 
 Engine::~Engine()
