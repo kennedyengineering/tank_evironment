@@ -21,6 +21,7 @@ action.right_tread_force = 0
 
 print(tank_game.engineStep(action, action))
 
+# TODO: handle cases where the engine is not initialized
 frame = tank_game.engineRender()
 print(frame)
 print(frame.shape)
