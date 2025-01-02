@@ -10,8 +10,9 @@
 #include <box2d/box2d.h>
 
 #include <stdio.h>
-#include <string.h>
+#include <string.h> // TODO: delete?
 
+// TODO: move to engine.h or something
 /* Simulation Constants */
 #define TIME_STEP   1.0f / 60.0f
 #define SUB_STEPS   4.0f
@@ -25,7 +26,7 @@
 
 #define GRAVITY_ACCEL 9.8
 
-
+// TODO: refactor into a tank.h or something
 /* Tank Constants */
 #define TANK_BODY_HEIGHT 7.93f   // m1-abrams (meters)
 #define TANK_BODY_WIDTH  3.66f
@@ -45,6 +46,7 @@
 /* Global Variables*/
 static bool initialized = false;
 
+// TODO: make this var part of an engine config struct that is passed to engineInit()
 static bool isVisible = true;
 
 static b2WorldId worldId;
@@ -405,6 +407,7 @@ bool engineInit()
 
     worldId = b2CreateWorld(&worldDef);
 
+    // TODO: replace with source in engineRender()
     debugDraw.drawShapes = true;
     debugDraw.DrawSolidPolygon = &DrawSolidPolygon;
 
@@ -604,6 +607,7 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
     tankScanLidar(&tank2);
 }
 
+// TODO: call in engineStep, return output as observation && update window as well as simulation
 uint8_t *engineRender()
 {
     // Render the physics engine
@@ -619,9 +623,10 @@ uint8_t *engineRender()
     if (isVisible)
     {
         glfwSwapBuffers(window);
-        glfwPollEvents();
+        glfwPollEvents();   // TODO: is this needed? and if so, should it be put in its own thread?
     }
     
+    // TODO: use GLuint?
     uint8_t *pixels = malloc(3 * SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(uint8_t));
     glReadPixels(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
