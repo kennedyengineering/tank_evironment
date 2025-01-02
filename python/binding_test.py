@@ -16,7 +16,7 @@ print(tank_game.engineInit())
 action = tank_game.TankAction()
 action.gun_angle = 10
 action.fire_gun = False
-action.left_tread_force = 50
+action.left_tread_force = 500
 action.right_tread_force = 0
 
 print(tank_game.engineStep(action, action))
