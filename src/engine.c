@@ -607,8 +607,8 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
 uint8_t *engineRender()
 {
     // Render the physics engine
-    //if (!initialized)
-    //    return NULL;
+    if (!initialized)
+       return NULL;
 
     glClear(GL_COLOR_BUFFER_BIT);
     
