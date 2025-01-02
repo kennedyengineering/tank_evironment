@@ -25,7 +25,7 @@ frame = tank_game.engineRender()
 print(frame)
 print(frame.shape)
 
-steps = 500
+steps = 1000
 start = time.time()
 for i in range(steps):
     tank_game.engineStep(action, action)
