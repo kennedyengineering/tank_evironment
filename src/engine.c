@@ -3,6 +3,7 @@
 #include "engine.h"
 #include "buf.h"
 
+#include <gd.h>
 #include <box2d/box2d.h>
 #include <stdio.h>
 
@@ -494,6 +495,17 @@ void engineStep(TankAction tank1Action, TankAction tank2Action)
     // Update sensors
     tankScanLidar(&tank1);
     tankScanLidar(&tank2);
+}
+
+uint8_t *engineRender()
+{
+    // Render the game
+    if (!initialized)
+        return NULL;
+
+    uint8_t *pixels = malloc(sizeof(uint8_t) * SCREEN_WIDTH * SCREEN_HEIGHT * 3);
+
+    return pixels;
 }
 
 void engineDestroy()
