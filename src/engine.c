@@ -503,8 +503,38 @@ uint8_t *engineRender()
     if (!initialized)
         return NULL;
 
-    uint8_t *pixels = malloc(sizeof(uint8_t) * SCREEN_WIDTH * SCREEN_HEIGHT * 3);
+    // Create image
+    gdImagePtr im = gdImageCreate(SCREEN_WIDTH, SCREEN_HEIGHT);
 
+    // Render
+    int black = gdImageColorAllocate(im, 0, 0, 0);
+    int red = gdImageColorAllocate(im, 255, 0, 0);
+
+    int points[] = {100, 100, 200, 50, 300, 150, 200, 250, 100, 200};
+    gdImageFilledPolygon(im, (gdPointPtr)points, 5, red);
+
+    // Allocate pixel buffer
+    uint8_t *pixels = (uint8_t *)malloc(sizeof(uint8_t) * SCREEN_WIDTH * SCREEN_HEIGHT * 3);
+
+    // Copy to pixel buffer 
+    for (size_t y = 0; y < SCREEN_HEIGHT; y++)
+    {
+        for (size_t x = 0; x < SCREEN_WIDTH; x++)
+        {
+            int color = gdImagePalettePixel(im, x, y);
+            RGBf rgb = {0};
+
+            rgb.r = gdImageRed(im, color);
+            rgb.g = gdImageGreen(im, color);
+            rgb.b = gdImageBlue(im, color);
+
+            pixels[(y * SCREEN_WIDTH + x) * 3 + 0] = (uint8_t)(rgb.r);
+            pixels[(y * SCREEN_WIDTH + x) * 3 + 1] = (uint8_t)(rgb.g);
+            pixels[(y * SCREEN_WIDTH + x) * 3 + 2] = (uint8_t)(rgb.b);
+        }
+    }
+
+    gdImageDestroy(im);
     return pixels;
 }
 
