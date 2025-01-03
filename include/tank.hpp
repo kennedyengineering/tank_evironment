@@ -19,7 +19,8 @@ namespace TankGame
         void fireGun();
         void moveLeftTread(float force);
         void moveRightTread(float force);
-        void scanLidar(float range);
+
+        std::vector<b2Vec2> scanLidar(float range);
     
     private:
         TankConfig mTankConfig;
@@ -32,7 +33,5 @@ namespace TankGame
         b2BodyId mRightTreadBodyId;
 
         b2JointId mGunMotorJointId;
-
-        std::vector<b2Vec2> mLidarPoints;
     };
 }

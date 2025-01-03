@@ -136,7 +136,7 @@ void Tank::moveRightTread(float force)
     // TODO: compute friction forces, or other motion model stuff (set velocity?)
 }
 
-void Tank::scanLidar(float range)
+std::vector<b2Vec2> Tank::scanLidar(float range)
 {
     /* Perform a lidar scan */
 
@@ -159,8 +159,8 @@ void Tank::scanLidar(float range)
         return fraction;
     };
 
-    // Clear vector
-    mLidarPoints.clear();
+    // Define vector
+    std::vector<b2Vec2> points(mTankConfig.lidarPoints);
 
     // Populate vector
     for (size_t pointNum = 0; pointNum < mTankConfig.lidarPoints; pointNum++)
@@ -178,6 +178,8 @@ void Tank::scanLidar(float range)
         b2World_CastRay(mWorldId, startPosition, translation, viewFilter, rayCastCallback, &point);
 
         // Update vector
-        mLidarPoints.push_back(point);
+        points[pointNum] = point;
     }
+
+    return points;
 }
