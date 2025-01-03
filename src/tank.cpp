@@ -80,7 +80,19 @@ Tank::Tank(const TankConfig& tankConfig, b2WorldId worldId) : mTankConfig(tankCo
 
 Tank::~Tank()
 {
+    /* Destroy the tank */
 
+    // Check if world has been destroyed
+    if (!b2World_IsValid(mWorldId))
+    {
+        return;
+    }
+
+    // Destroy the tank bodies and joints
+    b2DestroyBody(mTankBodyId);
+    b2DestroyBody(mGunBodyId);
+    b2DestroyBody(mLeftTreadBodyId);
+    b2DestroyBody(mRightTreadBodyId);
 }
 
 void Tank::rotateGun(float angle)

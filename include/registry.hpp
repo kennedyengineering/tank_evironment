@@ -30,7 +30,9 @@ namespace TankGame
                 mFreeIds.erase(mFreeIds.begin());
             }
 
-            mObjectMap.emplace(id, T(std::forward<Args>(args)...));
+            mObjectMap.emplace(std::piecewise_construct,
+                               std::forward_as_tuple(id),
+                               std::forward_as_tuple(std::forward<Args>(args)...));
             return id;
         }
 

@@ -22,3 +22,5 @@ print("TankId", tankId1)
 
 tankId2 = engine.addTank(tankConfig)
 print("TankId", tankId2)
+
+engine.removeTank(tankId1)
