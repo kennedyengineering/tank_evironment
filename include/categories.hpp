@@ -2,6 +2,7 @@
 
 #pragma once
 
+// TODO: figure out how to make this scalable with more than two tanks. Maybe use new mechanism for collision resolution?
 namespace TankGame
 {
     enum CategoryBits
