@@ -39,7 +39,10 @@ Engine::Engine(const Config& config) : mConfig(config)
 
 Engine::~Engine()
 {
-    // Destroy the engine
+    /* Destroy the engine */
+
+    // Destroy the physics engine
+    b2DestroyWorld(mWorldId);
 }
 
 RegistryId Engine::addTank(const TankConfig& tankConfig)
@@ -63,9 +66,4 @@ void Engine::step()
 
     // Step the physics engine
     b2World_Step(mWorldId, mConfig.timeStep, mConfig.subStep);
-}
-
-void Engine::destroy()
-{
-    // Destroy the engine
 }

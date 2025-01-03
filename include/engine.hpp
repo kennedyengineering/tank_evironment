@@ -20,7 +20,6 @@ namespace TankGame
         void removeTank(RegistryId tankId);
 
         void step();
-        void destroy();
 
     private:
         Config mConfig;

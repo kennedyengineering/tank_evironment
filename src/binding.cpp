@@ -29,6 +29,5 @@ PYBIND11_MODULE(tank_game, handle)
         .def("addTank", &TankGame::Engine::addTank)
         .def("removeTank", &TankGame::Engine::removeTank)
         .def("step", &TankGame::Engine::step)
-        .def("destroy", &TankGame::Engine::destroy)
         ;
 }
