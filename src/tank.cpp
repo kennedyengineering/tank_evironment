@@ -99,7 +99,7 @@ void Tank::fireGun()
     projectileBodyDef.type = b2_dynamicBody;
     projectileBodyDef.position = b2Body_GetPosition(mGunBodyId);
     projectileBodyDef.rotation = b2Body_GetRotation(mGunBodyId);
-    projectileBodyDef.linearVelocity = b2Body_GetWorldVector(mGunBodyId, (b2Vec2){mTankConfig.projectileVelocity, 0.0f});
+    projectileBodyDef.linearVelocity = b2Body_GetWorldVector(mGunBodyId, (b2Vec2){mTankConfig.projectileVelocity, 0.0f});   // TODO: add gun's current velocity
     projectileBodyDef.isBullet = true;
     b2BodyId projectileBodyId = b2CreateBody(mWorldId, &projectileBodyDef);
 
@@ -112,4 +112,15 @@ void Tank::fireGun()
 
     b2Polygon projectilePolygon = b2MakeOffsetBox(mTankConfig.gunWidth, mTankConfig.gunWidth, (b2Vec2){mTankConfig.gunHeight*2+mTankConfig.gunWidth, 0}, 0);
     b2CreatePolygonShape(projectileBodyId, &projectileShapeDef, &projectilePolygon);
+}
+
+void Tank::moveLeftTread(float force)
+{
+    /* Move the left tread */
+
+    // Apply force to the left tread
+    b2Vec2 leftTreadWorldForce = b2Body_GetWorldVector(mTankBodyId, (b2Vec2){force, 0});
+    b2Body_ApplyForceToCenter(mLeftTreadBodyId, leftTreadWorldForce, true);
+
+    // TODO: compute friction forces, or other motion model stuff (set velocity?)
 }
