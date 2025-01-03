@@ -124,3 +124,12 @@ void Tank::moveLeftTread(float force)
 
     // TODO: compute friction forces, or other motion model stuff (set velocity?)
 }
+
+void Tank::moveRightTread(float force)
+{
+    /* Move the right tread */
+
+    // Apply force to the right tread
+    b2Vec2 rightTreadWorldForce = b2Body_GetWorldVector(mTankBodyId, (b2Vec2){force, 0});
+    b2Body_ApplyForceToCenter(mRightTreadBodyId, rightTreadWorldForce, true);
+}
