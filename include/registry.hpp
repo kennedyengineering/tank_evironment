@@ -4,6 +4,7 @@
 
 #include <map>
 #include <set>
+#include <stdexcept>
 
 namespace TankGame
 {
@@ -36,9 +37,25 @@ namespace TankGame
             return id;
         }
 
+        T& get(RegistryId id)
+        {
+            auto it = mObjectMap.find(id);
+            if (it == mObjectMap.end())
+            {
+                throw std::out_of_range("Invalid RegistryId");
+            }
+
+            return it->second;
+        }
+
         void remove(RegistryId id)
         {
-            mObjectMap.erase(id);
+            auto count = mObjectMap.erase(id);
+            if (count == 0)
+            {
+                throw std::out_of_range("Invalid RegistryId");
+            }
+
             mFreeIds.insert(id);
         }
 
