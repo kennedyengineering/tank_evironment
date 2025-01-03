@@ -160,6 +160,7 @@ static void tankForceTreads(Tank tank, float force_left, float force_right)
     b2Body_ApplyForceToCenter(tank.rightTreadId, rightTreadWorldForce, true);
 
     // Apply friction force to tank treads
+    // FIXME: if a low force is applied, a larger friction force is applied in response?
     float mass = b2Body_GetMass(tank.bodyId) + b2Body_GetMass(tank.gunId) + b2Body_GetMass(tank.leftTreadId) + b2Body_GetMass(tank.rightTreadId);
 
     float left_friction_coef = sqrtf(GROUND_FRICTION_COEF * b2Shape_GetFriction(tank.leftTreadShapeId));
