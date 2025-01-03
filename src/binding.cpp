@@ -22,11 +22,12 @@ PYBIND11_MODULE(tank_game, handle)
         .def(py::init<>())
         .def_readwrite("arenaWidth", &TankGame::Config::arenaWidth)
         .def_readwrite("arenaHeight", &TankGame::Config::arenaHeight)
-        .def_readwrite("tankConfigs", &TankGame::Config::tankConfigs)
         ;
 
     py::class_<TankGame::Engine>(handle, "Engine")
         .def(py::init<const TankGame::Config&>())
+        .def("addTank", &TankGame::Engine::addTank)
+        .def("removeTank", &TankGame::Engine::removeTank)
         .def("step", &TankGame::Engine::step)
         .def("destroy", &TankGame::Engine::destroy)
         ;

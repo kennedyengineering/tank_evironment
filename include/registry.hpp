@@ -14,9 +14,10 @@ namespace TankGame
     {
     public:
         Registry() : mNextId(0) { }
-        ~Registry();
+        ~Registry() = default;
 
-        RegistryId add(const T& obj)
+        template <typename... Args>
+        RegistryId emplace(Args&&... args)
         {
             RegistryId id;
             if (mFreeIds.empty())
@@ -29,7 +30,7 @@ namespace TankGame
                 mFreeIds.erase(mFreeIds.begin());
             }
 
-            mObjectMap[id] = obj;
+            mObjectMap.emplace(id, T(std::forward<Args>(args)...));
             return id;
         }
 

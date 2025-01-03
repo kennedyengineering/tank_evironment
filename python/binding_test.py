@@ -11,12 +11,14 @@ print("Module", dir(tank_game))
 config = tank_game.Config()
 print("Config", dir(config))
 
+engine = tank_game.Engine(config)
+print("Engine", dir(engine))
+
 tankConfig = tank_game.TankConfig()
 print("TankConfig", dir(tankConfig))
 
-print(config.tankConfigs)
-config.tankConfigs = [tankConfig]
-print(config.tankConfigs)
+tankId1 = engine.addTank(tankConfig)
+print("TankId", tankId1)
 
-engine = tank_game.Engine(config)
-print("Engine", dir(engine))
+tankId2 = engine.addTank(tankConfig)
+print("TankId", tankId2)

@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <vector>
-
 namespace TankGame
 {
     struct TankConfig
@@ -31,7 +29,5 @@ namespace TankGame
     {
         unsigned int arenaWidth = 100;    // in meters
         unsigned int arenaHeight = 75;    // in meters
-
-        std::vector<TankConfig> tankConfigs;
     };
 }

@@ -3,10 +3,10 @@
 #pragma once
 
 #include <box2d/box2d.h>
-#include <vector>
 
 #include "config.hpp"
 #include "tank.hpp"
+#include "registry.hpp"
 
 namespace TankGame
 {
@@ -16,11 +16,15 @@ namespace TankGame
         Engine(const Config& config);
         ~Engine();
 
+        RegistryId addTank(const TankConfig& tankConfig);
+        void removeTank(RegistryId tankId);
+
         void step();
         void destroy();
 
     private:
         b2WorldId mWorldId;
-        std::vector<Tank> mTanks;
+
+        Registry<Tank> mTankRegistry;
     };
 }
