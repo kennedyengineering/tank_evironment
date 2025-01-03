@@ -14,5 +14,9 @@ print("Config", dir(config))
 tankConfig = tank_game.TankConfig()
 print("TankConfig", dir(tankConfig))
 
+print(config.tankConfigs)
+config.tankConfigs = [tankConfig]
+print(config.tankConfigs)
+
 engine = tank_game.Engine(config)
 print("Engine", dir(engine))
