@@ -3,6 +3,7 @@
 #pragma once
 
 #include <box2d/box2d.h>
+#include <vector>
 
 #include "config.hpp"
 
@@ -18,7 +19,7 @@ namespace TankGame
         void fireGun();
         void moveLeftTread(float force);
         void moveRightTread(float force);
-        // void scanLidar();
+        void scanLidar(float range);
     
     private:
         TankConfig mTankConfig;
@@ -31,5 +32,7 @@ namespace TankGame
         b2BodyId mRightTreadBodyId;
 
         b2JointId mGunMotorJointId;
+
+        std::vector<b2Vec2> mLidarPoints;
     };
 }

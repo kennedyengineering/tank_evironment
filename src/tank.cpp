@@ -132,4 +132,52 @@ void Tank::moveRightTread(float force)
     // Apply force to the right tread
     b2Vec2 rightTreadWorldForce = b2Body_GetWorldVector(mTankBodyId, (b2Vec2){force, 0});
     b2Body_ApplyForceToCenter(mRightTreadBodyId, rightTreadWorldForce, true);
+
+    // TODO: compute friction forces, or other motion model stuff (set velocity?)
+}
+
+void Tank::scanLidar(float range)
+{
+    /* Perform a lidar scan */
+
+    // TODO: see if range returns endPosition or zero (want to return endPosition...)
+
+    // Compute angle resolution (radians per point)
+    float angleResolution = 2*b2_pi/mTankConfig.lidarPoints;
+
+    // Find start position
+    b2Vec2 startPosition = b2Body_GetPosition(mTankBodyId);
+
+    // Construct query filter
+    // uint32_t maskBits = PROJECTILE | WALL | (tank->categoryBits == TANK1 ? TANK2 : TANK1);
+    // b2QueryFilter viewFilter = {.categoryBits=0xFFFFFFFF, .maskBits=maskBits};
+    b2QueryFilter viewFilter = {0}; // temporary
+
+    // Define raycast callback
+    auto rayCastCallback = [](b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float fraction, void* context) -> float {
+        *(b2Vec2*)context = point;
+        return fraction;
+    };
+
+    // Clear vector
+    mLidarPoints.clear();
+
+    // Populate vector
+    for (size_t pointNum = 0; pointNum < mTankConfig.lidarPoints; pointNum++)
+    {
+        // Compute angle
+        float angle = angleResolution*pointNum;
+
+        // Compute translation vector
+        b2Rot rotation = b2MakeRot(angle);
+        b2Vec2 endPosition = b2Body_GetWorldPoint(mTankBodyId, b2RotateVector(rotation, (b2Vec2){range, 0}));
+        b2Vec2 translation = b2Sub(endPosition, startPosition);
+
+        // Perform raycast
+        b2Vec2 point = {0};
+        b2World_CastRay(mWorldId, startPosition, translation, viewFilter, rayCastCallback, &point);
+
+        // Update vector
+        mLidarPoints.push_back(point);
+    }
 }
