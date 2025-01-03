@@ -23,6 +23,8 @@ namespace TankGame
         void destroy();
 
     private:
+        Config mConfig;
+
         b2WorldId mWorldId;
 
         Registry<Tank> mTankRegistry;

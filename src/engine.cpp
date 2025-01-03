@@ -5,7 +5,7 @@
 
 using namespace TankGame;
 
-Engine::Engine(const Config& config)
+Engine::Engine(const Config& config) : mConfig(config)
 {
     /* Create the engine */
 
@@ -45,8 +45,11 @@ Engine::~Engine()
 RegistryId Engine::addTank(const TankConfig& tankConfig)
 {
     /* Add a tank */
+    // TODO: pass registryId to tank constructor
     return mTankRegistry.emplace(tankConfig, mWorldId);
 }
+
+// TODO: add tank control method, and action struct? or just retrieve tank and call methods directly?
 
 void Engine::removeTank(RegistryId id)
 {
@@ -56,7 +59,10 @@ void Engine::removeTank(RegistryId id)
 
 void Engine::step()
 {
-    // Step the engine forward
+    /* Step the engine forward */
+
+    // Step the physics engine
+    b2World_Step(mWorldId, mConfig.timeStep, mConfig.subStep);
 }
 
 void Engine::destroy()
