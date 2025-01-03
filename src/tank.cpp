@@ -86,5 +86,30 @@ Tank::~Tank()
 void Tank::rotateGun(float angle)
 {
     /* Rotate the tank gun to a set angle (in radians) */
+
     b2MotorJoint_SetAngularOffset(mGunMotorJointId, angle);
+}
+
+void Tank::fireGun()
+{
+    /* Fire the tank gun */
+
+    // Create the projectile body
+    b2BodyDef projectileBodyDef = b2DefaultBodyDef();
+    projectileBodyDef.type = b2_dynamicBody;
+    projectileBodyDef.position = b2Body_GetPosition(mGunBodyId);
+    projectileBodyDef.rotation = b2Body_GetRotation(mGunBodyId);
+    projectileBodyDef.linearVelocity = b2Body_GetWorldVector(mGunBodyId, (b2Vec2){mTankConfig.projectileVelocity, 0.0f});
+    projectileBodyDef.isBullet = true;
+    b2BodyId projectileBodyId = b2CreateBody(mWorldId, &projectileBodyDef);
+
+    // Create the projectile shape
+    b2ShapeDef projectileShapeDef = b2DefaultShapeDef();
+    projectileShapeDef.customColor = b2_colorGray;
+    // projectileShapeDef.filter.categoryBits = PROJECTILE;
+    // uint32_t maskBits = PROJECTILE | WALL | (tank.categoryBits == TANK1 ? TANK2 : TANK1);
+    // projectileShapeDef.filter.maskBits = maskBits;
+
+    b2Polygon projectilePolygon = b2MakeOffsetBox(mTankConfig.gunWidth, mTankConfig.gunWidth, (b2Vec2){mTankConfig.gunHeight*2+mTankConfig.gunWidth, 0}, 0);
+    b2CreatePolygonShape(projectileBodyId, &projectileShapeDef, &projectilePolygon);
 }
