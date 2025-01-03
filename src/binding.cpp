@@ -13,6 +13,9 @@ PYBIND11_MODULE(tank_game, handle)
 
     py::class_<TankGame::TankConfig>(handle, "TankConfig")
         .def(py::init<>())
+        .def_readwrite("positionX", &TankGame::TankConfig::positionX)
+        .def_readwrite("positionY", &TankGame::TankConfig::positionY)
+        .def_readwrite("angle", &TankGame::TankConfig::angle)
         ;
 
     py::class_<TankGame::Config>(handle, "Config")
