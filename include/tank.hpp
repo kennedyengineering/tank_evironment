@@ -14,7 +14,7 @@ namespace TankGame
         Tank(const TankConfig& tankConfig, b2WorldId worldId);
         ~Tank();
 
-        // void rotateTurret(float angle);
+        void rotateGun(float angle);
         // void fireGun();
         // void moveLeftTread(float force);
         // void moveRightTread(float force);
