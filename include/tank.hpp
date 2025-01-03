@@ -21,6 +21,8 @@ namespace TankGame
         // void scanLidar();
     
     private:
+        TankConfig mTankConfig;
+
         b2WorldId mWorldId;
 
         b2BodyId mTankBodyId;

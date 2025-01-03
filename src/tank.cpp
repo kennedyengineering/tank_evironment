@@ -7,15 +7,15 @@ using namespace TankGame;
 // TODO: check for valid tankConfig values
 // TODO: make colors configurable in tankConfig
 
-Tank::Tank(const TankConfig& tankConfig, b2WorldId worldId) : mWorldId(worldId)
+Tank::Tank(const TankConfig& tankConfig, b2WorldId worldId) : mTankConfig(tankConfig), mWorldId(worldId)
 {
     /* Create the tank */
 
     // Construct bodies
     b2BodyDef bodyDef = b2DefaultBodyDef();
     bodyDef.type = b2_dynamicBody;
-    bodyDef.position = (b2Vec2){tankConfig.positionX, tankConfig.positionY};
-    bodyDef.rotation = b2MakeRot(tankConfig.angle);
+    bodyDef.position = (b2Vec2){mTankConfig.positionX, mTankConfig.positionY};
+    bodyDef.rotation = b2MakeRot(mTankConfig.angle);
 
     mTankBodyId = b2CreateBody(mWorldId, &bodyDef);
     mGunBodyId = b2CreateBody(mWorldId, &bodyDef);
@@ -27,7 +27,7 @@ Tank::Tank(const TankConfig& tankConfig, b2WorldId worldId) : mWorldId(worldId)
     bodyShapeDef.customColor = b2_colorGreenYellow;
     // bodyShapeDef.filter.categoryBits = categoryBits;
     
-    b2Polygon bodyPolygon = b2MakeBox(tankConfig.bodyHeight, tankConfig.bodyWidth);
+    b2Polygon bodyPolygon = b2MakeBox(mTankConfig.bodyHeight, mTankConfig.bodyWidth);
     b2CreatePolygonShape(mTankBodyId, &bodyShapeDef, &bodyPolygon);
 
     // Construct the left tread shape
@@ -35,7 +35,7 @@ Tank::Tank(const TankConfig& tankConfig, b2WorldId worldId) : mWorldId(worldId)
     leftTreadShapeDef.customColor = b2_colorHotPink;
     // leftTreadShapeDef.filter.categoryBits = categoryBits;
 
-    b2Polygon leftTreadPolygon = b2MakeOffsetBox(tankConfig.bodyHeight, tankConfig.treadWidth, (b2Vec2){0, tankConfig.bodyHeight/2.0f}, 0);
+    b2Polygon leftTreadPolygon = b2MakeOffsetBox(mTankConfig.bodyHeight, mTankConfig.treadWidth, (b2Vec2){0, mTankConfig.bodyHeight/2.0f}, 0);
     b2ShapeId leftTreadShapeId = b2CreatePolygonShape(mLeftTreadBodyId, &leftTreadShapeDef, &leftTreadPolygon);
 
     // Weld left tread to tank body
@@ -49,7 +49,7 @@ Tank::Tank(const TankConfig& tankConfig, b2WorldId worldId) : mWorldId(worldId)
     rightTreadShapeDef.customColor = b2_colorHotPink;
     // rightTreadShapeDef.filter.categoryBits = categoryBits;
 
-    b2Polygon rightTreadPolygon = b2MakeOffsetBox(tankConfig.bodyHeight, tankConfig.treadWidth, (b2Vec2){0, -tankConfig.bodyHeight/2.0f}, 0);
+    b2Polygon rightTreadPolygon = b2MakeOffsetBox(mTankConfig.bodyHeight, mTankConfig.treadWidth, (b2Vec2){0, -mTankConfig.bodyHeight/2.0f}, 0);
     b2ShapeId rightTreadShapeId = b2CreatePolygonShape(mRightTreadBodyId, &rightTreadShapeDef, &rightTreadPolygon);
 
     // Weld right tread to tank body
@@ -64,7 +64,7 @@ Tank::Tank(const TankConfig& tankConfig, b2WorldId worldId) : mWorldId(worldId)
     gunShapeDef.customColor = b2_colorGreen;
     // gunShapeDef.filter.categoryBits = categoryBits;
 
-    b2Polygon gunPolygon = b2MakeOffsetBox(tankConfig.gunHeight, tankConfig.gunWidth, (b2Vec2){tankConfig.gunHeight, 0}, 0);
+    b2Polygon gunPolygon = b2MakeOffsetBox(mTankConfig.gunHeight, mTankConfig.gunWidth, (b2Vec2){mTankConfig.gunHeight, 0}, 0);
     b2CreatePolygonShape(mGunBodyId, &gunShapeDef, &gunPolygon);
 
     // Create gun motor joint
