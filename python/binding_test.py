@@ -6,10 +6,13 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../buil
 
 import tank_game
 
-print(dir(tank_game))
+print("Module", dir(tank_game))
 
 config = tank_game.Config()
-print(dir(config))
+print("Config", dir(config))
+
+tankConfig = tank_game.TankConfig()
+print("TankConfig", dir(tankConfig))
 
 engine = tank_game.Engine(config)
-print(dir(engine))
+print("Engine", dir(engine))

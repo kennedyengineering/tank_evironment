@@ -35,6 +35,13 @@ Engine::Engine(const Config& config)
 
     boundaryPolygon = b2MakeOffsetBox(config.arenaWidth, 0, (b2Vec2){0, (float)-config.arenaHeight}, 0); // bottom wall
     b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &boundaryPolygon);
+
+    // Create tanks
+    for (const TankConfig& tankConfig : config.tankConfigs)
+    {
+        Tank tank(tankConfig, mWorldId);
+        mTanks.push_back(tank);
+    }
 }
 
 Engine::~Engine()
