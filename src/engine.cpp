@@ -24,7 +24,7 @@ Engine::Engine(const Config& config)
 
     b2Polygon boundaryPolygon;
 
-    boundaryPolygon = b2MakeOffsetBox(0, config.arenaHeight, (b2Vec2){(float)-config.arenaWidth, 0}, 0); // left wall
+    boundaryPolygon = b2MakeOffsetBox(0, config.arenaHeight, (b2Vec2){-(float)config.arenaWidth, 0}, 0); // left wall
     b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &boundaryPolygon);
 
     boundaryPolygon = b2MakeOffsetBox(0, config.arenaHeight, (b2Vec2){(float)config.arenaWidth, 0}, 0); // right wall
@@ -33,7 +33,7 @@ Engine::Engine(const Config& config)
     boundaryPolygon = b2MakeOffsetBox(config.arenaWidth, 0, (b2Vec2){0, (float)config.arenaHeight}, 0); // top wall
     b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &boundaryPolygon);
 
-    boundaryPolygon = b2MakeOffsetBox(config.arenaWidth, 0, (b2Vec2){0, (float)-config.arenaHeight}, 0); // bottom wall
+    boundaryPolygon = b2MakeOffsetBox(config.arenaWidth, 0, (b2Vec2){0, -(float)config.arenaHeight}, 0); // bottom wall
     b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &boundaryPolygon);
 
     // Create tanks
