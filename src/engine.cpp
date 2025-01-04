@@ -171,6 +171,9 @@ void Engine::handleCollisions()
     for (const std::pair<TableEntry, std::set<TableEntry>>& pair : table)
     {
         b2ShapeId projectileShapeId = pair.first;
+        
+        delete static_cast<TankId*>(b2Shape_GetUserData(projectileShapeId));
+
         b2DestroyBody(b2Shape_GetBody(projectileShapeId));
     }
 }
