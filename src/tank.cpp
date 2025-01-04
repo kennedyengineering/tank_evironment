@@ -167,10 +167,27 @@ std::vector<b2Vec2> Tank::scanLidar(float range)
     // Construct query filter
     b2QueryFilter viewFilter = {.categoryBits=CategoryBits::ALL, .maskBits=CategoryBits::ALL};
 
+    // Define raycast context
+    struct RayCastContext
+    {
+        b2Vec2 point;
+        TankId tankId;
+    };
+
     // Define raycast callback
     auto rayCastCallback = [](b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float fraction, void* context) -> float {
-        *(b2Vec2*)context = point;
-        // TODO: check shapeId userdata for tank Id
+        // Retrieve context data
+        RayCastContext* ctx = reinterpret_cast<RayCastContext*>(context);
+        ctx->point = point;
+
+        // Check if colliding with self
+        TankId otherTankId = *reinterpret_cast<TankId*>(b2Shape_GetUserData(shapeId));
+        if (otherTankId == ctx->tankId)
+        {
+            // Continue and ignore this shape
+            fraction = -1;
+        }
+
         return fraction;
     };
 
@@ -189,11 +206,11 @@ std::vector<b2Vec2> Tank::scanLidar(float range)
         b2Vec2 translation = b2Sub(endPosition, startPosition);
 
         // Perform raycast
-        b2Vec2 point = {0};
-        b2World_CastRay(mWorldId, startPosition, translation, viewFilter, rayCastCallback, &point);
+        RayCastContext context = {.point = (b2Vec2){0}, .tankId = mTankId};
+        b2World_CastRay(mWorldId, startPosition, translation, viewFilter, rayCastCallback, &context);
 
         // Update vector
-        points[pointNum] = point;
+        points[pointNum] = context.point;
     }
 
     return points;
