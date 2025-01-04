@@ -20,20 +20,24 @@ namespace TankGame
         template <typename... Args>
         RegistryId emplace(Args&&... args)
         {
-            RegistryId id;
-            if (mFreeIds.empty())
-            {
-                id = mNextId++;
-            }
-            else
-            {
-                id = *mFreeIds.begin();
-                mFreeIds.erase(mFreeIds.begin());
-            }
+            RegistryId id = getNextId();
 
             mObjectMap.emplace(std::piecewise_construct,
                                std::forward_as_tuple(id),
                                std::forward_as_tuple(std::forward<Args>(args)...));
+
+            return id;
+        }
+
+        template <typename... Args>
+        RegistryId emplaceWithId(Args&&... args)
+        {
+            RegistryId id = getNextId();
+
+            mObjectMap.emplace(std::piecewise_construct,
+                               std::forward_as_tuple(id),
+                               std::forward_as_tuple(id, std::forward<Args>(args)...));
+
             return id;
         }
 
@@ -57,6 +61,23 @@ namespace TankGame
             }
 
             mFreeIds.insert(id);
+        }
+
+    private:
+        RegistryId getNextId()
+        {
+            RegistryId id;
+            if (mFreeIds.empty())
+            {
+                id = mNextId++;
+            }
+            else
+            {
+                id = *mFreeIds.begin();
+                mFreeIds.erase(mFreeIds.begin());
+            }
+
+            return id;
         }
 
     private:

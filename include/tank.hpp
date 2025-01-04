@@ -9,10 +9,12 @@
 
 namespace TankGame
 {
+    using TankId = unsigned int;
+
     class Tank
     {
     public:
-        Tank(const TankConfig& tankConfig, b2WorldId worldId);
+        Tank(TankId tankId, const TankConfig& tankConfig, b2WorldId worldId);
         ~Tank();
 
         void rotateGun(float angle);
@@ -23,6 +25,8 @@ namespace TankGame
         std::vector<b2Vec2> scanLidar(float range);
     
     private:
+        TankId mTankId;
+
         TankConfig mTankConfig;
 
         b2WorldId mWorldId;

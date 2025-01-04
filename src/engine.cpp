@@ -48,8 +48,9 @@ Engine::~Engine()
 RegistryId Engine::addTank(const TankConfig& tankConfig)
 {
     /* Add a tank */
-    // TODO: pass registryId to tank constructor
-    return mTankRegistry.emplace(tankConfig, mWorldId);
+
+    // Create a new tank in registry with id as argument
+    return mTankRegistry.emplaceWithId(tankConfig, mWorldId);
 }
 
 // TODO: add tank control method, and action struct? or just retrieve tank and call methods directly?

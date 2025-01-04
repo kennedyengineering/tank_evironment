@@ -1,13 +1,14 @@
 // Tank Game (@kennedyengineering)
 
 #include "tank.hpp"
+#include "categories.hpp"
 
 using namespace TankGame;
 
 // TODO: check for valid tankConfig values
 // TODO: make colors configurable in tankConfig
 
-Tank::Tank(const TankConfig& tankConfig, b2WorldId worldId) : mTankConfig(tankConfig), mWorldId(worldId)
+Tank::Tank(TankId tankId, const TankConfig& tankConfig, b2WorldId worldId) : mTankId(tankId), mTankConfig(tankConfig), mWorldId(worldId)
 {
     /* Create the tank */
 
@@ -25,7 +26,8 @@ Tank::Tank(const TankConfig& tankConfig, b2WorldId worldId) : mTankConfig(tankCo
     // Construct the tank body shape
     b2ShapeDef bodyShapeDef = b2DefaultShapeDef();
     bodyShapeDef.customColor = b2_colorGreenYellow;
-    // bodyShapeDef.filter.categoryBits = categoryBits;
+    bodyShapeDef.filter.categoryBits = CategoryBits::TANK;
+    bodyShapeDef.userData = reinterpret_cast<void*>(&mTankId);
     
     b2Polygon bodyPolygon = b2MakeBox(mTankConfig.bodyHeight, mTankConfig.bodyWidth);
     b2CreatePolygonShape(mTankBodyId, &bodyShapeDef, &bodyPolygon);
@@ -33,7 +35,8 @@ Tank::Tank(const TankConfig& tankConfig, b2WorldId worldId) : mTankConfig(tankCo
     // Construct the left tread shape
     b2ShapeDef leftTreadShapeDef = b2DefaultShapeDef();
     leftTreadShapeDef.customColor = b2_colorHotPink;
-    // leftTreadShapeDef.filter.categoryBits = categoryBits;
+    leftTreadShapeDef.filter.categoryBits = CategoryBits::TANK;
+    leftTreadShapeDef.userData = reinterpret_cast<void*>(&mTankId);
 
     b2Polygon leftTreadPolygon = b2MakeOffsetBox(mTankConfig.bodyHeight, mTankConfig.treadWidth, (b2Vec2){0, mTankConfig.bodyHeight/2.0f}, 0);
     b2ShapeId leftTreadShapeId = b2CreatePolygonShape(mLeftTreadBodyId, &leftTreadShapeDef, &leftTreadPolygon);
@@ -47,7 +50,8 @@ Tank::Tank(const TankConfig& tankConfig, b2WorldId worldId) : mTankConfig(tankCo
     // Construct the right tread shape
     b2ShapeDef rightTreadShapeDef = b2DefaultShapeDef();
     rightTreadShapeDef.customColor = b2_colorHotPink;
-    // rightTreadShapeDef.filter.categoryBits = categoryBits;
+    rightTreadShapeDef.filter.categoryBits = CategoryBits::TANK;
+    rightTreadShapeDef.userData = reinterpret_cast<void*>(&mTankId);
 
     b2Polygon rightTreadPolygon = b2MakeOffsetBox(mTankConfig.bodyHeight, mTankConfig.treadWidth, (b2Vec2){0, -mTankConfig.bodyHeight/2.0f}, 0);
     b2ShapeId rightTreadShapeId = b2CreatePolygonShape(mRightTreadBodyId, &rightTreadShapeDef, &rightTreadPolygon);
@@ -62,7 +66,8 @@ Tank::Tank(const TankConfig& tankConfig, b2WorldId worldId) : mTankConfig(tankCo
     b2ShapeDef gunShapeDef = b2DefaultShapeDef();
     gunShapeDef.density = 0.001f;                       // TODO: still need this?
     gunShapeDef.customColor = b2_colorGreen;
-    // gunShapeDef.filter.categoryBits = categoryBits;
+    gunShapeDef.filter.categoryBits = CategoryBits::TANK;
+    gunShapeDef.userData = reinterpret_cast<void*>(&mTankId);
 
     b2Polygon gunPolygon = b2MakeOffsetBox(mTankConfig.gunHeight, mTankConfig.gunWidth, (b2Vec2){mTankConfig.gunHeight, 0}, 0);
     b2CreatePolygonShape(mGunBodyId, &gunShapeDef, &gunPolygon);
@@ -118,9 +123,8 @@ void Tank::fireGun()
     // Create the projectile shape
     b2ShapeDef projectileShapeDef = b2DefaultShapeDef();
     projectileShapeDef.customColor = b2_colorGray;
-    // projectileShapeDef.filter.categoryBits = PROJECTILE;
-    // uint32_t maskBits = PROJECTILE | WALL | (tank.categoryBits == TANK1 ? TANK2 : TANK1);
-    // projectileShapeDef.filter.maskBits = maskBits;
+    projectileShapeDef.filter.categoryBits = CategoryBits::PROJECTILE;
+    projectileShapeDef.filter.maskBits = CategoryBits::ALL;
 
     b2Polygon projectilePolygon = b2MakeOffsetBox(mTankConfig.gunWidth, mTankConfig.gunWidth, (b2Vec2){mTankConfig.gunHeight*2+mTankConfig.gunWidth, 0}, 0);
     b2CreatePolygonShape(projectileBodyId, &projectileShapeDef, &projectilePolygon);
@@ -161,13 +165,12 @@ std::vector<b2Vec2> Tank::scanLidar(float range)
     b2Vec2 startPosition = b2Body_GetPosition(mTankBodyId);
 
     // Construct query filter
-    // uint32_t maskBits = PROJECTILE | WALL | (tank->categoryBits == TANK1 ? TANK2 : TANK1);
-    // b2QueryFilter viewFilter = {.categoryBits=0xFFFFFFFF, .maskBits=maskBits};
-    b2QueryFilter viewFilter = {0}; // temporary
+    b2QueryFilter viewFilter = {.categoryBits=CategoryBits::ALL, .maskBits=CategoryBits::ALL};
 
     // Define raycast callback
     auto rayCastCallback = [](b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float fraction, void* context) -> float {
         *(b2Vec2*)context = point;
+        // TODO: check shapeId userdata for tank Id
         return fraction;
     };
 
