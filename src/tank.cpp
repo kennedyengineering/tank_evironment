@@ -178,11 +178,11 @@ std::vector<b2Vec2> Tank::scanLidar(float range)
     // Define raycast callback
     auto rayCastCallback = [](b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float fraction, void* context) -> float {
         // Retrieve context data
-        RayCastContext* ctx = reinterpret_cast<RayCastContext*>(context);
+        RayCastContext* ctx = static_cast<RayCastContext*>(context);
         ctx->point = point;
 
         // Check if colliding with self
-        TankId otherTankId = *reinterpret_cast<TankId*>(b2Shape_GetUserData(shapeId));
+        TankId otherTankId = *static_cast<TankId*>(b2Shape_GetUserData(shapeId));
         if (otherTankId == ctx->tankId)
         {
             // Continue and ignore this shape
