@@ -3,6 +3,7 @@
 #pragma once
 
 #include <box2d/box2d.h>
+#include <vector>
 
 #include "config.hpp"
 #include "tank.hpp"
@@ -34,5 +35,7 @@ namespace TankGame
         b2WorldId mWorldId;
 
         Registry<Tank> mTankRegistry;
+
+        std::vector<b2ShapeId> mProjectileShapeIdVector;
     };
 }

@@ -107,7 +107,7 @@ void Tank::rotateGun(float angle)
     b2MotorJoint_SetAngularOffset(mGunMotorJointId, angle);
 }
 
-void Tank::fireGun()
+b2ShapeId Tank::fireGun()
 {
     /* Fire the tank gun */
 
@@ -128,7 +128,9 @@ void Tank::fireGun()
     projectileShapeDef.userData = new TankId(mTankId);  // FIXME: will leak if world is destroyed AKA engine destructs...
 
     b2Polygon projectilePolygon = b2MakeOffsetBox(mTankConfig.gunWidth, mTankConfig.gunWidth, (b2Vec2){mTankConfig.gunHeight*2+mTankConfig.gunWidth, 0}, 0);
-    b2CreatePolygonShape(projectileBodyId, &projectileShapeDef, &projectilePolygon);
+    b2ShapeId projectileShapeId = b2CreatePolygonShape(projectileBodyId, &projectileShapeDef, &projectilePolygon);
+
+    return projectileShapeId;
 }
 
 void Tank::moveLeftTread(float force)

@@ -18,7 +18,7 @@ namespace TankGame
         ~Tank();
 
         void rotateGun(float angle);
-        void fireGun();
+        b2ShapeId fireGun();
         void moveLeftTread(float force);
         void moveRightTread(float force);
 

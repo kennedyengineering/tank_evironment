@@ -1,5 +1,6 @@
 // Tank Game (@kennedyengineering)
 
+#include <algorithm>
 #include <iostream>
 
 #include "engine.hpp"
@@ -43,6 +44,12 @@ Engine::~Engine()
 {
     /* Destroy the engine */
 
+    // Deallocate userData from projectile shape
+    for (const b2ShapeId& projectileShapeId : mProjectileShapeIdVector)
+    {
+        delete static_cast<TankId*>(b2Shape_GetUserData(projectileShapeId));
+    }
+
     // Destroy the physics engine
     b2DestroyWorld(mWorldId);
 }
@@ -67,8 +74,8 @@ void Engine::fireTankGun(RegistryId tankId)
 {
     /* Fire a tank gun */
 
-    // Retrieve tank and apply method
-    mTankRegistry.get(tankId).fireGun();
+    // Retrieve tank and apply method, track projectile shapeId
+    mProjectileShapeIdVector.push_back(mTankRegistry.get(tankId).fireGun());
 }
 
 void Engine::moveLeftTankTread(RegistryId tankId, float force)
@@ -117,6 +124,11 @@ void Engine::handleCollisions()
         bool operator<(const b2ShapeId& other) const
         {
             return std::tie(index1, world0, revision) < 
+                   std::tie(other.index1, other.world0, other.revision);
+        }
+        bool operator==(const b2ShapeId& other) const
+        {
+            return std::tie(index1, world0, revision) == 
                    std::tie(other.index1, other.world0, other.revision);
         }
     };
@@ -202,7 +214,23 @@ void Engine::handleCollisions()
     {
         b2ShapeId projectileShapeId = pair.first;
         
+        // Deallocate userData from projectile shape
         delete static_cast<TankId*>(b2Shape_GetUserData(projectileShapeId));
+
+        // Remove projectile shape from vector
+        mProjectileShapeIdVector.erase
+        (
+            std::remove_if
+            (
+                mProjectileShapeIdVector.begin(),
+                mProjectileShapeIdVector.end(),
+                [pair](b2ShapeId shapeId)
+                {
+                    return pair.first == shapeId;
+                }
+            ),
+            mProjectileShapeIdVector.end()
+        );
 
         b2DestroyBody(b2Shape_GetBody(projectileShapeId));
     }
