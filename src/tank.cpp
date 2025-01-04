@@ -125,6 +125,7 @@ void Tank::fireGun()
     projectileShapeDef.customColor = b2_colorGray;
     projectileShapeDef.filter.categoryBits = CategoryBits::PROJECTILE;
     projectileShapeDef.filter.maskBits = CategoryBits::ALL;
+    projectileShapeDef.userData = reinterpret_cast<void*>(&mTankId);
 
     b2Polygon projectilePolygon = b2MakeOffsetBox(mTankConfig.gunWidth, mTankConfig.gunWidth, (b2Vec2){mTankConfig.gunHeight*2+mTankConfig.gunWidth, 0}, 0);
     b2CreatePolygonShape(projectileBodyId, &projectileShapeDef, &projectilePolygon);
