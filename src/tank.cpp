@@ -27,7 +27,7 @@ Tank::Tank(TankId tankId, const TankConfig& tankConfig, b2WorldId worldId) : mTa
     b2ShapeDef bodyShapeDef = b2DefaultShapeDef();
     bodyShapeDef.customColor = b2_colorGreenYellow;
     bodyShapeDef.filter.categoryBits = CategoryBits::TANK;
-    bodyShapeDef.userData = reinterpret_cast<void*>(&mTankId);
+    bodyShapeDef.userData = &mTankId;
     
     b2Polygon bodyPolygon = b2MakeBox(mTankConfig.bodyHeight, mTankConfig.bodyWidth);
     b2CreatePolygonShape(mTankBodyId, &bodyShapeDef, &bodyPolygon);
@@ -36,7 +36,7 @@ Tank::Tank(TankId tankId, const TankConfig& tankConfig, b2WorldId worldId) : mTa
     b2ShapeDef leftTreadShapeDef = b2DefaultShapeDef();
     leftTreadShapeDef.customColor = b2_colorHotPink;
     leftTreadShapeDef.filter.categoryBits = CategoryBits::TANK;
-    leftTreadShapeDef.userData = reinterpret_cast<void*>(&mTankId);
+    leftTreadShapeDef.userData = &mTankId;
 
     b2Polygon leftTreadPolygon = b2MakeOffsetBox(mTankConfig.bodyHeight, mTankConfig.treadWidth, (b2Vec2){0, mTankConfig.bodyHeight/2.0f}, 0);
     b2ShapeId leftTreadShapeId = b2CreatePolygonShape(mLeftTreadBodyId, &leftTreadShapeDef, &leftTreadPolygon);
@@ -51,7 +51,7 @@ Tank::Tank(TankId tankId, const TankConfig& tankConfig, b2WorldId worldId) : mTa
     b2ShapeDef rightTreadShapeDef = b2DefaultShapeDef();
     rightTreadShapeDef.customColor = b2_colorHotPink;
     rightTreadShapeDef.filter.categoryBits = CategoryBits::TANK;
-    rightTreadShapeDef.userData = reinterpret_cast<void*>(&mTankId);
+    rightTreadShapeDef.userData = &mTankId;
 
     b2Polygon rightTreadPolygon = b2MakeOffsetBox(mTankConfig.bodyHeight, mTankConfig.treadWidth, (b2Vec2){0, -mTankConfig.bodyHeight/2.0f}, 0);
     b2ShapeId rightTreadShapeId = b2CreatePolygonShape(mRightTreadBodyId, &rightTreadShapeDef, &rightTreadPolygon);
@@ -67,7 +67,7 @@ Tank::Tank(TankId tankId, const TankConfig& tankConfig, b2WorldId worldId) : mTa
     gunShapeDef.density = 0.001f;                       // TODO: still need this?
     gunShapeDef.customColor = b2_colorGreen;
     gunShapeDef.filter.categoryBits = CategoryBits::TANK;
-    gunShapeDef.userData = reinterpret_cast<void*>(&mTankId);
+    gunShapeDef.userData = &mTankId;
 
     b2Polygon gunPolygon = b2MakeOffsetBox(mTankConfig.gunHeight, mTankConfig.gunWidth, (b2Vec2){mTankConfig.gunHeight, 0}, 0);
     b2CreatePolygonShape(mGunBodyId, &gunShapeDef, &gunPolygon);
@@ -125,7 +125,7 @@ void Tank::fireGun()
     projectileShapeDef.customColor = b2_colorGray;
     projectileShapeDef.filter.categoryBits = CategoryBits::PROJECTILE;
     projectileShapeDef.filter.maskBits = CategoryBits::ALL;
-    projectileShapeDef.userData = reinterpret_cast<void*>(&mTankId);
+    projectileShapeDef.userData = &mTankId;
 
     b2Polygon projectilePolygon = b2MakeOffsetBox(mTankConfig.gunWidth, mTankConfig.gunWidth, (b2Vec2){mTankConfig.gunHeight*2+mTankConfig.gunWidth, 0}, 0);
     b2CreatePolygonShape(projectileBodyId, &projectileShapeDef, &projectilePolygon);
