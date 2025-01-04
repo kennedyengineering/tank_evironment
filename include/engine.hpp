@@ -22,6 +22,9 @@ namespace TankGame
         void step();
 
     private:
+        void handleCollisions();
+
+    private:
         Config mConfig;
 
         b2WorldId mWorldId;

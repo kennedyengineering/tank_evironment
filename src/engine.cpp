@@ -1,5 +1,7 @@
 // Tank Game (@kennedyengineering)
 
+#include <iostream>
+
 #include "engine.hpp"
 #include "categories.hpp"
 
@@ -67,4 +69,108 @@ void Engine::step()
 
     // Step the physics engine
     b2World_Step(mWorldId, mConfig.timeStep, mConfig.subStep);
+
+    // Resolve resultant collisions
+    handleCollisions();
+}
+
+void Engine::handleCollisions()
+{
+    /* Handle collisions */
+
+    // Retrieve contact events
+    b2ContactEvents contactEvents = b2World_GetContactEvents(mWorldId);
+
+    // Define table
+    struct TableEntry : b2ShapeId
+    {
+        bool operator<(const b2ShapeId& other) const
+        {
+            return std::tie(index1, world0, revision) < 
+                   std::tie(other.index1, other.world0, other.revision);
+        }
+    };
+
+    std::map<TableEntry, std::set<TableEntry>> table;
+
+    // Populate table
+    for (size_t contactNum = 0; contactNum < contactEvents.beginCount; contactNum++)
+    {
+        // Retrieve contact event
+        b2ContactBeginTouchEvent* contactEvent = contactEvents.beginEvents + contactNum;
+
+        // Retrieve shape ids
+        b2ShapeId shapeIdA = contactEvent->shapeIdA;
+        b2ShapeId shapeIdB = contactEvent->shapeIdB;
+
+        // Retrieve category bits
+        CategoryBits categoryBitsA = static_cast<CategoryBits>(b2Shape_GetFilter(shapeIdA).categoryBits);
+        CategoryBits categoryBitsB = static_cast<CategoryBits>(b2Shape_GetFilter(shapeIdB).categoryBits);
+
+        // Determine if a projectile was involved
+        if (categoryBitsA != CategoryBits::PROJECTILE && categoryBitsB != CategoryBits::PROJECTILE)
+        {
+            continue;
+        }
+
+        // Handle the first shape being a projectile
+        if (categoryBitsA == CategoryBits::PROJECTILE)
+        {
+            table[TableEntry{shapeIdA}].insert(TableEntry{shapeIdB});
+        }
+
+        // Handle the second shape being a projectile
+        if (categoryBitsB == CategoryBits::PROJECTILE)
+        {
+            table[TableEntry{shapeIdB}].insert(TableEntry{shapeIdA});
+        }
+    }
+
+    // Handle collision effects
+    for (const std::pair<TableEntry, std::set<TableEntry>>& pair : table)
+    {
+        b2ShapeId projectileShapeId = pair.first;
+        TankId sourceTankId = *static_cast<TankId*>(b2Shape_GetUserData(projectileShapeId));
+
+        for (const b2ShapeId& contactShapeId : pair.second)
+        {
+            CategoryBits contactCategoryBits = static_cast<CategoryBits>(b2Shape_GetFilter(contactShapeId).categoryBits);
+
+            switch (contactCategoryBits)
+            {
+                case CategoryBits::PROJECTILE:
+                {
+                    TankId otherTankId = *static_cast<TankId*>(b2Shape_GetUserData(contactShapeId));
+                    std::cout << "projectile v projectile : " << sourceTankId << " hit " << otherTankId << std::endl;
+                    break;
+                }
+
+                case CategoryBits::WALL:
+                {
+                    std::cout << "projectile v wall : " << sourceTankId << " hit wall" << std::endl;
+                    break;
+                }
+
+                case CategoryBits::TANK:
+                {
+                    TankId otherTankId = *static_cast<TankId*>(b2Shape_GetUserData(contactShapeId));
+                    std::cout << "projectile v tank : " << sourceTankId << " hit " << otherTankId << std::endl;
+                    break;
+                }
+
+                default :
+                {
+                    std::cout << "projectile v unknown" << sourceTankId << " hit unknown" << std::endl;
+                    break;
+                }
+            }
+        }
+    }
+    
+    // Destroy projectiles
+    for (const std::pair<TableEntry, std::set<TableEntry>>& pair : table)
+    {
+        b2ShapeId projectileShapeId = pair.first;
+        b2DestroyBody(b2Shape_GetBody(projectileShapeId));
+    }
 }
