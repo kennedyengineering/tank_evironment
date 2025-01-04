@@ -55,12 +55,42 @@ RegistryId Engine::addTank(const TankConfig& tankConfig)
     return mTankRegistry.emplaceWithId(tankConfig, mWorldId);
 }
 
-// TODO: add tank control method, and action struct? or just retrieve tank and call methods directly?
+void Engine::rotateTankGun(RegistryId tankId, float angle)
+{
+    /* Rotate a tank gun */
 
-void Engine::removeTank(RegistryId id)
+    // Retrieve tank and apply method
+    mTankRegistry.get(tankId).rotateGun(angle);
+}
+
+void Engine::fireTankGun(RegistryId tankId)
+{
+    /* Fire a tank gun */
+
+    // Retrieve tank and apply method
+    mTankRegistry.get(tankId).fireGun();
+}
+
+void Engine::moveLeftTankTread(RegistryId tankId, float force)
+{
+    /* Move a tank left tread */
+
+    // Retrieve tank and apply method
+    mTankRegistry.get(tankId).moveLeftTread(force);
+}
+
+void Engine::moveRightTankTread(RegistryId tankId, float force)
+{
+    /* Move a tank right tread */
+
+    // Retrieve tank and apply method
+    mTankRegistry.get(tankId).moveRightTread(force);
+}
+
+void Engine::removeTank(RegistryId tankId)
 {
     /* Remove a tank */
-    mTankRegistry.remove(id);
+    mTankRegistry.remove(tankId);
 }
 
 void Engine::step()

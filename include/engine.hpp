@@ -17,6 +17,10 @@ namespace TankGame
         ~Engine();
 
         RegistryId addTank(const TankConfig& tankConfig);
+        void rotateTankGun(RegistryId tankId, float angle);
+        void fireTankGun(RegistryId tankId);
+        void moveLeftTankTread(RegistryId tankId, float force);
+        void moveRightTankTread(RegistryId tankId, float force);
         void removeTank(RegistryId tankId);
 
         void step();
