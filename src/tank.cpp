@@ -125,7 +125,7 @@ void Tank::fireGun()
     projectileShapeDef.customColor = b2_colorGray;
     projectileShapeDef.filter.categoryBits = CategoryBits::PROJECTILE;
     projectileShapeDef.filter.maskBits = CategoryBits::ALL;
-    projectileShapeDef.userData = &mTankId;
+    projectileShapeDef.userData = &mTankId; // FIXME: if projectile outlives the firing tank object, this pointer is invalid. need to dynamically allocate memory or something. could just get rid of it, but might be nice for credit assignment later (who killed who). if memory is dynamically allocated, can free when it is destroyed.
 
     b2Polygon projectilePolygon = b2MakeOffsetBox(mTankConfig.gunWidth, mTankConfig.gunWidth, (b2Vec2){mTankConfig.gunHeight*2+mTankConfig.gunWidth, 0}, 0);
     b2CreatePolygonShape(projectileBodyId, &projectileShapeDef, &projectilePolygon);
