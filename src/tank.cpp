@@ -125,7 +125,7 @@ b2ShapeId Tank::fireGun()
     projectileShapeDef.customColor = b2_colorGray;
     projectileShapeDef.filter.categoryBits = CategoryBits::PROJECTILE;
     projectileShapeDef.filter.maskBits = CategoryBits::ALL;
-    projectileShapeDef.userData = new TankId(mTankId);  // FIXME: will leak if world is destroyed AKA engine destructs...
+    projectileShapeDef.userData = new TankId(mTankId);
 
     b2Polygon projectilePolygon = b2MakeOffsetBox(mTankConfig.gunWidth, mTankConfig.gunWidth, (b2Vec2){mTankConfig.gunHeight*2+mTankConfig.gunWidth, 0}, 0);
     b2ShapeId projectileShapeId = b2CreatePolygonShape(projectileBodyId, &projectileShapeDef, &projectilePolygon);
