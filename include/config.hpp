@@ -34,5 +34,8 @@ namespace TankGame
         /* Simulation parameters */
         float timeStep = 1.0f / 60.0f;  // in seconds
         int subStep = 8;                // number of sub-steps
+
+        /* Rendering parameters */
+        float pixelDensity = 8;     // pixels per meter
     };
 }
