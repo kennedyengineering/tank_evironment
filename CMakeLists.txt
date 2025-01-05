@@ -8,6 +8,10 @@ project(simple_simulator
         )
 
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+
 include(FetchContent)
 
 
@@ -22,7 +26,7 @@ FetchContent_MakeAvailable(box2d)
 
 # Cairo
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(CAIRO REQUIRED cairo)
+pkg_check_modules(CAIRO REQUIRED cairo=1.18.0)
 
 
 # PyBind11
