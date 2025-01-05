@@ -39,6 +39,6 @@ FetchContent_MakeAvailable(pybind11)
 
 
 # Python Bindings
-pybind11_add_module(tank_game src/binding.cpp src/engine.cpp src/tank.cpp)
-target_include_directories(tank_game PRIVATE include ${CAIRO_LIBRARY})
-target_link_libraries(tank_game PRIVATE box2d ${CAIRO_INCLUDE_DIR})
+pybind11_add_module(tank_game src/binding.cpp src/engine.cpp src/tank.cpp src/render.cpp)
+target_include_directories(tank_game PRIVATE include ${CAIRO_INCLUDE_DIRS})
+target_link_libraries(tank_game PRIVATE box2d ${CAIRO_LIBRARIES})
