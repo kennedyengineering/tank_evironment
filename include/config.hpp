@@ -6,7 +6,7 @@ namespace TankGame
 {
     struct TankConfig
     {
-        /* Initialization parmameters */
+        /* Initialization parameters */
         float positionX = 0.0f;    // in meters
         float positionY = 0.0f;    // in meters
         float angle = 0.0f;        // in radians
