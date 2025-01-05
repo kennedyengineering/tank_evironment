@@ -5,11 +5,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt update && apt upgrade -y
 
-# Update Mesa driver (optional)
-RUN apt install -y software-properties-common
-RUN add-apt-repository ppa:kisak/kisak-mesa
-RUN apt update && apt upgrade -y
-
 # Build packages
 RUN apt install -y \ 
     git \
@@ -21,14 +16,9 @@ RUN apt install -y \
     gdb \
     valgrind
 
-# Graphics packages (optional)
+# Cairo packages
 RUN apt install -y \
-    xorg-dev \
-    mesa-utils
-
-# Glad packages (optional)
-RUN apt install -y \
-    python3-jinja2
+    libcairo2-dev
 
 # PyBind11 packages
 RUN apt install -y \
