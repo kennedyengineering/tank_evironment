@@ -27,12 +27,14 @@ namespace TankGame
         unsigned int lidarPoints = 360;     // number of lidar points
 
         /* Rendering parameters */
-        b2HexColor projectileColor = b2_colorGray;
-        b2HexColor lidarColor = b2_colorGold;
-        b2HexColor tankColor = b2_colorYellow;
-        b2HexColor gunColor = b2_colorLime;
-        b2HexColor leftTreadColor = b2_colorCyan;
-        b2HexColor rightTreadColor = b2_colorMagenta;
+        b2HexColor projectileColor = b2_colorGray;      // hex color
+        b2HexColor lidarColor = b2_colorGold;           // hex color
+        b2HexColor tankColor = b2_colorYellow;          // hex color
+        b2HexColor gunColor = b2_colorLime;             // hex color
+        b2HexColor leftTreadColor = b2_colorCyan;       // hex color
+        b2HexColor rightTreadColor = b2_colorMagenta;   // hex color
+
+        float lidarRadius = 5;      // in pixels
     };
 
     struct Config
