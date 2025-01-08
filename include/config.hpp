@@ -26,6 +26,14 @@ namespace TankGame
         /* Lidar parameters */
         unsigned int lidarPoints = 360;     // number of lidar points
 
+        /* Gun parameters */
+        float gunDensity = 0.001f;
+
+        /* Gun motor parameters */
+        float gunMotorMaxForce = 5.0f;
+        float gunMotorMaxTorque = 20.0f;
+        float gunMotorCorrectionFactor = 0.05;
+
         /* Rendering parameters */
         b2HexColor projectileColor = b2_colorGray;      // hex color
         b2HexColor lidarColor = b2_colorGold;           // hex color

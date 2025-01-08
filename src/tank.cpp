@@ -60,7 +60,7 @@ Tank::Tank(TankId tankId, const TankConfig& tankConfig, b2WorldId worldId) : mTa
 
     // Create the gun shape
     b2ShapeDef gunShapeDef = b2DefaultShapeDef();
-    gunShapeDef.density = 0.001f;                       // TODO: still need this?
+    gunShapeDef.density = mTankConfig.gunDensity;
     gunShapeDef.filter.categoryBits = CategoryBits::TANK;
     gunShapeDef.userData = &mTankId;
 
@@ -71,9 +71,9 @@ Tank::Tank(TankId tankId, const TankConfig& tankConfig, b2WorldId worldId) : mTa
     b2MotorJointDef jointDef = b2DefaultMotorJointDef();
     jointDef.bodyIdA = mTankBodyId;
     jointDef.bodyIdB = mGunBodyId;
-    jointDef.maxForce = 5.0f;       // TODO: make configurable?
-    jointDef.maxTorque = 20.0f;
-    jointDef.correctionFactor = 0.05;
+    jointDef.maxForce = mTankConfig.gunMotorMaxForce;
+    jointDef.maxTorque = mTankConfig.gunMotorMaxTorque;
+    jointDef.correctionFactor = mTankConfig.gunMotorCorrectionFactor;
 
     mGunMotorJointId = b2CreateMotorJoint(mWorldId, &jointDef);
 
