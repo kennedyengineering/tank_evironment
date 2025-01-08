@@ -23,6 +23,8 @@ namespace TankGame
         void moveRightTread(float force);
 
         std::vector<b2Vec2> scanLidar(float range);
+
+        b2HexColor getProjectileColor();
     
     private:
         TankId mTankId;

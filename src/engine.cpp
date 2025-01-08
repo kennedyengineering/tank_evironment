@@ -65,6 +65,12 @@ RegistryId Engine::addTank(const TankConfig& tankConfig)
     return mTankRegistry.emplaceWithId(tankConfig, mWorldId);
 }
 
+void Engine::removeTank(RegistryId tankId)
+{
+    /* Remove a tank */
+    mTankRegistry.remove(tankId);
+}
+
 void Engine::rotateTankGun(RegistryId tankId, float angle)
 {
     /* Rotate a tank gun */
@@ -97,10 +103,38 @@ void Engine::moveRightTankTread(RegistryId tankId, float force)
     mTankRegistry.get(tankId).moveRightTread(force);
 }
 
-void Engine::removeTank(RegistryId tankId)
+void Engine::renderProjectiles()
 {
-    /* Remove a tank */
-    mTankRegistry.remove(tankId);
+    /* Render all projectiles */
+
+    // Render projectiles tracked in vector
+    for (const b2ShapeId& projectileShapeId : mProjectileShapeIdVector)
+    {
+        b2Polygon projectileShapePolygon = b2Shape_GetPolygon(projectileShapeId);
+        b2Transform worldTransform = b2Body_GetTransform(b2Shape_GetBody(projectileShapeId));
+
+        std::vector<b2Vec2> vertices;
+
+        for (int i = 0; i < projectileShapePolygon.count; i++)
+        {
+            // Compute vertex location (meters)
+            b2Vec2 transformedVertex = b2TransformPoint(worldTransform, projectileShapePolygon.vertices[i]);
+            
+            // Convert meters to pixels
+            transformedVertex.x *= mConfig.pixelDensity;
+            transformedVertex.y *= mConfig.pixelDensity;
+
+            // Add to vector
+            vertices.push_back(transformedVertex);
+        }
+
+        // Get source tank projectile color
+        TankId sourceTankId = *static_cast<TankId*>(b2Shape_GetUserData(projectileShapeId));
+        b2HexColor projectileColor = mTankRegistry.get(sourceTankId).getProjectileColor();
+
+        // Render the projectile
+        mRenderEngine.renderPolygon(vertices, projectileColor);
+    }
 }
 
 void Engine::step()

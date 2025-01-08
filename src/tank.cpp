@@ -218,3 +218,11 @@ std::vector<b2Vec2> Tank::scanLidar(float range)
 
     return points;
 }
+
+b2HexColor Tank::getProjectileColor()
+{
+    /* Get the color of the projectile */
+
+    // Return color
+    return mTankConfig.projectileColor;
+}
