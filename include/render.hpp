@@ -29,7 +29,7 @@ namespace TankGame
         // TODO: render lidar scan
         // TODO: implement the above methods in engine, have engine keep track of pixel density etc... initialize this class in initialization list
 
-        // TODO: get pixel buffer
+        // TODO: get pixel buffer (either create struct to hold vector (buffer) and image dimensions, or create another method to get image dimensions and call that in bindings lambda. probably the latter.)
 
         void clearImage(Color color);
 
