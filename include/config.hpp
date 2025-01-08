@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <box2d/box2d.h>
+
 namespace TankGame
 {
     struct TankConfig
@@ -23,6 +25,9 @@ namespace TankGame
 
         /* Lidar parameters */
         unsigned int lidarPoints = 360;     // number of lidar points
+
+        /* Rendering parameters */
+        b2HexColor projectileColor = b2_colorGray;
     };
 
     struct Config
