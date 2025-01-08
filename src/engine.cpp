@@ -103,6 +103,31 @@ void Engine::moveRightTankTread(RegistryId tankId, float force)
     mTankRegistry.get(tankId).moveRightTread(force);
 }
 
+std::vector<float> Engine::scanTankLidar(RegistryId tankId)
+{
+    /* Scan a tank lidar, and get vector of distances */
+
+    // Get the tank
+    Tank& tank = mTankRegistry.get(tankId);
+
+    // Get tank body position
+    b2Vec2 position = tank.getPosition();
+
+    // Perform a lidar scan
+    tank.scanLidar(mConfig.arenaHeight*mConfig.arenaWidth);
+
+    // Populate the vector
+    std::vector<float> lidarData;
+
+    for (const b2Vec2& point : tank.getLidarData())
+    {
+        lidarData.push_back(b2Distance(position, point));
+    }
+
+    // Return the vector
+    return lidarData;
+}
+
 void Engine::renderProjectiles()
 {
     /* Render all projectiles */
@@ -122,11 +147,10 @@ void Engine::renderProjectiles()
             b2Vec2 transformedVertex = b2TransformPoint(worldTransform, projectileShapePolygon.vertices[i]);
             
             // Convert meters to pixels
-            transformedVertex.x *= mConfig.pixelDensity;
-            transformedVertex.y *= mConfig.pixelDensity;
+            b2Vec2 convertedVertex = b2MulSV(mConfig.pixelDensity, transformedVertex);
 
             // Add to vector
-            vertices.push_back(transformedVertex);
+            vertices.push_back(convertedVertex);
         }
 
         // Get source tank projectile color
@@ -161,15 +185,38 @@ void Engine::renderTank(RegistryId tankId)
             b2Vec2 transformedVertex = b2TransformPoint(worldTransform, tankShapePolygon.vertices[i]);
             
             // Convert meters to pixels
-            transformedVertex.x *= mConfig.pixelDensity;
-            transformedVertex.y *= mConfig.pixelDensity;
+            b2Vec2 convertedVertex = b2MulSV(mConfig.pixelDensity, transformedVertex);
 
             // Add to vector
-            vertices.push_back(transformedVertex);
+            vertices.push_back(convertedVertex);
         }
 
         // Render the projectile
         mRenderEngine.renderPolygon(vertices, tankShapeColor);
+    }
+}
+
+void Engine::renderTankLidar(RegistryId tankId)
+{
+    /* Render a tank's latest lidar scan */
+
+    // Get tank
+    Tank& tank = mTankRegistry.get(tankId);
+
+    // Get color
+    b2HexColor color = tank.getLidarColor();
+
+    // Get radius
+    float radius = tank.getLidarRadius();
+
+    // Get and render lidar data buffer
+    for (const b2Vec2& point : tank.getLidarData())
+    {
+        // Convert meters to pixels
+        b2Vec2 convertedPoint = b2MulSV(mConfig.pixelDensity, point);
+        
+        // Render the circle
+        mRenderEngine.renderCircle(convertedPoint, radius, color);
     }
 }
 

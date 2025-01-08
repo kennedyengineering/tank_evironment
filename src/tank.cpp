@@ -6,7 +6,6 @@
 using namespace TankGame;
 
 // TODO: check for valid tankConfig values
-// TODO: make colors configurable in tankConfig
 
 Tank::Tank(TankId tankId, const TankConfig& tankConfig, b2WorldId worldId) : mTankId(tankId), mTankConfig(tankConfig), mWorldId(worldId)
 {
@@ -77,6 +76,9 @@ Tank::Tank(TankId tankId, const TankConfig& tankConfig, b2WorldId worldId) : mTa
     jointDef.correctionFactor = 0.05;
 
     mGunMotorJointId = b2CreateMotorJoint(mWorldId, &jointDef);
+
+    // Reserve space in lidar data vector
+    mLidarData.reserve(mTankConfig.lidarPoints);
 }
 
 Tank::~Tank()
@@ -150,7 +152,7 @@ void Tank::moveRightTread(float force)
     // TODO: compute friction forces, or other motion model stuff (set velocity?)
 }
 
-std::vector<b2Vec2> Tank::scanLidar(float range)
+void Tank::scanLidar(float range)
 {
     /* Perform a lidar scan */
 
@@ -189,8 +191,8 @@ std::vector<b2Vec2> Tank::scanLidar(float range)
         return fraction;
     };
 
-    // Define vector
-    std::vector<b2Vec2> points(mTankConfig.lidarPoints);
+    // Clear vector
+    mLidarData.clear();
 
     // Populate vector
     for (size_t pointNum = 0; pointNum < mTankConfig.lidarPoints; pointNum++)
@@ -208,10 +210,24 @@ std::vector<b2Vec2> Tank::scanLidar(float range)
         b2World_CastRay(mWorldId, startPosition, translation, viewFilter, rayCastCallback, &context);
 
         // Update vector
-        points[pointNum] = context.point;
+        mLidarData.push_back(context.point);
     }
+}
 
-    return points;
+std::vector<b2Vec2> Tank::getLidarData()
+{
+    /* Get the lidar data vector */
+
+    // Return data
+    return mLidarData;
+}
+
+b2Vec2 Tank::getPosition()
+{
+    /* Get the center of the tank position */
+
+    // Return position
+    return b2Body_GetPosition(mTankBodyId);
 }
 
 b2HexColor Tank::getProjectileColor()
@@ -228,6 +244,14 @@ b2HexColor Tank::getLidarColor()
 
     // Return color
     return mTankConfig.lidarColor;
+}
+
+float Tank::getLidarRadius()
+{
+    /* Get the radius of the lidar point (for rendering) */
+
+    // Return radius
+    return mTankConfig.lidarRadius;
 }
 
 std::vector<std::pair<b2ShapeId, b2HexColor>> Tank::getShapeIdsAndColors()
