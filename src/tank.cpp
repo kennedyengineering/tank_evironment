@@ -222,6 +222,14 @@ b2HexColor Tank::getProjectileColor()
     return mTankConfig.projectileColor;
 }
 
+b2HexColor Tank::getLidarColor()
+{
+    /* Get the color of the lidar point (for rendering) */
+
+    // Return color
+    return mTankConfig.lidarColor;
+}
+
 std::vector<std::pair<b2ShapeId, b2HexColor>> Tank::getShapeIdsAndColors()
 {
     /* Get shapes of the tank (for rendering) */

@@ -25,6 +25,7 @@ namespace TankGame
         std::vector<b2Vec2> scanLidar(float range);
 
         b2HexColor getProjectileColor();
+        b2HexColor getLidarColor();
         std::vector<std::pair<b2ShapeId, b2HexColor>> getShapeIdsAndColors();
     
     private:
