@@ -25,21 +25,19 @@ Tank::Tank(TankId tankId, const TankConfig& tankConfig, b2WorldId worldId) : mTa
 
     // Construct the tank body shape
     b2ShapeDef bodyShapeDef = b2DefaultShapeDef();
-    bodyShapeDef.customColor = b2_colorGreenYellow;
     bodyShapeDef.filter.categoryBits = CategoryBits::TANK;
     bodyShapeDef.userData = &mTankId;
     
     b2Polygon bodyPolygon = b2MakeBox(mTankConfig.bodyHeight, mTankConfig.bodyWidth);
-    b2CreatePolygonShape(mTankBodyId, &bodyShapeDef, &bodyPolygon);
+    mTankShapeId = b2CreatePolygonShape(mTankBodyId, &bodyShapeDef, &bodyPolygon);
 
     // Construct the left tread shape
     b2ShapeDef leftTreadShapeDef = b2DefaultShapeDef();
-    leftTreadShapeDef.customColor = b2_colorHotPink;
     leftTreadShapeDef.filter.categoryBits = CategoryBits::TANK;
     leftTreadShapeDef.userData = &mTankId;
 
     b2Polygon leftTreadPolygon = b2MakeOffsetBox(mTankConfig.bodyHeight, mTankConfig.treadWidth, (b2Vec2){0, mTankConfig.bodyHeight/2.0f}, 0);
-    b2ShapeId leftTreadShapeId = b2CreatePolygonShape(mLeftTreadBodyId, &leftTreadShapeDef, &leftTreadPolygon);
+    mLeftTreadShapeId = b2CreatePolygonShape(mLeftTreadBodyId, &leftTreadShapeDef, &leftTreadPolygon);
 
     // Weld left tread to tank body
     b2WeldJointDef leftTreadJointDef = b2DefaultWeldJointDef();
@@ -49,12 +47,11 @@ Tank::Tank(TankId tankId, const TankConfig& tankConfig, b2WorldId worldId) : mTa
 
     // Construct the right tread shape
     b2ShapeDef rightTreadShapeDef = b2DefaultShapeDef();
-    rightTreadShapeDef.customColor = b2_colorHotPink;
     rightTreadShapeDef.filter.categoryBits = CategoryBits::TANK;
     rightTreadShapeDef.userData = &mTankId;
 
     b2Polygon rightTreadPolygon = b2MakeOffsetBox(mTankConfig.bodyHeight, mTankConfig.treadWidth, (b2Vec2){0, -mTankConfig.bodyHeight/2.0f}, 0);
-    b2ShapeId rightTreadShapeId = b2CreatePolygonShape(mRightTreadBodyId, &rightTreadShapeDef, &rightTreadPolygon);
+    mRightTreadShapeId = b2CreatePolygonShape(mRightTreadBodyId, &rightTreadShapeDef, &rightTreadPolygon);
 
     // Weld right tread to tank body
     b2WeldJointDef rightTreadJointDef = b2DefaultWeldJointDef();
@@ -65,12 +62,11 @@ Tank::Tank(TankId tankId, const TankConfig& tankConfig, b2WorldId worldId) : mTa
     // Create the gun shape
     b2ShapeDef gunShapeDef = b2DefaultShapeDef();
     gunShapeDef.density = 0.001f;                       // TODO: still need this?
-    gunShapeDef.customColor = b2_colorGreen;
     gunShapeDef.filter.categoryBits = CategoryBits::TANK;
     gunShapeDef.userData = &mTankId;
 
     b2Polygon gunPolygon = b2MakeOffsetBox(mTankConfig.gunHeight, mTankConfig.gunWidth, (b2Vec2){mTankConfig.gunHeight, 0}, 0);
-    b2CreatePolygonShape(mGunBodyId, &gunShapeDef, &gunPolygon);
+    mGunShapeId = b2CreatePolygonShape(mGunBodyId, &gunShapeDef, &gunPolygon);
 
     // Create gun motor joint
     b2MotorJointDef jointDef = b2DefaultMotorJointDef();
@@ -122,7 +118,6 @@ b2ShapeId Tank::fireGun()
 
     // Create the projectile shape
     b2ShapeDef projectileShapeDef = b2DefaultShapeDef();
-    projectileShapeDef.customColor = b2_colorGray;
     projectileShapeDef.filter.categoryBits = CategoryBits::PROJECTILE;
     projectileShapeDef.filter.maskBits = CategoryBits::ALL;
     projectileShapeDef.userData = new TankId(mTankId);
@@ -221,8 +216,22 @@ std::vector<b2Vec2> Tank::scanLidar(float range)
 
 b2HexColor Tank::getProjectileColor()
 {
-    /* Get the color of the projectile */
+    /* Get the color of the projectile (for rendering) */
 
     // Return color
     return mTankConfig.projectileColor;
+}
+
+std::vector<std::pair<b2ShapeId, b2HexColor>> Tank::getShapeIdsAndColors()
+{
+    /* Get shapes of the tank (for rendering) */
+
+    // Return shapes in order to be rendered
+    return std::vector<std::pair<b2ShapeId, b2HexColor>>
+    {
+        std::pair<b2ShapeId, b2HexColor>{mTankShapeId, mTankConfig.tankColor},
+        std::pair<b2ShapeId, b2HexColor>{mLeftTreadShapeId, mTankConfig.leftTreadColor},
+        std::pair<b2ShapeId, b2HexColor>{mRightTreadShapeId, mTankConfig.rightTreadColor},
+        std::pair<b2ShapeId, b2HexColor>{mGunShapeId, mTankConfig.gunColor}
+    };
 }
