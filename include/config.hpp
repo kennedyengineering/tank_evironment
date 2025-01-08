@@ -28,6 +28,10 @@ namespace TankGame
 
         /* Rendering parameters */
         b2HexColor projectileColor = b2_colorGray;
+        b2HexColor tankColor = b2_colorYellow;
+        b2HexColor gunColor = b2_colorLime;
+        b2HexColor leftTreadColor = b2_colorCyan;
+        b2HexColor rightTreadColor = b2_colorMagenta;
     };
 
     struct Config
