@@ -8,7 +8,10 @@
 
 using namespace TankGame;
 
-Engine::Engine(const Config& config) : mConfig(config)
+Engine::Engine(const Config& config) 
+    : mConfig(config), 
+      mRenderEngine(std::ceil(config.arenaWidth*config.pixelDensity), 
+                    std::ceil(config.arenaHeight*config.pixelDensity))
 {
     /* Create the engine */
 

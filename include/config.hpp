@@ -36,6 +36,6 @@ namespace TankGame
         int subStep = 8;                // number of sub-steps
 
         /* Rendering parameters */
-        float pixelDensity = 8;     // pixels per meter
+        float pixelDensity = 8.0f;     // pixels per meter
     };
 }

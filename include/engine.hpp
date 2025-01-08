@@ -8,6 +8,7 @@
 #include "config.hpp"
 #include "tank.hpp"
 #include "registry.hpp"
+#include "render.hpp"
 
 namespace TankGame
 {
@@ -33,6 +34,8 @@ namespace TankGame
         Config mConfig;
 
         b2WorldId mWorldId;
+
+        RenderEngine mRenderEngine;
 
         Registry<Tank> mTankRegistry;
 
