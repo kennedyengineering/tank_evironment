@@ -110,6 +110,7 @@ void Engine::renderProjectiles()
     // Render projectiles tracked in vector
     for (const b2ShapeId& projectileShapeId : mProjectileShapeIdVector)
     {
+        // Get shape vertices and transform
         b2Polygon projectileShapePolygon = b2Shape_GetPolygon(projectileShapeId);
         b2Transform worldTransform = b2Body_GetTransform(b2Shape_GetBody(projectileShapeId));
 
@@ -134,6 +135,41 @@ void Engine::renderProjectiles()
 
         // Render the projectile
         mRenderEngine.renderPolygon(vertices, projectileColor);
+    }
+}
+
+void Engine::renderTank(RegistryId tankId)
+{
+    /* Render a tank */
+
+    // Render tank shapes returned in vector
+    for (const std::pair<b2ShapeId, b2HexColor>& tankShapeIdAndColor :  mTankRegistry.get(tankId).getShapeIdsAndColors())
+    {
+        // Extract shapeId and color
+        b2ShapeId tankShapeId = tankShapeIdAndColor.first;
+        b2HexColor tankShapeColor = tankShapeIdAndColor.second;
+
+        // Get shape vertices and transform
+        b2Polygon tankShapePolygon = b2Shape_GetPolygon(tankShapeId);
+        b2Transform worldTransform = b2Body_GetTransform(b2Shape_GetBody(tankShapeId));
+
+        std::vector<b2Vec2> vertices;
+
+        for (int i = 0; i < tankShapePolygon.count; i++)
+        {
+            // Compute vertex location (meters)
+            b2Vec2 transformedVertex = b2TransformPoint(worldTransform, tankShapePolygon.vertices[i]);
+            
+            // Convert meters to pixels
+            transformedVertex.x *= mConfig.pixelDensity;
+            transformedVertex.y *= mConfig.pixelDensity;
+
+            // Add to vector
+            vertices.push_back(transformedVertex);
+        }
+
+        // Render the projectile
+        mRenderEngine.renderPolygon(vertices, tankShapeColor);
     }
 }
 

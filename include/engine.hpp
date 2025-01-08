@@ -25,10 +25,12 @@ namespace TankGame
         void fireTankGun(RegistryId tankId);
         void moveLeftTankTread(RegistryId tankId, float force);
         void moveRightTankTread(RegistryId tankId, float force);
+        // TODO: add scan lidar
 
         void renderProjectiles();
+        void renderTank(RegistryId tankId);
+        // TODO: add render lidar
         
-
         void step();
 
     private:
