@@ -18,18 +18,30 @@ RenderEngine::RenderEngine(int imageWidth, int imageHeight)
     mContext = cairo_create(mSurface);
 }
 
-void RenderEngine::clearImage(Color color)
+RenderEngine::~RenderEngine()
+{
+    /* Destroy the render engine */
+
+    // Destroy render context
+    cairo_destroy(mContext);
+
+    // Deallocate the image surface
+    cairo_surface_destroy(mSurface);
+}
+
+void RenderEngine::clearImage(b2HexColor color)
 {
     /* Clear the surface */
 
     // Set color
-    cairo_set_source_rgb(mContext, color.r, color.g, color.b);
+    RGB_t rgb = getRGB(color);
+    cairo_set_source_rgb(mContext, rgb[0], rgb[1], rgb[2]);
 
     // Clear surface
     cairo_paint(mContext);
 }
 
-void RenderEngine::renderPolygon(std::vector<Point> vertices, Color color)
+void RenderEngine::renderPolygon(std::vector<b2Vec2> vertices, b2HexColor color)
 {
     /* Render a polygon */
 
@@ -40,12 +52,13 @@ void RenderEngine::renderPolygon(std::vector<Point> vertices, Color color)
     }
 
     // Set color
-    cairo_set_source_rgb(mContext, color.r, color.g, color.b);
+    RGB_t rgb = getRGB(color);
+    cairo_set_source_rgb(mContext, rgb[0], rgb[1], rgb[2]);
 
     // Create path
     bool first = true;
 
-    for (const Point& point : vertices)
+    for (const b2Vec2& point : vertices)
     {
         if (first)
         {
@@ -64,12 +77,13 @@ void RenderEngine::renderPolygon(std::vector<Point> vertices, Color color)
     cairo_fill(mContext);
 }
 
-void RenderEngine::renderCircle(Point center, float radius, Color color)
+void RenderEngine::renderCircle(b2Vec2 center, float radius, b2HexColor color)
 {
     /* Render a circle */
 
     // Set color
-    cairo_set_source_rgb(mContext, color.r, color.g, color.b);
+    RGB_t rgb = getRGB(color);
+    cairo_set_source_rgb(mContext, rgb[0], rgb[1], rgb[2]);
 
     // Create path
     cairo_arc(mContext, center.x, center.y, radius, 0, 2.0f*M_PIf);
@@ -92,13 +106,15 @@ void RenderEngine::writeToPng(const std::filesystem::path& filePath)
     cairo_surface_write_to_png(mSurface, filePath.c_str());
 }
 
-RenderEngine::~RenderEngine()
+inline RenderEngine::RGB_t RenderEngine::getRGB(b2HexColor color)
 {
-    /* Destroy the render engine */
+    /* Convert b2HexColor into RGB */
 
-    // Destroy render context
-    cairo_destroy(mContext);
-
-    // Deallocate the image surface
-    cairo_surface_destroy(mSurface);
+    // Convert a box2d color to std::tuple of RGB
+    return RGB_t
+    {
+        (((color >> 16) & 0xFF) / 255.0f),  // Red
+        (((color >> 8) & 0xFF) / 255.0f),   // Green
+        ((color & 0xFF) / 255.0f)           // Blue
+    };
 }

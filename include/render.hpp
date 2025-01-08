@@ -2,22 +2,14 @@
 
 #pragma once
 
+#include <box2d/box2d.h>
 #include <cairo.h>
 #include <filesystem>
 #include <vector>
+#include <array>
 
 namespace TankGame
 {
-    struct Point
-    {
-        float x, y;
-    };
-
-    struct Color
-    {
-        float r, g, b;
-    };
-
     class RenderEngine
     {
     public:
@@ -25,18 +17,19 @@ namespace TankGame
         ~RenderEngine();
         
         // TODO: render tank
-        // TODO: render projectiles (separate methods, don't need debug draw since all shapes are being manually tracked. shape in list -> get body -> get world transform. shape -> get polygon -> vertices && count)
         // TODO: render lidar scan
-        // TODO: implement the above methods in engine, have engine keep track of pixel density etc... initialize this class in initialization list
-
         // TODO: get pixel buffer (either create struct to hold vector (buffer) and image dimensions, or create another method to get image dimensions and call that in bindings lambda. probably the latter.)
 
-        void clearImage(Color color);
+        void clearImage(b2HexColor color);
 
-        void renderPolygon(std::vector<Point> vertices, Color color);
-        void renderCircle(Point center, float radius, Color color);
+        void renderPolygon(std::vector<b2Vec2> vertices, b2HexColor color);
+        void renderCircle(b2Vec2 center, float radius, b2HexColor color);
 
         void writeToPng(const std::filesystem::path& filePath);
+
+    private:
+        using RGB_t = std::array<float, 3>;
+        inline RGB_t getRGB(b2HexColor color);
 
     private:
         cairo_surface_t *mSurface;
