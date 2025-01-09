@@ -106,6 +106,49 @@ void RenderEngine::writeToPng(const std::filesystem::path& filePath)
     cairo_surface_write_to_png(mSurface, filePath.c_str());
 }
 
+std::vector<unsigned char> RenderEngine::getBuffer()
+{
+    /* Get a copy of the surface as a pixel buffer */
+
+    // Get image dimensions
+    int height = cairo_image_surface_get_height(mSurface);
+    int stride = cairo_image_surface_get_stride(mSurface);
+    int size = height*stride;
+
+    // Get data
+    cairo_surface_flush(mSurface);
+    unsigned char* data = cairo_image_surface_get_data(mSurface);
+
+    // Copy data into vector
+    std::vector<unsigned char> pixelBuffer(data, data+size);
+
+    // Remove the unused alpha channel
+    int count = 0;
+    for (int i = 0; i < size; i += 4){
+        pixelBuffer.erase(pixelBuffer.begin() + (i - count));
+        count++;
+    }
+
+    // Return pixel buffer
+    return pixelBuffer;
+}
+
+int RenderEngine::getChannels()
+{
+    /* Get the number of channels in the surface */
+
+    // Return channels
+    return 3;
+}
+
+std::pair<int, int> RenderEngine::getDimensions()
+{
+    /* Get the dimensions of the surface */
+
+    // Return dimensions
+    return std::pair<int, int>(cairo_image_surface_get_width(mSurface), cairo_image_surface_get_height(mSurface));
+}
+
 inline RenderEngine::RGB_t RenderEngine::getRGB(b2HexColor color)
 {
     /* Convert b2HexColor into RGB */

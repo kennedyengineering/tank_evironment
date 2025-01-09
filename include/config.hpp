@@ -56,6 +56,8 @@ namespace TankGame
         int subStep = 8;                // number of sub-steps
 
         /* Rendering parameters */
+        b2HexColor clearColor = b2_colorBlack;  // hex color
+
         float pixelDensity = 8.0f;     // pixels per meter
     };
 }

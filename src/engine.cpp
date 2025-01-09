@@ -128,6 +128,14 @@ std::vector<float> Engine::scanTankLidar(RegistryId tankId)
     return lidarData;
 }
 
+void Engine::clearImage()
+{
+    /* Clear the image */
+
+    // Clear the image
+    mRenderEngine.clearImage(mConfig.clearColor);
+}
+
 void Engine::renderProjectiles()
 {
     /* Render all projectiles */
@@ -218,6 +226,30 @@ void Engine::renderTankLidar(RegistryId tankId)
         // Render the circle
         mRenderEngine.renderCircle(convertedPoint, radius, color);
     }
+}
+
+std::vector<unsigned char> Engine::getImageBuffer()
+{
+    /* Return pixel buffer from render enging */
+
+    // Return image
+    return mRenderEngine.getBuffer();
+}
+
+std::pair<int, int> Engine::getImageDimensions()
+{
+    /* Return dimensions of the image */
+
+    // Return dimensions
+    return mRenderEngine.getDimensions();
+}
+
+int Engine::getImageChannels()
+{
+    /* Return number of channels of the image */
+
+    // Return channels
+    return mRenderEngine.getChannels();
 }
 
 void Engine::step()

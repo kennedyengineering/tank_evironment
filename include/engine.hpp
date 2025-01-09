@@ -28,9 +28,15 @@ namespace TankGame
 
         std::vector<float> scanTankLidar(RegistryId tankId);
 
+        void clearImage();
+
         void renderProjectiles();
         void renderTank(RegistryId tankId);
         void renderTankLidar(RegistryId tankId);
+
+        std::vector<unsigned char> getImageBuffer();
+        std::pair<int, int> getImageDimensions();
+        int getImageChannels();
         
         void step();
 

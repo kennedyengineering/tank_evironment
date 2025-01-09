@@ -15,8 +15,6 @@ namespace TankGame
     public:
         RenderEngine(int imageWidth, int imageHeight);
         ~RenderEngine();
-        
-        // TODO: get pixel buffer (either create struct to hold vector (buffer) and image dimensions, or create another method to get image dimensions and call that in bindings lambda. probably the latter.)
 
         void clearImage(b2HexColor color);
 
@@ -24,6 +22,10 @@ namespace TankGame
         void renderCircle(b2Vec2 center, float radius, b2HexColor color);
 
         void writeToPng(const std::filesystem::path& filePath);
+
+        std::vector<unsigned char> getBuffer();
+        std::pair<int, int> getDimensions();
+        int getChannels();
 
     private:
         using RGB_t = std::array<float, 3>;
