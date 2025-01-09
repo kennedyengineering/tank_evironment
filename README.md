@@ -29,11 +29,11 @@ tank_environment
 ├── CMakeLists.txt
 ├── README.md
 ├── include                         [ CPP header files ]
-├── python                          [ Python unit Tests ]
+├── python                          [ Python unit tests ]
 ├── requirements.txt
 ├── setup.sh
 ├── src                             [ CPP source files ]
-└── test                            [ CPP unit Tests ]
+└── test                            [ CPP unit tests ]
 ```
 
 ## Building
