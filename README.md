@@ -28,12 +28,12 @@ tank_environment
 ├── .vscode                         [ VSCode related configuration files ]
 ├── CMakeLists.txt
 ├── README.md
-├── include                         [ CPP Header files ]
-├── python                          [ Python Units Tests ]
+├── include                         [ CPP header files ]
+├── python                          [ Python unit Tests ]
 ├── requirements.txt
 ├── setup.sh
-├── src                             [ CPP Source files ]
-└── test                            [ CPP Units Tests ]
+├── src                             [ CPP source files ]
+└── test                            [ CPP unit Tests ]
 ```
 
 ## Building
