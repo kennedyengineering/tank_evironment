@@ -69,7 +69,12 @@ target_link_libraries(tank_game_lib PUBLIC
 enable_testing()
 
 add_executable(tank_game_lib_tests
-    test/test.cpp
+    test/test_categories.cpp
+    test/test_config.cpp
+    test/test_engine.cpp
+    test/test_registry.cpp
+    test/test_render.cpp
+    test/test_tank.cpp
 )
 
 target_link_libraries(tank_game_lib_tests PRIVATE
