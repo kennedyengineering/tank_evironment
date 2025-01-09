@@ -8,8 +8,6 @@
 
 namespace py = pybind11;
 
-// TODO: switch to _ notation for python names
-
 PYBIND11_MODULE(tank_game, handle)
 {
     handle.doc() = "Tank Game Python Bindings";
@@ -29,9 +27,29 @@ PYBIND11_MODULE(tank_game, handle)
 
     py::class_<TankGame::Engine>(handle, "Engine")
         .def(py::init<const TankGame::Config&>())
+        /* Add & Remove Tanks */
         .def("addTank", &TankGame::Engine::addTank)
         .def("removeTank", &TankGame::Engine::removeTank)
+        /* Control Tanks */
+        .def("rotateTankGun", &TankGame::Engine::rotateTankGun)
+        .def("fireTankGun", &TankGame::Engine::rotateTankGun)
+        .def("moveLeftTankTread", &TankGame::Engine::moveLeftTankTread)
+        .def("moveRightTankTread", &TankGame::Engine::moveRightTankTread)
+        /* Tank Sensors */
+        .def("scanTankLidar", [](TankGame::Engine &self, TankGame::RegistryId tankId)
+        {
+            // Get scan data
+            std::vector<float> scanData = self.scanTankLidar(tankId);
+
+            // Return numpy array
+            return py::array_t<float>(scanData.size(), scanData.data());
+        })
+        /* Tank Rendering */
+        .def("renderProjectiles", &TankGame::Engine::renderProjectiles)
         .def("renderTank", &TankGame::Engine::renderTank)
+        .def("renderTankLidar", &TankGame::Engine::renderTankLidar)
+        /* Image Handling */
+        .def("clearImage", &TankGame::Engine::clearImage)
         .def("getImage", [](TankGame::Engine &self)
         {
             // Get image dimensions
@@ -44,6 +62,7 @@ PYBIND11_MODULE(tank_game, handle)
             // Return numpy array
             return py::array_t<unsigned char>({imageHeight, imageWidth, imageChannels}, imageBuffer.data());
         })
+        /* Simulation Step */
         .def("step", &TankGame::Engine::step)
         ;
 }
