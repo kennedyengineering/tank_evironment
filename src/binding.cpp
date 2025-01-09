@@ -31,17 +31,18 @@ PYBIND11_MODULE(tank_game, handle)
         .def(py::init<const TankGame::Config&>())
         .def("addTank", &TankGame::Engine::addTank)
         .def("removeTank", &TankGame::Engine::removeTank)
+        .def("renderTank", &TankGame::Engine::renderTank)
         .def("getImage", [](TankGame::Engine &self)
         {
             // Get image dimensions
-            std::pair<int, int> imageDimensions = self.getImageDimensions();
+            auto [imageWidth, imageHeight] = self.getImageDimensions();
             int imageChannels = self.getImageChannels();
 
             // Get image buffer
             std::vector<unsigned char> imageBuffer = self.getImageBuffer();
 
             // Return numpy array
-            return py::array_t<unsigned char>({imageDimensions.first, imageDimensions.second, imageChannels}, imageBuffer.data());
+            return py::array_t<unsigned char>({imageHeight, imageWidth, imageChannels}, imageBuffer.data());
         })
         .def("step", &TankGame::Engine::step)
         ;
