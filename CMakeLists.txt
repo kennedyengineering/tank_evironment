@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.22)
 
 
-project(simple_simulator
+project(tank_game
         VERSION 0.1
-        DESCRIPTION "A simple simulator"
+        DESCRIPTION "Tank Game Environment"
         LANGUAGES C CXX
         )
 
@@ -38,7 +38,24 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(pybind11)
 
 
+# Tank Game Library
+add_library(tank_game_lib SHARED
+    src/engine.cpp
+    src/tank.cpp
+    src/render.cpp
+)
+
+target_include_directories(tank_game_lib PUBLIC
+    include
+    ${CAIRO_INCLUDE_DIRS}
+)
+
+target_link_libraries(tank_game_lib PUBLIC
+    box2d
+    ${CAIRO_LIBRARIES}
+)
+
+
 # Python Bindings
-pybind11_add_module(tank_game src/binding.cpp src/engine.cpp src/tank.cpp src/render.cpp)
-target_include_directories(tank_game PRIVATE include ${CAIRO_INCLUDE_DIRS})
-target_link_libraries(tank_game PRIVATE box2d ${CAIRO_LIBRARIES})
+pybind11_add_module(python_bindings src/binding.cpp)
+target_link_libraries(python_bindings PRIVATE tank_game_lib)

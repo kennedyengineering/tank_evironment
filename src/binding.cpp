@@ -8,7 +8,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(tank_game, handle)
+PYBIND11_MODULE(python_bindings, handle)
 {
     handle.doc() = "Tank Game Python Bindings";
 
