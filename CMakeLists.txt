@@ -38,6 +38,15 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(pybind11)
 
 
+# GoogleTest
+FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest
+    GIT_TAG        v1.15.2
+)
+FetchContent_MakeAvailable(googletest)
+
+
 # Tank Game Library
 add_library(tank_game_lib SHARED
     src/engine.cpp
@@ -56,6 +65,27 @@ target_link_libraries(tank_game_lib PUBLIC
 )
 
 
+# Tank Game Library Tests
+enable_testing()
+
+add_executable(tank_game_lib_tests
+    test/test.cpp
+)
+
+target_link_libraries(tank_game_lib_tests PRIVATE
+    tank_game_lib
+    GTest::gtest_main
+)
+
+include(GoogleTest)
+gtest_discover_tests(tank_game_lib_tests)
+
+
 # Python Bindings
-pybind11_add_module(python_bindings src/binding.cpp)
-target_link_libraries(python_bindings PRIVATE tank_game_lib)
+pybind11_add_module(python_bindings
+    src/binding.cpp
+)
+
+target_link_libraries(python_bindings PRIVATE
+    tank_game_lib
+)
