@@ -1,17 +1,17 @@
 {
-    "build": { 
-        "dockerfile": "Dockerfile"
-    },
-    "runArgs": [
-        "--network=host"
-    ],
-    "customizations": {
-        "vscode": {
-            "extensions": [
-                "ms-vscode.cpptools-extension-pack",
-                "gruntfuggly.todo-tree",
-                "ms-python.python"
-            ]
-        }
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "runArgs": [
+    "--network=host"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools-extension-pack",
+        "gruntfuggly.todo-tree",
+        "ms-python.python"
+      ]
     }
+  }
 }

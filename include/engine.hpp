@@ -6,52 +6,50 @@
 #include <vector>
 
 #include "config.hpp"
-#include "tank.hpp"
 #include "registry.hpp"
 #include "render.hpp"
+#include "tank.hpp"
 
-namespace TankGame
-{
-    class Engine
-    {
-    public:
-        Engine(const Config& config);
-        ~Engine();
+namespace TankGame {
+class Engine {
+public:
+  Engine(const Config &config);
+  ~Engine();
 
-        RegistryId addTank(const TankConfig& tankConfig);
-        void removeTank(RegistryId tankId);
+  RegistryId addTank(const TankConfig &tankConfig);
+  void removeTank(RegistryId tankId);
 
-        void rotateTankGun(RegistryId tankId, float angle);
-        void fireTankGun(RegistryId tankId);
-        void moveLeftTankTread(RegistryId tankId, float force);
-        void moveRightTankTread(RegistryId tankId, float force);
+  void rotateTankGun(RegistryId tankId, float angle);
+  void fireTankGun(RegistryId tankId);
+  void moveLeftTankTread(RegistryId tankId, float force);
+  void moveRightTankTread(RegistryId tankId, float force);
 
-        std::vector<float> scanTankLidar(RegistryId tankId);
+  std::vector<float> scanTankLidar(RegistryId tankId);
 
-        void clearImage();
+  void clearImage();
 
-        void renderProjectiles();
-        void renderTank(RegistryId tankId);
-        void renderTankLidar(RegistryId tankId);
+  void renderProjectiles();
+  void renderTank(RegistryId tankId);
+  void renderTankLidar(RegistryId tankId);
 
-        std::vector<unsigned char> getImageBuffer();
-        std::pair<int, int> getImageDimensions();
-        int getImageChannels();
-        
-        void step();
+  std::vector<unsigned char> getImageBuffer();
+  std::pair<int, int> getImageDimensions();
+  int getImageChannels();
 
-    private:
-        void handleCollisions();
+  void step();
 
-    private:
-        Config mConfig;
+private:
+  void handleCollisions();
 
-        b2WorldId mWorldId;
+private:
+  Config mConfig;
 
-        RenderEngine mRenderEngine;
+  b2WorldId mWorldId;
 
-        Registry<Tank> mTankRegistry;
+  RenderEngine mRenderEngine;
 
-        std::vector<b2ShapeId> mProjectileShapeIdVector;
-    };
-}
+  Registry<Tank> mTankRegistry;
+
+  std::vector<b2ShapeId> mProjectileShapeIdVector;
+};
+} // namespace TankGame
