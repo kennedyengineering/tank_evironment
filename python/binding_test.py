@@ -24,3 +24,6 @@ tankId2 = engine.addTank(tankConfig)
 print("TankId", tankId2)
 
 engine.removeTank(tankId1)
+
+image = engine.getImage()
+print("Image Shape", image.shape)

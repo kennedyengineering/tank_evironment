@@ -2,10 +2,13 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/numpy.h>
 
 #include "engine.hpp"
 
 namespace py = pybind11;
+
+// TODO: switch to _ notation for python names
 
 PYBIND11_MODULE(tank_game, handle)
 {
@@ -28,6 +31,18 @@ PYBIND11_MODULE(tank_game, handle)
         .def(py::init<const TankGame::Config&>())
         .def("addTank", &TankGame::Engine::addTank)
         .def("removeTank", &TankGame::Engine::removeTank)
+        .def("getImage", [](TankGame::Engine &self)
+        {
+            // Get image dimensions
+            std::pair<int, int> imageDimensions = self.getImageDimensions();
+            int imageChannels = self.getImageChannels();
+
+            // Get image buffer
+            std::vector<unsigned char> imageBuffer = self.getImageBuffer();
+
+            // Return numpy array
+            return py::array_t<unsigned char>({imageDimensions.first, imageDimensions.second, imageChannels}, imageBuffer.data());
+        })
         .def("step", &TankGame::Engine::step)
         ;
 }
