@@ -6,6 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../buil
 
 import python_bindings
 from PIL import Image
+import time
 
 print("Module", dir(python_bindings))
 
@@ -29,9 +30,15 @@ print("TankId", tankId2)
 
 engine.removeTank(tankId1)
 
+start = time.time()
 engine.renderTank(tankId2)
+end = time.time()
+print("Tank Render Time", end-start)
 
+start = time.time()
 image = engine.getImage()
+end = time.time()
+print("Image Get Time", end-start)
 print("Image Shape", image.shape)
 
 pil_image = Image.fromarray(image)
