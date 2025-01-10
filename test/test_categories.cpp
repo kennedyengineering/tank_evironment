@@ -1,11 +1,22 @@
 // Tank Game (@kennedyengineering)
 
+#include <array>
 #include <gtest/gtest.h>
 
-// Demonstrate some basic assertions.
-TEST(CategoriesTest, BasicAssertions) {
-  // Expect two strings not to be equal.
-  EXPECT_STRNE("hello", "world");
-  // Expect equality.
-  EXPECT_EQ(7 * 6, 42);
+#include "categories.hpp"
+
+TEST(CategoriesTest, NoOverlap) {
+  // Ensure no two category bits overlap
+  std::array<TankGame::CategoryBits, 4> allCategoryBits = {
+      TankGame::PROJECTILE, TankGame::WALL, TankGame::TANK};
+
+  uint32_t bitRecord = 0;
+
+  for (const TankGame::CategoryBits &bits : allCategoryBits) {
+    // Check if any bits overlap
+    ASSERT_EQ(bitRecord & bits, 0);
+
+    // Add bits to record
+    bitRecord |= bits;
+  }
 }
