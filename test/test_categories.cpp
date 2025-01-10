@@ -20,3 +20,14 @@ TEST(CategoriesTest, NoOverlap) {
     bitRecord |= bits;
   }
 }
+
+TEST(CategoriesTest, AllContainsAll) {
+  // Ensure ALL contains all bits in enum
+  std::array<TankGame::CategoryBits, 4> allCategoryBits = {
+      TankGame::PROJECTILE, TankGame::WALL, TankGame::TANK};
+
+  for (const TankGame::CategoryBits &bits : allCategoryBits) {
+    // Check if all bits are covered
+    ASSERT_EQ(TankGame::CategoryBits::ALL & bits, bits);
+  }
+}
