@@ -4,14 +4,14 @@
 
 #include "config.hpp"
 
-TEST(ConfigTest, TankConfigInitialization) {
+TEST(TankConfigTest, Initialization) {
   // Ensure default initialization works
   TankGame::TankConfig tankConfig;
 }
 
 // TODO: add TankConfig::ValidateConfig
 
-TEST(ConfigTest, ConfigInitialization) {
+TEST(ConfigTest, Initialization) {
   // Ensure default initialization works
   TankGame::Config config;
 }
