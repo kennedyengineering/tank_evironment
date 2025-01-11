@@ -39,6 +39,7 @@ TEST(EngineTest, RenderTankToPng) {
   eng.writeImageToPng("EngineTest_RenderTankToPng.png");
 }
 
+// FIXME: scan logic not working correctly
 TEST(EngineTest, RenderTankLidarToPng) {
   // Ensure Engine renders correctly
 
@@ -84,4 +85,58 @@ TEST(EngineTest, RenderTankLidarToPng) {
 
   // Save to PNG
   eng.writeImageToPng("EngineTest_RenderTankLidarToPng_PostScan.png");
+}
+
+// FIXME: tank projectiles are colliding with the shooting tank. make tanks
+// unable to hit themselves, initialize projectile further away from tank, or
+// make tank gun unhittable?
+TEST(EngineTest, RenderTankProjectileToPng) {
+  // Ensure Engine renders correctly
+
+  // Create config
+  TankGame::Config config;
+
+  // Create engine
+  TankGame::Engine eng(config);
+
+  // Create tank config
+  TankGame::TankConfig tankConfig;
+  tankConfig.positionX = config.arenaWidth / 2.0f;
+  tankConfig.positionY = config.arenaHeight / 2.0f;
+
+  // Create tank
+  TankGame::RegistryId id = eng.addTank(tankConfig);
+
+  // Fire a projectile
+  eng.fireTankGun(id);
+
+  // Step the simulation
+  for (int i = 0; i < 5; i++) {
+    eng.step();
+  }
+
+  // Fire a projectile
+  eng.fireTankGun(id);
+
+  // Step the simulation
+  for (int i = 0; i < 5; i++) {
+    eng.step();
+  }
+
+  // Fire a projectile
+  eng.fireTankGun(id);
+
+  // Step the simulation
+  for (int i = 0; i < 5; i++) {
+    eng.step();
+  }
+
+  // Render tank
+  eng.renderTank(id);
+
+  // Render projectiles
+  eng.renderProjectiles();
+
+  // Save to PNG
+  eng.writeImageToPng("EngineTest_RenderTankProjectileToPng.png");
 }
