@@ -112,6 +112,7 @@ std::vector<unsigned char> RenderEngine::getBuffer() {
   std::vector<unsigned char> pixelBuffer;
   pixelBuffer.reserve(size);
 
+  // FIXME: switch ordering (currently BGR, want RGB)
   // Remove the unused alpha channel
   for (int i = 0; i < size; i += 4) {
     pixelBuffer.push_back(data[i]);
