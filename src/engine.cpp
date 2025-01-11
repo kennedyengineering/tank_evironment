@@ -244,6 +244,13 @@ int Engine::getImageChannels() {
   return mRenderEngine.getChannels();
 }
 
+void Engine::writeImageToPng(const std::filesystem::path &filePath) {
+  /* Write the current image to disk as a .png */
+
+  // Write .png to disk
+  mRenderEngine.writeToPng(filePath);
+}
+
 void Engine::step() {
   /* Step the engine forward */
 

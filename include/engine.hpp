@@ -3,6 +3,7 @@
 #pragma once
 
 #include <box2d/box2d.h>
+#include <filesystem>
 #include <vector>
 
 #include "config.hpp"
@@ -35,6 +36,7 @@ public:
   std::vector<unsigned char> getImageBuffer();
   std::pair<int, int> getImageDimensions();
   int getImageChannels();
+  void writeImageToPng(const std::filesystem::path &filePath);
 
   void step();
 
