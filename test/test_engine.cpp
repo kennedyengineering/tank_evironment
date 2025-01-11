@@ -38,3 +38,39 @@ TEST(EngineTest, RenderTankToPng) {
   // Save to PNG
   eng.writeImageToPng("EngineTest_RenderTankToPng.png");
 }
+
+TEST(EngineTest, RenderTankLidarToPng) {
+  // Ensure Engine renders correctly
+
+  // Create config
+  TankGame::Config config;
+
+  // Create engine
+  TankGame::Engine eng(config);
+
+  // Create tank config
+  TankGame::TankConfig tankConfig;
+  tankConfig.positionX = config.arenaWidth / 2.0f;
+  tankConfig.positionY = config.arenaHeight / 2.0f;
+
+  // Create tank
+  TankGame::RegistryId id = eng.addTank(tankConfig);
+
+  // Render tank
+  eng.renderTank(id);
+
+  // Render lidar
+  eng.renderTankLidar(id);
+
+  // Save to PNG
+  eng.writeImageToPng("EngineTest_RenderTankLidarToPng_PreScan.png");
+
+  // Scan lidar
+  eng.scanTankLidar(id);
+
+  // Render lidar
+  eng.renderTankLidar(id);
+
+  // Save to PNG
+  eng.writeImageToPng("EngineTest_RenderTankLidarToPng_PostScan.png");
+}
