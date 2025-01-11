@@ -48,7 +48,7 @@ FetchContent_MakeAvailable(googletest)
 
 
 # Tank Game Library
-add_library(tank_game_lib SHARED
+add_library(tank_game_lib STATIC
     src/engine.cpp
     src/tank.cpp
     src/render.cpp
@@ -63,6 +63,8 @@ target_link_libraries(tank_game_lib PUBLIC
     box2d
     ${CAIRO_LIBRARIES}
 )
+
+set_property(TARGET tank_game_lib PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 
 # Tank Game Library Tests
