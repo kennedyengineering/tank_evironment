@@ -30,6 +30,12 @@ width, height = engine.getImageDimensions()
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Tank Game Demo")
 
+# Initialize clock for FPS management
+clock = pygame.time.Clock()
+
+# Font for displaying FPS
+font = pygame.font.SysFont(None, 36)
+
 # Game loop
 running = True
 while running:
@@ -48,8 +54,16 @@ while running:
     image = pygame.surfarray.make_surface(image_buff)
     screen.blit(image, (0, 0))
 
+    # Display FPS
+    fps = clock.get_fps()  # Get the current FPS
+    fps_text = font.render(f"FPS: {fps:.2f}", True, (255, 0, 0))  # Render FPS text
+    screen.blit(fps_text, (10, 10))  # Draw FPS on the screen
+
     # Update the display
     pygame.display.flip()
+
+    # Cap the frame rate
+    clock.tick(60)
 
 # Quit Pygame
 pygame.quit()
