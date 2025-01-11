@@ -192,10 +192,14 @@ void Tank::scanLidar(float range) {
     ctx->point = point;
 
     // Check if colliding with self
-    TankId otherTankId = *static_cast<TankId *>(b2Shape_GetUserData(shapeId));
-    if (otherTankId == ctx->tankId) {
-      // Continue and ignore this shape
-      fraction = -1;
+    TankId *otherTankIdPtr =
+        static_cast<TankId *>(b2Shape_GetUserData(shapeId));
+    if (otherTankIdPtr != nullptr) {
+      TankId otherTankId = *otherTankIdPtr;
+      if (otherTankId == ctx->tankId) {
+        // Continue and ignore this shape
+        fraction = -1.0f;
+      }
     }
 
     return fraction;
