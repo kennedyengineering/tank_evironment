@@ -1,6 +1,7 @@
 // Tank Game (@kennedyengineering)
 
 #include <gtest/gtest.h>
+#include <vector>
 
 #include "config.hpp"
 #include "engine.hpp"
@@ -139,4 +140,21 @@ TEST(EngineTest, RenderTankProjectileToPng) {
 
   // Save to PNG
   eng.writeImageToPng("EngineTest_RenderTankProjectileToPng.png");
+}
+
+TEST(EngineTest, GetBuffer) {
+  // Ensure the image buffer can be retrieved correctly
+
+  // Create config
+  TankGame::Config config;
+
+  // Create engine
+  TankGame::Engine eng(config);
+
+  // Get buffer
+  std::vector<unsigned char> buff = eng.getImageBuffer();
+
+  for (const unsigned char &c : buff) {
+    ASSERT_EQ(c, 0);
+  }
 }
