@@ -137,6 +137,39 @@ TEST(RenderTest, PolygonToPNG) {
   reng.writeToPng("RenderTest_PolygonToPNG.png");
 }
 
+TEST(RenderTest, PolygonOutOfBoundsToPNG) {
+  // Ensure RenderEngine correctly draws polygons
+
+  // Construct render engine
+  TankGame::RenderEngine reng(100, 200);
+
+  // Fill with black
+  reng.clearImage(b2_colorBlue);
+
+  // Render polygon
+  std::vector<b2Vec2> vertices;
+  vertices.push_back({50, 100});
+  vertices.push_back({25, 175});
+  vertices.push_back({75, 175});
+
+  std::vector<b2Vec2> translatedVerticesRight(vertices.size());
+  std::transform(vertices.begin(), vertices.end(),
+                 translatedVerticesRight.begin(),
+                 [](b2Vec2 point) { return b2Add(point, {50, 0}); });
+
+  std::vector<b2Vec2> translatedVerticesDown(vertices.size());
+  std::transform(vertices.begin(), vertices.end(),
+                 translatedVerticesDown.begin(),
+                 [](b2Vec2 point) { return b2Add(point, {0, 75}); });
+
+  reng.renderPolygon(translatedVerticesRight, b2_colorRed);
+
+  reng.renderPolygon(translatedVerticesDown, b2_colorRed);
+
+  // Save to PNG
+  reng.writeToPng("RenderTest_PolygonOutOfBoundsToPNG.png");
+}
+
 TEST(RenderTest, CircleToPNG) {
   // Ensure RenderEngine correctly draws polygons
 
