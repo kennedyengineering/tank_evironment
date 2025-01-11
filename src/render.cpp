@@ -113,7 +113,7 @@ std::vector<unsigned char> RenderEngine::getBuffer() {
 
   // Remove the unused alpha channel
   int count = 0;
-  for (int i = 0; i < size; i += 4) {
+  for (int i = 3; i < size; i += 4) {
     pixelBuffer.erase(pixelBuffer.begin() + (i - count));
     count++;
   }
