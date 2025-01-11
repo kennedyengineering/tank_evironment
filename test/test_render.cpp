@@ -146,7 +146,7 @@ TEST(RenderTest, PolygonOutOfBoundsToPNG) {
   // Fill with blue
   reng.clearImage(b2_colorBlue);
 
-  // Render polygons
+  // Define polygons
   std::vector<b2Vec2> vertices;
   vertices.push_back({50, 100});
   vertices.push_back({25, 175});
@@ -162,9 +162,18 @@ TEST(RenderTest, PolygonOutOfBoundsToPNG) {
                  translatedVerticesDown.begin(),
                  [](b2Vec2 point) { return b2Add(point, {0, 75}); });
 
+  std::vector<b2Vec2> translatedVerticesAbsurd(vertices.size());
+  std::transform(vertices.begin(), vertices.end(),
+                 translatedVerticesAbsurd.begin(),
+                 [](b2Vec2 point) { return b2Add(point, {1000, 1000}); });
+
+  // Render partially observable polygons
   reng.renderPolygon(translatedVerticesRight, b2_colorRed);
 
   reng.renderPolygon(translatedVerticesDown, b2_colorRed);
+
+  // Render unobservable polygon
+  reng.renderPolygon(translatedVerticesAbsurd, b2_colorRed);
 
   // Save to PNG
   reng.writeToPng("RenderTest_PolygonOutOfBoundsToPNG.png");
@@ -180,15 +189,35 @@ TEST(RenderTest, CircleToPNG) {
   reng.clearImage(b2_colorBlue);
 
   // Render circles
-  std::vector<b2Vec2> vertices;
-  vertices.push_back({50, 100});
-  vertices.push_back({25, 175});
-  vertices.push_back({75, 175});
-
-  reng.renderCircle(vertices[0], 1.0f, b2_colorRed);
-  reng.renderCircle(vertices[1], 5.0f, b2_colorRed);
-  reng.renderCircle(vertices[2], 15.0f, b2_colorRed);
+  reng.renderCircle({50, 100}, 1.0f, b2_colorRed);
+  reng.renderCircle({25, 175}, 5.0f, b2_colorRed);
+  reng.renderCircle({75, 175}, 15.0f, b2_colorRed);
 
   // Save to PNG
   reng.writeToPng("RenderTest_CircleToPNG.png");
+}
+
+TEST(RenderTest, CircleOutOfBoundsToPNG) {
+  // Ensure RenderEngine correctly draws circles
+
+  // Construct render engine
+  TankGame::RenderEngine reng(100, 200);
+
+  // Fill with blue
+  reng.clearImage(b2_colorBlue);
+
+  // Render partially observable circles
+  reng.renderCircle({100, 50}, 1.0f, b2_colorRed);
+  reng.renderCircle({100, 100}, 5.0f, b2_colorRed);
+  reng.renderCircle({100, 150}, 15.0f, b2_colorRed);
+
+  reng.renderCircle({25, 200}, 1.0f, b2_colorRed);
+  reng.renderCircle({50, 200}, 5.0f, b2_colorRed);
+  reng.renderCircle({75, 200}, 15.0f, b2_colorRed);
+
+  // Render unobservable circle
+  reng.renderCircle({1000, 1000}, 15.0f, b2_colorRed);
+
+  // Save to PNG
+  reng.writeToPng("RenderTest_CircleOutOfBoundsToPNG.png");
 }
