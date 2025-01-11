@@ -19,6 +19,16 @@ TEST(RenderTest, Initialization) {
 
   // Check channels
   ASSERT_EQ(reng.getChannels(), 3);
+
+  // Get and validate buffer
+  std::vector<unsigned char> buff = reng.getBuffer();
+
+  for (const unsigned char &c : buff) {
+    ASSERT_EQ(c, 0);
+  }
+
+  // Save to PNG
+  reng.writeToPng("RenderTest_Initialization.png");
 }
 
 TEST(RenderTest, ClearAndGetBufferBlack) {
@@ -104,4 +114,48 @@ TEST(RenderTest, ClearAndGetBufferBlue) {
   for (size_t i = 0; i < buff.size(); i += 3) {
     ASSERT_EQ(buff[i], 255);
   }
+}
+
+TEST(RenderTest, PolygonToPNG) {
+  // Ensure RenderEngine correctly draws polygons
+
+  // Construct render engine
+  TankGame::RenderEngine reng(100, 200);
+
+  // Fill with black
+  reng.clearImage(b2_colorBlue);
+
+  // Render polygon
+  std::vector<b2Vec2> vertices;
+  vertices.push_back({50, 100});
+  vertices.push_back({25, 175});
+  vertices.push_back({75, 175});
+
+  reng.renderPolygon(vertices, b2_colorRed);
+
+  // Save to PNG
+  reng.writeToPng("RenderTest_PolygonToPNG.png");
+}
+
+TEST(RenderTest, CircleToPNG) {
+  // Ensure RenderEngine correctly draws polygons
+
+  // Construct render engine
+  TankGame::RenderEngine reng(100, 200);
+
+  // Fill with black
+  reng.clearImage(b2_colorBlue);
+
+  // Render polygon
+  std::vector<b2Vec2> vertices;
+  vertices.push_back({50, 100});
+  vertices.push_back({25, 175});
+  vertices.push_back({75, 175});
+
+  reng.renderCircle(vertices[0], 1.0f, b2_colorRed);
+  reng.renderCircle(vertices[1], 5.0f, b2_colorRed);
+  reng.renderCircle(vertices[2], 15.0f, b2_colorRed);
+
+  // Save to PNG
+  reng.writeToPng("RenderTest_CircleToPNG.png");
 }
