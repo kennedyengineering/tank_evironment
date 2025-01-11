@@ -54,7 +54,7 @@ TEST(RenderTest, ClearAndGetBufferWhite) {
   // Construct render engine
   TankGame::RenderEngine reng(100, 200);
 
-  // Fill with black
+  // Fill with white
   reng.clearImage(b2_colorWhite);
 
   // Get and validate buffer
@@ -71,7 +71,7 @@ TEST(RenderTest, ClearAndGetBufferRed) {
   // Construct render engine
   TankGame::RenderEngine reng(100, 200);
 
-  // Fill with black
+  // Fill with red
   reng.clearImage(b2_colorRed);
 
   // Get and validate buffer
@@ -88,7 +88,7 @@ TEST(RenderTest, ClearAndGetBufferGreen) {
   // Construct render engine
   TankGame::RenderEngine reng(100, 200);
 
-  // Fill with black
+  // Fill with green
   reng.clearImage(b2_colorGreen);
 
   // Get and validate buffer
@@ -105,7 +105,7 @@ TEST(RenderTest, ClearAndGetBufferBlue) {
   // Construct render engine
   TankGame::RenderEngine reng(100, 200);
 
-  // Fill with black
+  // Fill with blue
   reng.clearImage(b2_colorBlue);
 
   // Get and validate buffer
@@ -122,7 +122,7 @@ TEST(RenderTest, PolygonToPNG) {
   // Construct render engine
   TankGame::RenderEngine reng(100, 200);
 
-  // Fill with black
+  // Fill with blue
   reng.clearImage(b2_colorBlue);
 
   // Render polygon
@@ -143,10 +143,10 @@ TEST(RenderTest, PolygonOutOfBoundsToPNG) {
   // Construct render engine
   TankGame::RenderEngine reng(100, 200);
 
-  // Fill with black
+  // Fill with blue
   reng.clearImage(b2_colorBlue);
 
-  // Render polygon
+  // Render polygons
   std::vector<b2Vec2> vertices;
   vertices.push_back({50, 100});
   vertices.push_back({25, 175});
@@ -171,15 +171,15 @@ TEST(RenderTest, PolygonOutOfBoundsToPNG) {
 }
 
 TEST(RenderTest, CircleToPNG) {
-  // Ensure RenderEngine correctly draws polygons
+  // Ensure RenderEngine correctly draws circles
 
   // Construct render engine
   TankGame::RenderEngine reng(100, 200);
 
-  // Fill with black
+  // Fill with blue
   reng.clearImage(b2_colorBlue);
 
-  // Render polygon
+  // Render circles
   std::vector<b2Vec2> vertices;
   vertices.push_back({50, 100});
   vertices.push_back({25, 175});
