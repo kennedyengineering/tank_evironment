@@ -108,14 +108,15 @@ std::vector<unsigned char> RenderEngine::getBuffer() {
   cairo_surface_flush(mSurface);
   unsigned char *data = cairo_image_surface_get_data(mSurface);
 
-  // Copy data into vector
-  std::vector<unsigned char> pixelBuffer(data, data + size);
+  // Copy data into vector and remove unused alpha channel
+  std::vector<unsigned char> pixelBuffer;
+  pixelBuffer.reserve(size);
 
   // Remove the unused alpha channel
-  int count = 0;
-  for (int i = 3; i < size; i += 4) {
-    pixelBuffer.erase(pixelBuffer.begin() + (i - count));
-    count++;
+  for (int i = 0; i < size; i += 4) {
+    pixelBuffer.push_back(data[i]);
+    pixelBuffer.push_back(data[i + 1]);
+    pixelBuffer.push_back(data[i + 2]);
   }
 
   // Return pixel buffer
