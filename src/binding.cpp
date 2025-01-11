@@ -47,7 +47,9 @@ PYBIND11_MODULE(python_bindings, handle) {
       .def("renderTankLidar", &TankGame::Engine::renderTankLidar)
       /* Image Handling */
       .def("clearImage", &TankGame::Engine::clearImage)
-      .def("getImage",
+      .def("getImageDimensions", &TankGame::Engine::getImageDimensions)
+      .def("getImageChannels", &TankGame::Engine::getImageChannels)
+      .def("getImageBuffer",
            [](TankGame::Engine &self) {
              // Get image dimensions
              auto [imageWidth, imageHeight] = self.getImageDimensions();
