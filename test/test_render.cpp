@@ -1,11 +1,107 @@
 // Tank Game (@kennedyengineering)
 
+#include <box2d/box2d.h>
 #include <gtest/gtest.h>
+#include <vector>
 
-// Demonstrate some basic assertions.
-TEST(RenderTest, BasicAssertions) {
-  // Expect two strings not to be equal.
-  EXPECT_STRNE("hello", "world");
-  // Expect equality.
-  EXPECT_EQ(7 * 6, 42);
+#include "render.hpp"
+
+TEST(RenderTest, Initialization) {
+  // Ensure RenderEngine initializes correctly
+
+  // Construct render engine
+  TankGame::RenderEngine reng(100, 200);
+
+  // Check dimensions were stored
+  auto [width, height] = reng.getDimensions();
+  ASSERT_EQ(width, 100);
+  ASSERT_EQ(height, 200);
+
+  // Check channels
+  ASSERT_EQ(reng.getChannels(), 3);
+}
+
+TEST(RenderTest, ClearAndGetBufferBlack) {
+  // Ensure RenderEngine clearImage and getBuffer methods work correctly
+
+  // Construct render engine
+  TankGame::RenderEngine reng(100, 200);
+
+  // Fill with black
+  reng.clearImage(b2_colorBlack);
+
+  // Get and validate buffer
+  std::vector<unsigned char> buff = reng.getBuffer();
+
+  for (const unsigned char &c : buff) {
+    ASSERT_EQ(c, 0);
+  }
+}
+
+TEST(RenderTest, ClearAndGetBufferWhite) {
+  // Ensure RenderEngine clearImage and getBuffer methods work correctly
+
+  // Construct render engine
+  TankGame::RenderEngine reng(100, 200);
+
+  // Fill with black
+  reng.clearImage(b2_colorWhite);
+
+  // Get and validate buffer
+  std::vector<unsigned char> buff = reng.getBuffer();
+
+  for (const unsigned char &c : buff) {
+    ASSERT_EQ(c, 255);
+  }
+}
+
+TEST(RenderTest, ClearAndGetBufferRed) {
+  // Ensure RenderEngine clearImage and getBuffer methods work correctly
+
+  // Construct render engine
+  TankGame::RenderEngine reng(100, 200);
+
+  // Fill with black
+  reng.clearImage(b2_colorRed);
+
+  // Get and validate buffer
+  std::vector<unsigned char> buff = reng.getBuffer();
+
+  for (size_t i = 2; i < buff.size(); i += 3) {
+    ASSERT_EQ(buff[i], 255);
+  }
+}
+
+TEST(RenderTest, ClearAndGetBufferGreen) {
+  // Ensure RenderEngine clearImage and getBuffer methods work correctly
+
+  // Construct render engine
+  TankGame::RenderEngine reng(100, 200);
+
+  // Fill with black
+  reng.clearImage(b2_colorGreen);
+
+  // Get and validate buffer
+  std::vector<unsigned char> buff = reng.getBuffer();
+
+  for (size_t i = 1; i < buff.size(); i += 3) {
+    ASSERT_EQ(buff[i], 255);
+  }
+}
+
+TEST(RenderTest, ClearAndGetBufferBlue) {
+  // Ensure RenderEngine clearImage and getBuffer methods work correctly
+
+  // Construct render engine
+  TankGame::RenderEngine reng(100, 200);
+
+  // Fill with black
+  reng.clearImage(b2_colorBlue);
+
+  // Get and validate buffer
+  std::vector<unsigned char> buff = reng.getBuffer();
+
+  for (size_t i = 0; i < buff.size(); i += 3) {
+    ASSERT_EQ(buff[i], 255);
+  }
 }
