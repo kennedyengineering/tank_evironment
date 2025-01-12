@@ -234,6 +234,10 @@ void Tank::scanLidar(float range) {
     b2World_CastRay(mWorldId, startPosition, translation, viewFilter,
                     rayCastCallback, &context);
 
+    // Note: if you wanted to return a value of zero if no objects are within
+    // range, check for a fraction of 1.0f here and set the context.point to
+    // {0}.
+
     // Update vector
     mLidarData.push_back(context.point);
   }
