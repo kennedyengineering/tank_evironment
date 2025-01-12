@@ -38,7 +38,7 @@ Tank::Tank(TankId tankId, const TankConfig &tankConfig, b2WorldId worldId)
 
   b2Polygon leftTreadPolygon =
       b2MakeOffsetBox(mTankConfig.bodyHeight, mTankConfig.treadWidth,
-                      (b2Vec2){0, mTankConfig.bodyHeight / 2.0f}, 0);
+                      (b2Vec2){0, -mTankConfig.bodyHeight / 2.0f}, 0);
   mLeftTreadShapeId = b2CreatePolygonShape(mLeftTreadBodyId, &leftTreadShapeDef,
                                            &leftTreadPolygon);
 
@@ -55,7 +55,7 @@ Tank::Tank(TankId tankId, const TankConfig &tankConfig, b2WorldId worldId)
 
   b2Polygon rightTreadPolygon =
       b2MakeOffsetBox(mTankConfig.bodyHeight, mTankConfig.treadWidth,
-                      (b2Vec2){0, -mTankConfig.bodyHeight / 2.0f}, 0);
+                      (b2Vec2){0, mTankConfig.bodyHeight / 2.0f}, 0);
   mRightTreadShapeId = b2CreatePolygonShape(
       mRightTreadBodyId, &rightTreadShapeDef, &rightTreadPolygon);
 
