@@ -58,7 +58,8 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            fire_projectile = True
+            if event.key == pygame.K_SPACE:
+                fire_projectile = True
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_q]:
