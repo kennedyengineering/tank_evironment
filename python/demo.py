@@ -45,12 +45,16 @@ font = pygame.font.SysFont(None, 36)
 
 # Game loop
 running = True
+move_gun_accumulator = 0
 while running:
 
     # Get input
     movement_force = 3000.0
     move_left_tread = 0
     move_right_tread = 0
+
+    movement_angle = 0.06
+    move_gun = 0
 
     fire_projectile = False
 
@@ -70,13 +74,20 @@ while running:
         move_right_tread += movement_force
     if keys[pygame.K_d]:
         move_right_tread -= movement_force
+    if keys[pygame.K_z]:
+        move_gun -= movement_angle
+    if keys[pygame.K_x]:
+        move_gun += movement_angle
 
     # Apply input
-    movement_force = 3000.0
     if move_left_tread:
         engine.moveLeftTankTread(player_tank_id, move_left_tread)
     if move_right_tread:
         engine.moveRightTankTread(player_tank_id, move_right_tread)
+
+    if move_gun:
+        move_gun_accumulator += move_gun
+        engine.rotateTankGun(player_tank_id, move_gun_accumulator)
 
     if fire_projectile:
         engine.fireTankGun(player_tank_id)
@@ -110,7 +121,7 @@ while running:
     pygame.display.flip()
 
     # Cap the frame rate
-    clock.tick(60)
+    clock.tick(30)
 
 # Quit Pygame
 pygame.quit()
