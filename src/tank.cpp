@@ -108,6 +108,7 @@ Tank::~Tank() {
 void Tank::rotateGun(float angle) {
   /* Rotate the tank gun to a set angle (in radians) */
 
+  b2Joint_WakeBodies(mGunMotorJointId);
   b2MotorJoint_SetAngularOffset(mGunMotorJointId, angle);
 }
 
