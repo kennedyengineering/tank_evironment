@@ -45,8 +45,8 @@ struct TankConfig {
 
 struct Config {
   /* Arena dimensions */
-  unsigned int arenaWidth = 100; // in meters
-  unsigned int arenaHeight = 75; // in meters
+  float arenaWidth = 100; // in meters
+  float arenaHeight = 75; // in meters
 
   /* Simulation parameters */
   float timeStep = 1.0f / 60.0f; // in seconds
