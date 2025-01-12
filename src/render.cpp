@@ -97,7 +97,7 @@ void RenderEngine::writeToPng(const std::filesystem::path &filePath) {
 }
 
 std::vector<unsigned char> RenderEngine::getBuffer() {
-  /* Get a copy of the surface as a pixel buffer */
+  /* Get a copy of the surface as a RGB pixel buffer */
 
   // Get image dimensions
   int height = cairo_image_surface_get_height(mSurface);
@@ -112,12 +112,11 @@ std::vector<unsigned char> RenderEngine::getBuffer() {
   std::vector<unsigned char> pixelBuffer;
   pixelBuffer.reserve(size);
 
-  // FIXME: switch ordering (currently BGR, want RGB)
   // Remove the unused alpha channel
   for (int i = 0; i < size; i += 4) {
-    pixelBuffer.push_back(data[i]);
-    pixelBuffer.push_back(data[i + 1]);
     pixelBuffer.push_back(data[i + 2]);
+    pixelBuffer.push_back(data[i + 1]);
+    pixelBuffer.push_back(data[i]);
   }
 
   // Return pixel buffer

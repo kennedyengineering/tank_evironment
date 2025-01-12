@@ -77,7 +77,7 @@ TEST(RenderTest, ClearAndGetBufferRed) {
   // Get and validate buffer
   std::vector<unsigned char> buff = reng.getBuffer();
 
-  for (size_t i = 2; i < buff.size(); i += 3) {
+  for (size_t i = 0; i < buff.size(); i += 3) {
     ASSERT_EQ(buff[i], 255);
   }
 }
@@ -111,7 +111,7 @@ TEST(RenderTest, ClearAndGetBufferBlue) {
   // Get and validate buffer
   std::vector<unsigned char> buff = reng.getBuffer();
 
-  for (size_t i = 0; i < buff.size(); i += 3) {
+  for (size_t i = 2; i < buff.size(); i += 3) {
     ASSERT_EQ(buff[i], 255);
   }
 }

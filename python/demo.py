@@ -50,7 +50,6 @@ while running:
     # Display image
     image_buff = engine.getImageBuffer()  # Get buffer
     image_buff = np.swapaxes(image_buff, 0, 1)  # Swap axis
-    iamge_buff = image_buff[..., ::-1]  # Reorder colors
     image = pygame.surfarray.make_surface(image_buff)
     screen.blit(image, (0, 0))
 
