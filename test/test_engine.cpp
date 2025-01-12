@@ -40,7 +40,6 @@ TEST(EngineTest, RenderTankToPng) {
   eng.writeImageToPng("EngineTest_RenderTankToPng.png");
 }
 
-// FIXME: scan logic not working correctly
 TEST(EngineTest, RenderTankLidarToPng) {
   // Ensure Engine renders correctly
 
