@@ -29,7 +29,7 @@ PYBIND11_MODULE(python_bindings, handle) {
       .def("removeTank", &TankGame::Engine::removeTank)
       /* Control Tanks */
       .def("rotateTankGun", &TankGame::Engine::rotateTankGun)
-      .def("fireTankGun", &TankGame::Engine::rotateTankGun)
+      .def("fireTankGun", &TankGame::Engine::fireTankGun)
       .def("moveLeftTankTread", &TankGame::Engine::moveLeftTankTread)
       .def("moveRightTankTread", &TankGame::Engine::moveRightTankTread)
       /* Tank Sensors */
