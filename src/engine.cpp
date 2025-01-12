@@ -336,6 +336,7 @@ void Engine::handleCollisions() {
         break;
       }
 
+      // FIXME: this is being printed in demo when no projectile is present
       case CategoryBits::TANK: {
         TankId otherTankId =
             *static_cast<TankId *>(b2Shape_GetUserData(contactShapeId));
