@@ -336,7 +336,7 @@ void Engine::handleCollisions() {
         break;
       }
 
-      case CategoryBits::TANK: {
+      case CategoryBits::TANK_BODY: {
         TankId otherTankId =
             *static_cast<TankId *>(b2Shape_GetUserData(contactShapeId));
         std::cout << "projectile v tank : " << sourceTankId << " hit "

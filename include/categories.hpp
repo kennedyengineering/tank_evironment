@@ -6,9 +6,10 @@
 
 namespace TankGame {
 enum CategoryBits : uint32_t {
-  PROJECTILE = 0x00000004,
-  WALL = 0x00000002,
-  TANK = 0x00000001,
+  PROJECTILE = 0x00000008,
+  WALL = 0x00000004,
+  TANK_BODY = 0x00000002,
+  TANK_GUN = 0x00000001,
   ALL = 0xFFFFFFFF
 };
 }

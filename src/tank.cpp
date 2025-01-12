@@ -24,7 +24,7 @@ Tank::Tank(TankId tankId, const TankConfig &tankConfig, b2WorldId worldId)
 
   // Construct the tank body shape
   b2ShapeDef bodyShapeDef = b2DefaultShapeDef();
-  bodyShapeDef.filter.categoryBits = CategoryBits::TANK;
+  bodyShapeDef.filter.categoryBits = CategoryBits::TANK_BODY;
   bodyShapeDef.userData = &mTankId;
 
   b2Polygon bodyPolygon =
@@ -33,7 +33,7 @@ Tank::Tank(TankId tankId, const TankConfig &tankConfig, b2WorldId worldId)
 
   // Construct the left tread shape
   b2ShapeDef leftTreadShapeDef = b2DefaultShapeDef();
-  leftTreadShapeDef.filter.categoryBits = CategoryBits::TANK;
+  leftTreadShapeDef.filter.categoryBits = CategoryBits::TANK_BODY;
   leftTreadShapeDef.userData = &mTankId;
 
   b2Polygon leftTreadPolygon =
@@ -50,7 +50,7 @@ Tank::Tank(TankId tankId, const TankConfig &tankConfig, b2WorldId worldId)
 
   // Construct the right tread shape
   b2ShapeDef rightTreadShapeDef = b2DefaultShapeDef();
-  rightTreadShapeDef.filter.categoryBits = CategoryBits::TANK;
+  rightTreadShapeDef.filter.categoryBits = CategoryBits::TANK_BODY;
   rightTreadShapeDef.userData = &mTankId;
 
   b2Polygon rightTreadPolygon =
@@ -68,7 +68,7 @@ Tank::Tank(TankId tankId, const TankConfig &tankConfig, b2WorldId worldId)
   // Create the gun shape
   b2ShapeDef gunShapeDef = b2DefaultShapeDef();
   gunShapeDef.density = mTankConfig.gunDensity;
-  gunShapeDef.filter.categoryBits = CategoryBits::TANK;
+  gunShapeDef.filter.categoryBits = CategoryBits::TANK_GUN;
   gunShapeDef.userData = &mTankId;
 
   b2Polygon gunPolygon =
@@ -129,7 +129,8 @@ b2ShapeId Tank::fireGun() {
   // Create the projectile shape
   b2ShapeDef projectileShapeDef = b2DefaultShapeDef();
   projectileShapeDef.filter.categoryBits = CategoryBits::PROJECTILE;
-  projectileShapeDef.filter.maskBits = CategoryBits::ALL;
+  projectileShapeDef.filter.maskBits =
+      CategoryBits::ALL & ~CategoryBits::TANK_GUN;
   projectileShapeDef.userData = new TankId(mTankId);
 
   b2Polygon projectilePolygon = b2MakeOffsetBox(
