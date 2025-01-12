@@ -16,11 +16,18 @@ config = tank_game.Config()
 engine = tank_game.Engine(config)
 
 # Initialize tanks
-tank_config = tank_game.TankConfig()
-tank_config.positionX = config.arenaWidth / 2
-tank_config.positionY = config.arenaHeight / 2
+player_tank_config = tank_game.TankConfig()
+player_tank_config.positionX = config.arenaWidth / 3
+player_tank_config.positionY = config.arenaHeight / 2
 
-tank_id = engine.addTank(tank_config)
+player_tank_id = engine.addTank(player_tank_config)
+
+other_tank_config = tank_game.TankConfig()
+other_tank_config.positionX = 2 * config.arenaWidth / 3
+other_tank_config.positionY = config.arenaHeight / 2
+other_tank_config.angle = np.pi
+
+other_tank_id = engine.addTank(other_tank_config)
 
 # Initialize Pygame
 pygame.init()
@@ -66,12 +73,12 @@ while running:
     # Apply input
     movement_force = 3000.0
     if move_left_tread:
-        engine.moveLeftTankTread(tank_id, move_left_tread)
+        engine.moveLeftTankTread(player_tank_id, move_left_tread)
     if move_right_tread:
-        engine.moveRightTankTread(tank_id, move_right_tread)
+        engine.moveRightTankTread(player_tank_id, move_right_tread)
 
     if fire_projectile:
-        engine.fireTankGun(tank_id)
+        engine.fireTankGun(player_tank_id)
 
     # Step the simulation
     engine.step()
@@ -79,10 +86,11 @@ while running:
     # Render scene
     engine.clearImage()
 
-    engine.renderTank(tank_id)
+    engine.renderTank(player_tank_id)
+    engine.renderTank(other_tank_id)
 
-    engine.scanTankLidar(tank_id)
-    engine.renderTankLidar(tank_id)
+    engine.scanTankLidar(player_tank_id)
+    engine.renderTankLidar(player_tank_id)
 
     engine.renderProjectiles()
 
