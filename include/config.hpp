@@ -27,7 +27,8 @@ struct TankConfig {
   /* Gun parameters */
   float gunDensity = 0.001f;
 
-  // TODO: tweak to make stronger (when running the gun into a wall)
+  // TODO: tweak to make stronger (when running the gun into a wall) (use
+  // revolute joint?)
   /* Gun motor parameters */
   float gunMotorMaxForce = 5.0f;
   float gunMotorMaxTorque = 20.0f;
