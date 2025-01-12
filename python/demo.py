@@ -39,13 +39,52 @@ font = pygame.font.SysFont(None, 36)
 # Game loop
 running = True
 while running:
+
+    # Get input
+    movement_force = 3000.0
+    move_left_tread = 0
+    move_right_tread = 0
+
+    fire_projectile = False
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.KEYDOWN:
+            fire_projectile = True
 
-    # Render
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_q]:
+        move_left_tread += movement_force
+    if keys[pygame.K_a]:
+        move_left_tread -= movement_force
+    if keys[pygame.K_e]:
+        move_right_tread += movement_force
+    if keys[pygame.K_d]:
+        move_right_tread -= movement_force
+
+    # Apply input
+    movement_force = 3000.0
+    if move_left_tread:
+        engine.moveLeftTankTread(tank_id, move_left_tread)
+    if move_right_tread:
+        engine.moveRightTankTread(tank_id, move_right_tread)
+
+    if fire_projectile:
+        engine.fireTankGun(tank_id)
+
+    # Step the simulation
+    engine.step()
+
+    # Render scene
     engine.clearImage()
+
     engine.renderTank(tank_id)
+
+    engine.scanTankLidar(tank_id)
+    engine.renderTankLidar(tank_id)
+
+    engine.renderProjectiles()
 
     # Display image
     image_buff = engine.getImageBuffer()  # Get buffer
