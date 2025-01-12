@@ -163,10 +163,11 @@ void Tank::moveRightTread(float force) {
 }
 
 void Tank::scanLidar(float range) {
-  /* Perform a lidar scan */
-
-  // TODO: see if range returns endPosition or zero (want to return
-  // endPosition...)
+  /* Perform a lidar scan
+     Input: range of the lidar scan (meters)
+     Note: If no objects are within ~range~ distance, that point will be ~range~
+     distance away
+  */
 
   // Compute angle resolution (radians per point)
   float angleResolution = 2 * b2_pi / mTankConfig.lidarPoints;
@@ -181,6 +182,7 @@ void Tank::scanLidar(float range) {
   // Define raycast context
   struct RayCastContext {
     b2Vec2 point;
+    float fraction;
     TankId tankId;
   };
 
@@ -189,7 +191,6 @@ void Tank::scanLidar(float range) {
                             float fraction, void *context) -> float {
     // Retrieve context data
     RayCastContext *ctx = static_cast<RayCastContext *>(context);
-    ctx->point = point;
 
     // Check if colliding with self
     TankId *otherTankIdPtr =
@@ -199,6 +200,14 @@ void Tank::scanLidar(float range) {
       if (otherTankId == ctx->tankId) {
         // Continue and ignore this shape
         fraction = -1.0f;
+      }
+    }
+
+    // Update context if not colliding with self
+    if (fraction > 0.0f) {
+      if (ctx->fraction > fraction) {
+        ctx->fraction = fraction;
+        ctx->point = point;
       }
     }
 
@@ -220,7 +229,8 @@ void Tank::scanLidar(float range) {
     b2Vec2 translation = b2Sub(endPosition, startPosition);
 
     // Perform raycast
-    RayCastContext context = {.point = (b2Vec2){0}, .tankId = mTankId};
+    RayCastContext context = {
+        .point = endPosition, .fraction = 1.0f, .tankId = mTankId};
     b2World_CastRay(mWorldId, startPosition, translation, viewFilter,
                     rayCastCallback, &context);
 
