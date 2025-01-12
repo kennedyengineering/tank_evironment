@@ -142,7 +142,6 @@ TEST(EngineTest, RenderTankProjectileToPng) {
   eng.writeImageToPng("EngineTest_RenderTankProjectileToPng.png");
 }
 
-// FIXME: takes 7 seconds!
 TEST(EngineTest, GetBuffer) {
   // Ensure the image buffer can be retrieved correctly
 
