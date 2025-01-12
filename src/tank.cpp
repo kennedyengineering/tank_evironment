@@ -120,9 +120,12 @@ b2ShapeId Tank::fireGun() {
   projectileBodyDef.type = b2_dynamicBody;
   projectileBodyDef.position = b2Body_GetPosition(mGunBodyId);
   projectileBodyDef.rotation = b2Body_GetRotation(mGunBodyId);
-  projectileBodyDef.linearVelocity = b2Body_GetWorldVector(
-      mGunBodyId, (b2Vec2){mTankConfig.projectileVelocity,
-                           0.0f}); // TODO: add gun's current velocity
+  projectileBodyDef.linearVelocity =
+      b2Add(b2Body_GetWorldVector(
+                mGunBodyId, (b2Vec2){mTankConfig.projectileVelocity, 0.0f}),
+            b2Body_GetLinearVelocity(
+                mGunBodyId)); // TODO: determine whether to add velocity of the
+                              // center of tank, or tip of gun
   projectileBodyDef.isBullet = true;
   b2BodyId projectileBodyId = b2CreateBody(mWorldId, &projectileBodyDef);
 
@@ -164,6 +167,7 @@ void Tank::moveRightTread(float force) {
   // TODO: compute friction forces, or other motion model stuff (set velocity?)
 }
 
+// FIXME: not colliding with projectiles, need to check category bits
 void Tank::scanLidar(float range) {
   /* Perform a lidar scan
      Input: range of the lidar scan (meters)
