@@ -205,7 +205,13 @@ void Tank::scanLidar(float range) {
       CategoryBits otherCategoryBits =
           static_cast<CategoryBits>(b2Shape_GetFilter(shapeId).categoryBits);
       if (otherTankId == ctx->tankId &&
-          otherCategoryBits != CategoryBits::PROJECTILE) {
+          otherCategoryBits !=
+              CategoryBits::PROJECTILE) { // TODO: this issue is caused by
+                                          // projectiles having a tankId, so
+                                          // they need to be differentiated by
+                                          // categorybits. Might be clearer if
+                                          // instead of not PROJECTILE, check if
+                                          // either TANK_BODY or TANK_GUN.
         // Continue and ignore this shape
         fraction = -1.0f;
       }
