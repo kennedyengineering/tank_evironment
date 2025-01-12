@@ -167,7 +167,6 @@ void Tank::moveRightTread(float force) {
   // TODO: compute friction forces, or other motion model stuff (set velocity?)
 }
 
-// FIXME: not colliding with projectiles, need to check category bits
 void Tank::scanLidar(float range) {
   /* Perform a lidar scan
      Input: range of the lidar scan (meters)
@@ -203,7 +202,10 @@ void Tank::scanLidar(float range) {
         static_cast<TankId *>(b2Shape_GetUserData(shapeId));
     if (otherTankIdPtr != nullptr) {
       TankId otherTankId = *otherTankIdPtr;
-      if (otherTankId == ctx->tankId) {
+      CategoryBits otherCategoryBits =
+          static_cast<CategoryBits>(b2Shape_GetFilter(shapeId).categoryBits);
+      if (otherTankId == ctx->tankId &&
+          otherCategoryBits != CategoryBits::PROJECTILE) {
         // Continue and ignore this shape
         fraction = -1.0f;
       }
