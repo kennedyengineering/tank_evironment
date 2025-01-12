@@ -87,9 +87,6 @@ TEST(EngineTest, RenderTankLidarToPng) {
   eng.writeImageToPng("EngineTest_RenderTankLidarToPng_PostScan.png");
 }
 
-// FIXME: tank projectiles are colliding with the shooting tank. make tanks
-// unable to hit themselves, initialize projectile further away from tank, or
-// make tank gun unhittable?
 TEST(EngineTest, RenderTankProjectileToPng) {
   // Ensure Engine renders correctly
 
