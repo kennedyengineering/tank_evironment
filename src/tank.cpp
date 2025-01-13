@@ -127,13 +127,10 @@ b2ShapeId Tank::fireGun() {
   projectileBodyDef.position = b2Body_GetPosition(mGunBodyId);
   projectileBodyDef.rotation = b2Body_GetRotation(mGunBodyId);
 
-  b2Vec2 gunTipLinearVelocityWorld =
-      2.0f * b2Body_GetLinearVelocity(mGunBodyId) -
-      b2Body_GetLinearVelocity(mTankBodyId);
-  b2Vec2 projectileLinearVelocityWorld = b2Body_GetWorldVector(
-      mGunBodyId, (b2Vec2){mTankConfig.projectileVelocity, 0.0f});
   projectileBodyDef.linearVelocity =
-      projectileLinearVelocityWorld + gunTipLinearVelocityWorld;
+      b2Body_GetWorldVector(mGunBodyId,
+                            (b2Vec2){mTankConfig.projectileVelocity}) +
+      b2Body_GetLinearVelocity(mTankBodyId);
 
   projectileBodyDef.isBullet = true;
   b2BodyId projectileBodyId = b2CreateBody(mWorldId, &projectileBodyDef);
