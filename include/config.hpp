@@ -32,7 +32,8 @@ struct TankConfig {
   // TODO: tweak to make stronger (when running the gun into a wall) (use
   // revolute joint?) (make gun not collide with anything? at least walls and
   // tank bodies. will have to make sure tank can't poke its gun through
-  // obstacles)
+  // obstacles -- could make gun internal to the hull, but then it gets complex
+  // and other tanks lose information
   /* Gun motor parameters */
   float gunMotorMaxForce = 5.0f;
   float gunMotorMaxTorque = 20.0f;
