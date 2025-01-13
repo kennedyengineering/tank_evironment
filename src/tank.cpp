@@ -259,6 +259,15 @@ std::vector<b2Vec2> Tank::getLidarData() {
   return mLidarData;
 }
 
+float Tank::getGunAngle() {
+  /* Get the current angle of the gun */
+
+  // Return angle (in radians)
+  return b2RelativeAngle(
+      b2Body_GetTransform(b2Joint_GetBodyB(mGunMotorJointId)).q,
+      b2Body_GetTransform(b2Joint_GetBodyA(mGunMotorJointId)).q);
+}
+
 b2Vec2 Tank::getPosition() {
   /* Get the center of the tank position */
 

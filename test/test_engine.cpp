@@ -154,3 +154,41 @@ TEST(EngineTest, GetBuffer) {
     ASSERT_EQ(c, 0);
   }
 }
+
+TEST(EngineTest, SetAndGetTankGunAngle) {
+  // Ensure the tank getGunAngle method works correctly
+
+  // Create config
+  TankGame::Config config;
+
+  // Create engine
+  TankGame::Engine eng(config);
+
+  // Create tank config
+  TankGame::TankConfig tankConfig;
+  tankConfig.positionX = config.arenaWidth / 2.0f;
+  tankConfig.positionY = config.arenaHeight / 2.0f;
+  tankConfig.angle = b2_pi / 4.0f;
+
+  // Create tank
+  TankGame::RegistryId id = eng.addTank(tankConfig);
+
+  // Set angle
+  float desiredAngle = 0.2;
+  eng.rotateTankGun(id, desiredAngle);
+
+  // Iterate simulation
+  for (int i = 0; i < 60; i++) {
+    eng.step();
+  }
+
+  // Get angle
+  float measuredAngle = eng.getTankGunAngle(id);
+
+  // Save to PNG
+  eng.renderTank(id);
+  eng.writeImageToPng("EngineTest_SetAndGetTankGunAngleToPng.png");
+
+  // Check
+  ASSERT_FLOAT_EQ(desiredAngle, measuredAngle);
+}

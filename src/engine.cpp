@@ -121,6 +121,13 @@ std::vector<float> Engine::scanTankLidar(RegistryId tankId) {
   return lidarData;
 }
 
+float Engine::getTankGunAngle(RegistryId tankId) {
+  /* Get the current angle of a tank gun */
+
+  // Return angle (in radians)
+  return mTankRegistry.get(tankId).getGunAngle();
+}
+
 void Engine::clearImage() {
   /* Clear the image */
 

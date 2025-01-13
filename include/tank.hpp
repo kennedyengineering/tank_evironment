@@ -21,9 +21,9 @@ public:
   void moveRightTread(float force);
   void scanLidar(float range);
 
-  // TODO: float getGunAngle(), return the current angular position of the gun
   std::vector<b2Vec2> getLidarData();
   b2Vec2 getPosition();
+  float getGunAngle();
   b2HexColor getProjectileColor();
   b2HexColor getLidarColor();
   float getLidarRadius();

@@ -26,6 +26,7 @@ public:
   void moveRightTankTread(RegistryId tankId, float force);
 
   std::vector<float> scanTankLidar(RegistryId tankId);
+  float getTankGunAngle(RegistryId tankId);
 
   void clearImage();
 
