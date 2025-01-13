@@ -30,7 +30,9 @@ struct TankConfig {
   float gunAngleMin = -0.3f; // in radians
 
   // TODO: tweak to make stronger (when running the gun into a wall) (use
-  // revolute joint?)
+  // revolute joint?) (make gun not collide with anything? at least walls and
+  // tank bodies. will have to make sure tank can't poke its gun through
+  // obstacles)
   /* Gun motor parameters */
   float gunMotorMaxForce = 5.0f;
   float gunMotorMaxTorque = 20.0f;
