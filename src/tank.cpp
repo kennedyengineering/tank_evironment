@@ -1,7 +1,9 @@
 // Tank Game (@kennedyengineering)
 
-#include "tank.hpp"
+#include <algorithm>
+
 #include "categories.hpp"
+#include "tank.hpp"
 
 using namespace TankGame;
 
@@ -108,8 +110,10 @@ Tank::~Tank() {
 void Tank::rotateGun(float angle) {
   /* Rotate the tank gun to a set angle (in radians) */
 
-  // TODO: enforce bounds, set in config file
+  // Enforce angle bounds
+  angle = std::clamp(angle, mTankConfig.gunAngleMin, mTankConfig.gunAngleMax);
 
+  // Update angular offset
   b2Joint_WakeBodies(mGunMotorJointId);
   b2MotorJoint_SetAngularOffset(mGunMotorJointId, angle);
 }

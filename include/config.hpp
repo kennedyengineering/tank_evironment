@@ -26,6 +26,8 @@ struct TankConfig {
 
   /* Gun parameters */
   float gunDensity = 0.001f;
+  float gunAngleMax = 0.3f;  // in radians
+  float gunAngleMin = -0.3f; // in radians
 
   // TODO: tweak to make stronger (when running the gun into a wall) (use
   // revolute joint?)
