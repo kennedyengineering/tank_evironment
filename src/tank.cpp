@@ -263,9 +263,8 @@ float Tank::getGunAngle() {
   /* Get the current angle of the gun */
 
   // Return angle (in radians)
-  return b2RelativeAngle(
-      b2Body_GetTransform(b2Joint_GetBodyB(mGunMotorJointId)).q,
-      b2Body_GetTransform(b2Joint_GetBodyA(mGunMotorJointId)).q);
+  return b2RelativeAngle(b2Body_GetTransform(mGunBodyId).q,
+                         b2Body_GetTransform(mTankBodyId).q);
 }
 
 b2Vec2 Tank::getPosition() {
