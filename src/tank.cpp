@@ -130,8 +130,8 @@ b2ShapeId Tank::fireGun() {
       b2Add(b2Body_GetWorldVector(
                 mGunBodyId, (b2Vec2){mTankConfig.projectileVelocity, 0.0f}),
             b2Body_GetLinearVelocity(
-                mGunBodyId)); // TODO: determine whether to add velocity of the
-                              // center of tank, or tip of gun
+                mTankBodyId)); // TODO: determine whether to add velocity of the
+                               // center of tank, or tip of gun
   projectileBodyDef.isBullet = true;
   b2BodyId projectileBodyId = b2CreateBody(mWorldId, &projectileBodyDef);
 
