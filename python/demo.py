@@ -8,7 +8,11 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../buil
 import python_bindings as tank_game
 
 # Import other packages
-import pygame
+from contextlib import redirect_stdout
+
+with redirect_stdout(None):
+    import pygame
+
 import numpy as np
 
 # Initialize engine
