@@ -8,6 +8,8 @@
 
 using namespace TankGame;
 
+// TODO: check for valid config values
+
 Engine::Engine(const Config &config)
     : mConfig(config),
       mRenderEngine(std::ceil(config.arenaWidth * config.pixelDensity),

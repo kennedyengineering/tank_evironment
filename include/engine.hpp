@@ -44,9 +44,6 @@ public:
 private:
   void handleCollisions();
 
-  // TODO: add isValid(new game object) -> yes if new tank doesn't overlap with
-  // existing tank, etc.
-
 private:
   Config mConfig;
 
