@@ -157,26 +157,30 @@ b2ShapeId Tank::fireGun() {
   return projectileShapeId;
 }
 
-void Tank::moveLeftTread(float force) {
+void Tank::moveLeftTread(float speed) {
   /* Move the left tread */
 
-  // Apply force to the left tread
-  b2Vec2 leftTreadWorldForce =
-      b2Body_GetWorldVector(mTankBodyId, (b2Vec2){0, force});
-  b2Body_ApplyForceToCenter(mLeftTreadBodyId, leftTreadWorldForce, true);
+  // Enforce speed bounds
+  speed =
+      std::clamp(speed, -mTankConfig.treadMaxSpeed, mTankConfig.treadMaxSpeed);
 
-  // TODO: compute friction forces, or other motion model stuff (set velocity?)
+  // Set speed of the left tread
+  b2Vec2 leftTreadWorldVelocity =
+      b2Body_GetWorldVector(mTankBodyId, (b2Vec2){0, speed});
+  b2Body_SetLinearVelocity(mLeftTreadBodyId, leftTreadWorldVelocity);
 }
 
-void Tank::moveRightTread(float force) {
+void Tank::moveRightTread(float speed) {
   /* Move the right tread */
 
-  // Apply force to the right tread
-  b2Vec2 rightTreadWorldForce =
-      b2Body_GetWorldVector(mTankBodyId, (b2Vec2){0, force});
-  b2Body_ApplyForceToCenter(mRightTreadBodyId, rightTreadWorldForce, true);
+  // Enforce speed bounds
+  speed =
+      std::clamp(speed, -mTankConfig.treadMaxSpeed, mTankConfig.treadMaxSpeed);
 
-  // TODO: compute friction forces, or other motion model stuff (set velocity?)
+  // Set speed of the right tread
+  b2Vec2 rightTreadWorldVelocity =
+      b2Body_GetWorldVector(mTankBodyId, (b2Vec2){0, speed});
+  b2Body_SetLinearVelocity(mRightTreadBodyId, rightTreadWorldVelocity);
 }
 
 void Tank::scanLidar(float range) {

@@ -96,18 +96,18 @@ void Engine::fireTankGun(RegistryId tankId) {
   mProjectileShapeIdVector.push_back(mTankRegistry.get(tankId).fireGun());
 }
 
-void Engine::moveLeftTankTread(RegistryId tankId, float force) {
+void Engine::moveLeftTankTread(RegistryId tankId, float speed) {
   /* Move a tank left tread */
 
   // Retrieve tank and apply method
-  mTankRegistry.get(tankId).moveLeftTread(force);
+  mTankRegistry.get(tankId).moveLeftTread(speed);
 }
 
-void Engine::moveRightTankTread(RegistryId tankId, float force) {
+void Engine::moveRightTankTread(RegistryId tankId, float speed) {
   /* Move a tank right tread */
 
   // Retrieve tank and apply method
-  mTankRegistry.get(tankId).moveRightTread(force);
+  mTankRegistry.get(tankId).moveRightTread(speed);
 }
 
 std::vector<float> Engine::scanTankLidar(RegistryId tankId) {

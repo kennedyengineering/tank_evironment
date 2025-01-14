@@ -19,6 +19,9 @@ struct TankConfig {
   float treadHeight = 7.93f; // in meters
   float treadWidth = 0.40f;  // in meters
 
+  /* Tread parameters */
+  float treadMaxSpeed = 20.0f;
+
   /* Projectile parameters */
   float projectileVelocity = 30.0f; // in meters per second
 

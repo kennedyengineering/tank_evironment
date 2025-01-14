@@ -53,7 +53,7 @@ move_gun_accumulator = 0
 while running:
 
     # Get input
-    movement_force = 3000.0
+    movement_speed = 15.0
     move_left_tread = 0
     move_right_tread = 0
 
@@ -71,23 +71,21 @@ while running:
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_q]:
-        move_left_tread += movement_force
+        move_left_tread += movement_speed
     if keys[pygame.K_a]:
-        move_left_tread -= movement_force
+        move_left_tread -= movement_speed
     if keys[pygame.K_e]:
-        move_right_tread += movement_force
+        move_right_tread += movement_speed
     if keys[pygame.K_d]:
-        move_right_tread -= movement_force
+        move_right_tread -= movement_speed
     if keys[pygame.K_z]:
         move_gun -= movement_angle
     if keys[pygame.K_x]:
         move_gun += movement_angle
 
     # Apply input
-    if move_left_tread:
-        engine.moveLeftTankTread(player_tank_id, move_left_tread)
-    if move_right_tread:
-        engine.moveRightTankTread(player_tank_id, move_right_tread)
+    engine.moveLeftTankTread(player_tank_id, move_left_tread)
+    engine.moveRightTankTread(player_tank_id, move_right_tread)
 
     if move_gun:
         move_gun_accumulator += move_gun
