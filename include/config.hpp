@@ -26,8 +26,8 @@ struct TankConfig {
 
   /* Gun parameters */
   float gunDensity = 0.001f;
-  float gunAngleMax = 0.3f;  // in radians
-  float gunAngleMin = -0.3f; // in radians
+  float gunAngleMax = b2_pi / 4.0f;  // in radians
+  float gunAngleMin = -b2_pi / 4.0f; // in radians
 
   // TODO: tweak to make stronger (when running the gun into a wall) (use
   // revolute joint?) (make gun not collide with anything? at least walls and
@@ -53,8 +53,11 @@ struct TankConfig {
 
 struct Config {
   /* Arena dimensions */
-  float arenaWidth = 100; // in meters
-  float arenaHeight = 75; // in meters
+  float arenaWidth = 100.0f; // in meters
+  float arenaHeight = 75.0f; // in meters
+
+  /* Arena wall dimensions */
+  float arenaWallThickness = 10.0f;
 
   /* Simulation parameters */
   float timeStep = 1.0f / 60.0f; // in seconds

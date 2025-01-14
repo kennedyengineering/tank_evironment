@@ -71,6 +71,9 @@ Tank::Tank(TankId tankId, const TankConfig &tankConfig, b2WorldId worldId)
   b2ShapeDef gunShapeDef = b2DefaultShapeDef();
   gunShapeDef.density = mTankConfig.gunDensity;
   gunShapeDef.filter.categoryBits = CategoryBits::TANK_GUN;
+  gunShapeDef.filter.maskBits =
+      CategoryBits::ALL & ~(CategoryBits::TANK_GUN | CategoryBits::TANK_BODY |
+                            CategoryBits::PROJECTILE | CategoryBits::WALL);
   gunShapeDef.userData = &mTankId;
 
   b2Polygon gunPolygon =

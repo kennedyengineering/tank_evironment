@@ -29,20 +29,32 @@ Engine::Engine(const Config &config)
 
   b2Polygon boundaryPolygon;
 
-  boundaryPolygon =
-      b2MakeOffsetBox(0, mConfig.arenaHeight, (b2Vec2){0, 0}, 0); // left wall
+  boundaryPolygon = b2MakeOffsetBox(
+      mConfig.arenaWallThickness / 2.0f, mConfig.arenaHeight / 2.0f,
+      (b2Vec2){-mConfig.arenaWallThickness / 2.0f, mConfig.arenaHeight / 2.0f},
+      0); // left wall
   b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &boundaryPolygon);
 
   boundaryPolygon = b2MakeOffsetBox(
-      0, mConfig.arenaHeight, (b2Vec2){mConfig.arenaWidth, 0}, 0); // right wall
+      mConfig.arenaWallThickness / 2.0f, mConfig.arenaHeight / 2.0f,
+      (b2Vec2){mConfig.arenaWidth + mConfig.arenaWallThickness / 2.0f,
+               mConfig.arenaHeight / 2.0f},
+      0); // right wall
   b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &boundaryPolygon);
 
   boundaryPolygon = b2MakeOffsetBox(
-      mConfig.arenaWidth, 0, (b2Vec2){0, mConfig.arenaHeight}, 0); // top wall
+      mConfig.arenaWidth / 2.0f + mConfig.arenaWallThickness,
+      mConfig.arenaWallThickness / 2.0f,
+      (b2Vec2){mConfig.arenaWidth / 2.0f, -mConfig.arenaWallThickness / 2.0f},
+      0); // top wall
   b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &boundaryPolygon);
 
-  boundaryPolygon = b2MakeOffsetBox(mConfig.arenaWidth, 0, (b2Vec2){0, 0},
-                                    0); // bottom wall
+  boundaryPolygon = b2MakeOffsetBox(
+      mConfig.arenaWidth / 2.0f + mConfig.arenaWallThickness,
+      mConfig.arenaWallThickness / 2.0f,
+      (b2Vec2){mConfig.arenaWidth / 2.0f,
+               mConfig.arenaHeight + mConfig.arenaWallThickness / 2.0f},
+      0); // bottom wall
   b2CreatePolygonShape(boundaryBodyId, &boundaryShapeDef, &boundaryPolygon);
 }
 
