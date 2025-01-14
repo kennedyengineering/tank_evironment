@@ -30,7 +30,7 @@ Tank::Tank(TankId tankId, const TankConfig &tankConfig, b2WorldId worldId)
   bodyShapeDef.userData = &mTankId;
 
   b2Polygon bodyPolygon =
-      b2MakeBox(mTankConfig.bodyHeight, mTankConfig.bodyWidth);
+      b2MakeBox(mTankConfig.bodyWidth / 2.0f, mTankConfig.bodyHeight / 2.0f);
   mTankShapeId = b2CreatePolygonShape(mTankBodyId, &bodyShapeDef, &bodyPolygon);
 
   // Construct the left tread shape
@@ -38,9 +38,10 @@ Tank::Tank(TankId tankId, const TankConfig &tankConfig, b2WorldId worldId)
   leftTreadShapeDef.filter.categoryBits = CategoryBits::TANK_BODY;
   leftTreadShapeDef.userData = &mTankId;
 
-  b2Polygon leftTreadPolygon =
-      b2MakeOffsetBox(mTankConfig.bodyHeight, mTankConfig.treadWidth,
-                      (b2Vec2){0, -mTankConfig.bodyHeight / 2.0f}, 0);
+  b2Polygon leftTreadPolygon = b2MakeOffsetBox(
+      mTankConfig.treadWidth / 2.0f, mTankConfig.treadHeight / 2.0f,
+      (b2Vec2){mTankConfig.bodyWidth / 2.0f + mTankConfig.treadWidth / 2.0f, 0},
+      0);
   mLeftTreadShapeId = b2CreatePolygonShape(mLeftTreadBodyId, &leftTreadShapeDef,
                                            &leftTreadPolygon);
 
@@ -55,9 +56,11 @@ Tank::Tank(TankId tankId, const TankConfig &tankConfig, b2WorldId worldId)
   rightTreadShapeDef.filter.categoryBits = CategoryBits::TANK_BODY;
   rightTreadShapeDef.userData = &mTankId;
 
-  b2Polygon rightTreadPolygon =
-      b2MakeOffsetBox(mTankConfig.bodyHeight, mTankConfig.treadWidth,
-                      (b2Vec2){0, mTankConfig.bodyHeight / 2.0f}, 0);
+  b2Polygon rightTreadPolygon = b2MakeOffsetBox(
+      mTankConfig.treadWidth / 2.0f, mTankConfig.treadHeight / 2.0f,
+      (b2Vec2){-mTankConfig.bodyWidth / 2.0f - mTankConfig.treadWidth / 2.0f,
+               0},
+      0);
   mRightTreadShapeId = b2CreatePolygonShape(
       mRightTreadBodyId, &rightTreadShapeDef, &rightTreadPolygon);
 
@@ -77,8 +80,8 @@ Tank::Tank(TankId tankId, const TankConfig &tankConfig, b2WorldId worldId)
   gunShapeDef.userData = &mTankId;
 
   b2Polygon gunPolygon =
-      b2MakeOffsetBox(mTankConfig.gunHeight, mTankConfig.gunWidth,
-                      (b2Vec2){mTankConfig.gunHeight, 0}, 0);
+      b2MakeOffsetBox(mTankConfig.gunWidth / 2.0f, mTankConfig.gunHeight / 2.0f,
+                      (b2Vec2){0, mTankConfig.gunHeight / 2.0f}, 0);
   mGunShapeId = b2CreatePolygonShape(mGunBodyId, &gunShapeDef, &gunPolygon);
 
   // Create gun motor joint
@@ -132,7 +135,7 @@ b2ShapeId Tank::fireGun() {
 
   projectileBodyDef.linearVelocity =
       b2Body_GetWorldVector(mGunBodyId,
-                            (b2Vec2){mTankConfig.projectileVelocity}) +
+                            (b2Vec2){0, mTankConfig.projectileVelocity}) +
       b2Body_GetLinearVelocity(mTankBodyId);
 
   projectileBodyDef.isBullet = true;
@@ -146,8 +149,8 @@ b2ShapeId Tank::fireGun() {
   projectileShapeDef.userData = new TankId(mTankId);
 
   b2Polygon projectilePolygon = b2MakeOffsetBox(
-      mTankConfig.gunWidth, mTankConfig.gunWidth,
-      (b2Vec2){mTankConfig.gunHeight * 2 + mTankConfig.gunWidth, 0}, 0);
+      mTankConfig.gunWidth / 2.0f, mTankConfig.gunWidth / 2.0f,
+      (b2Vec2){0, mTankConfig.gunHeight + mTankConfig.gunWidth / 2.0f}, 0);
   b2ShapeId projectileShapeId = b2CreatePolygonShape(
       projectileBodyId, &projectileShapeDef, &projectilePolygon);
 
@@ -159,7 +162,7 @@ void Tank::moveLeftTread(float force) {
 
   // Apply force to the left tread
   b2Vec2 leftTreadWorldForce =
-      b2Body_GetWorldVector(mTankBodyId, (b2Vec2){force, 0});
+      b2Body_GetWorldVector(mTankBodyId, (b2Vec2){0, force});
   b2Body_ApplyForceToCenter(mLeftTreadBodyId, leftTreadWorldForce, true);
 
   // TODO: compute friction forces, or other motion model stuff (set velocity?)
@@ -170,7 +173,7 @@ void Tank::moveRightTread(float force) {
 
   // Apply force to the right tread
   b2Vec2 rightTreadWorldForce =
-      b2Body_GetWorldVector(mTankBodyId, (b2Vec2){force, 0});
+      b2Body_GetWorldVector(mTankBodyId, (b2Vec2){0, force});
   b2Body_ApplyForceToCenter(mRightTreadBodyId, rightTreadWorldForce, true);
 
   // TODO: compute friction forces, or other motion model stuff (set velocity?)

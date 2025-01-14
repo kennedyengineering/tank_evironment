@@ -12,11 +12,12 @@ struct TankConfig {
   float angle = 0.0f;     // in radians
 
   /* Tank dimensions (M1-Abrams) */
-  float bodyHeight = 7.93f; // in meters
-  float bodyWidth = 3.66f;  // in meters
-  float gunHeight = 5.805f; // in meters
-  float gunWidth = 0.20f;   // in meters
-  float treadWidth = 0.40f; // in meters
+  float bodyHeight = 7.93f;  // in meters
+  float bodyWidth = 3.66f;   // in meters
+  float gunHeight = 5.805f;  // in meters
+  float gunWidth = 0.20f;    // in meters
+  float treadHeight = 7.93f; // in meters
+  float treadWidth = 0.40f;  // in meters
 
   /* Projectile parameters */
   float projectileVelocity = 30.0f; // in meters per second
