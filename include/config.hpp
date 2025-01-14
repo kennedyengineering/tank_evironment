@@ -46,7 +46,7 @@ struct TankConfig {
   b2HexColor leftTreadColor = b2_colorCyan;     // hex color
   b2HexColor rightTreadColor = b2_colorMagenta; // hex color
 
-  float lidarRadius = 3.0; // in pixels
+  float lidarRadius = 3.0f; // in pixels
 };
 
 struct Config {
