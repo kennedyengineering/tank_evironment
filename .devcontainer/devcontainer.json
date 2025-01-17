@@ -3,7 +3,8 @@
     "dockerfile": "Dockerfile"
   },
   "runArgs": [
-    "--network=host"
+    "--network=host",
+    "--gpus=all"
   ],
   "customizations": {
     "vscode": {
