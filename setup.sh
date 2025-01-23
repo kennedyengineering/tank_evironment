@@ -13,6 +13,10 @@ echo -e "${GREEN}Installing packages${NC}"
 pip install --upgrade pip
 pip install -r requirements.txt
 
+echo -e "${GREEN}Installing bindings${NC}"
+cmake -B build .
+cmake --build build
+
 echo -e "${GREEN}Installing pre-commit hooks${NC}"
 pre-commit install
 
