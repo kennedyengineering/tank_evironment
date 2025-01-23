@@ -35,6 +35,7 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/pybind/pybind11
     GIT_TAG        v2.13.6
 )
+set(PYBIND11_FINDPYTHON ON)
 FetchContent_MakeAvailable(pybind11)
 
 
@@ -93,3 +94,10 @@ pybind11_add_module(python_bindings
 target_link_libraries(python_bindings PRIVATE
     tank_game_lib
 )
+
+set(Python_VENV_SITELIB ${PROJECT_SOURCE_DIR}/.venv/lib/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages)
+if(EXISTS ${Python_VENV_SITELIB})
+    message(STATUS "Found Python ${Python_VERSION_MAJOR}.${Python_VERSION_MINOR} Virtual Environment")
+    set_target_properties(python_bindings PROPERTIES
+        LIBRARY_OUTPUT_DIRECTORY ${Python_VENV_SITELIB})
+endif()
