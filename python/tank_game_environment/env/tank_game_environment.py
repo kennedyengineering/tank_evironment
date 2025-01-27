@@ -1,5 +1,5 @@
 # Tank Game (@kennedyengineering)
-from pettingzoo import ParallelEnvs
+from pettingzoo import ParallelEnv
 
 
 class CustomEnvironment(ParallelEnv):
