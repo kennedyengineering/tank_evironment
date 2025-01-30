@@ -184,7 +184,12 @@ class TankGameEnvironment(ParallelEnv):
         """Get observation for agent."""
 
         lidar_scan = self.engine.scanTankLidar(self.agent_data[agent].id)
-        lidar_scan /= lidar_scan.max()  # FIXME: normalize by max_range from config
+        lidar_range = self.agent_data[agent].config.lidarRange
+
+        lidar_scan = np.clip(
+            lidar_scan, 0.0, lidar_range
+        )  # Due to precision errors in simulator, returned distance may be slightly larger than lidar_range
+        lidar_scan /= lidar_range  # Normalize between 0.0 and 1.0
 
         return lidar_scan
 
