@@ -165,6 +165,7 @@ class TankGameEnvironment(ParallelEnv):
 
         for a in self.agents:
             self.engine.renderTank(self.agent_data[a].id)
+            self.engine.renderTankLidar(self.agent_data[a].id)
 
         self.engine.renderProjectiles()
 
