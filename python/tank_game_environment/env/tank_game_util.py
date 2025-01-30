@@ -7,5 +7,5 @@ from dataclasses import dataclass
 
 @dataclass
 class TankData:
-    id: int = -1
-    config: tank_game.TankConfig = tank_game.TankConfig()
+    id: int
+    config: tank_game.TankConfig

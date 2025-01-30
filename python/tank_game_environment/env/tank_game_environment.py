@@ -58,7 +58,10 @@ class TankGameEnvironment(ParallelEnv):
             self.clock = pygame.time.Clock()
 
         self.timestep = None
-        self.agent_data = {"tank_1": TankData(), "tank_2": TankData()}
+        self.agent_data = {
+            "tank_1": TankData(-1, tank_game.TankConfig()),
+            "tank_2": TankData(-1, tank_game.TankConfig()),
+        }
         self.possible_agents = list(self.agent_data.keys())
 
         self.engine_config = tank_game.Config()
