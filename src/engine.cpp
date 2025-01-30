@@ -122,7 +122,7 @@ std::vector<float> Engine::scanTankLidar(RegistryId tankId) {
   b2Vec2 position = tank.getPosition();
 
   // Perform a lidar scan
-  tank.scanLidar(mConfig.arenaHeight * mConfig.arenaWidth);
+  tank.scanLidar();
 
   // Populate the vector
   std::vector<float> lidarData;

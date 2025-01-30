@@ -183,8 +183,14 @@ void Tank::moveRightTread(float speed) {
   b2Body_SetLinearVelocity(mRightTreadBodyId, rightTreadWorldVelocity);
 }
 
+void Tank::scanLidar() {
+  /* Perform a lidar scan using default range */
+
+  scanLidar(mTankConfig.lidarRange);
+}
+
 void Tank::scanLidar(float range) {
-  /* Perform a lidar scan
+  /* Perform a lidar scan using specified range
      Input: range of the lidar scan (meters)
      Note: If no objects are within ~range~ distance, that point will be ~range~
      distance away

@@ -19,6 +19,8 @@ public:
   b2ShapeId fireGun();
   void moveLeftTread(float speed);
   void moveRightTread(float speed);
+
+  void scanLidar();
   void scanLidar(float range);
 
   std::vector<b2Vec2> getLidarData();
