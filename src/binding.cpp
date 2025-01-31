@@ -31,7 +31,8 @@ PYBIND11_MODULE(python_bindings, handle) {
       .def(py::init<>())
       .def_readwrite("arenaWidth", &TankGame::Config::arenaWidth)
       .def_readwrite("arenaHeight", &TankGame::Config::arenaHeight)
-      .def_readwrite("pixelDensity", &TankGame::Config::pixelDensity);
+      .def_readwrite("pixelDensity", &TankGame::Config::pixelDensity)
+      .def_readwrite("verboseOutput", &TankGame::Config::verboseOutput);
 
   py::class_<TankGame::Engine>(handle, "Engine")
       .def(py::init<const TankGame::Config &>())
