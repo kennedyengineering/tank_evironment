@@ -177,6 +177,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         if unique_events:
             terminations = {a: True for a in self.agents}
 
+        # FIXME: if both get shot at same time, give both negative reward instead of tie?
         for event in unique_events:
             src_agent_id = event[1]
             src_agent = self.__get_agent_from_id(src_agent_id)
