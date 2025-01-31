@@ -75,6 +75,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         self.possible_agents = list(self.agent_data.keys())
 
         self.engine_config = tank_game.Config()
+        self.engine_config.verboseOutput = False
 
         self.agent_data["tank_1"].config.positionX = self.engine_config.arenaWidth / 3.0
         self.agent_data["tank_1"].config.positionY = (
