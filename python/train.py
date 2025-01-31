@@ -97,7 +97,7 @@ if __name__ == "__main__":
     env_kwargs = {}
 
     # Train a model (takes ~3 minutes on GPU)
-    train_env_supersuit(steps=100_000, seed=0, **env_kwargs)
+    train_env_supersuit(steps=1_000_000, seed=0, **env_kwargs)
 
     # Evaluate 10 games (average reward should be positive but can vary significantly)
     eval(num_games=10, render_mode=None, **env_kwargs)
