@@ -27,6 +27,7 @@ def train_env_supersuit(steps: int = 100_000, seed: int | None = 0, **env_kwargs
     env = ss.pettingzoo_env_to_vec_env_v1(env)
     env = ss.concat_vec_envs_v1(env, 8, num_cpus=2, base_class="stable_baselines3")
 
+    # TODO: add tensorboard logging
     model = PPO(
         MlpPolicy,
         env,

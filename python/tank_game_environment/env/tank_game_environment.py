@@ -19,9 +19,8 @@ from contextlib import redirect_stdout
 with redirect_stdout(None):
     import pygame
 
-# TODO: add variable number of tanks, remove tank if shot (remove from self.agents)
-# TODO: utilize randomness, add option for adding noise to lidar readings
-# TODO: dynamically import pygame to support multiprocessing?
+# TODO: add dense rewards
+# TODO: utilize randomness, add option for adding noise to lidar readings, maybe tank position / orientation as well
 
 
 def aec_env_fn(**kwargs):
