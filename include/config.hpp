@@ -68,6 +68,6 @@ struct Config {
   float pixelDensity = 8.0f; // pixels per meter
 
   /* Logging */
-  float verboseOutput = false;
+  bool verboseOutput = false;
 };
 } // namespace TankGame
