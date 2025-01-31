@@ -18,7 +18,6 @@ from contextlib import redirect_stdout
 with redirect_stdout(None):
     import pygame
 
-# TODO: add terminal conditions + sparse rewards (PRIORITY)
 # TODO: add variable number of tanks, remove tank if shot (remove from self.agents)
 # TODO: utilize randomness, add option for adding noise to lidar readings
 # TODO: dynamically import pygame to support multiprocessing?
