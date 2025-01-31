@@ -79,6 +79,7 @@ class TankGameEnvironment(ParallelEnv):
             self.engine_config.arenaHeight / 2.0
         )
         self.agent_data["tank_1"].config.angle = 0.0
+        self.agent_data["tank_1"].config.lidarRange = 35.0
 
         self.agent_data["tank_2"].config.positionX = (
             2.0 * self.engine_config.arenaWidth / 3.0
@@ -87,6 +88,7 @@ class TankGameEnvironment(ParallelEnv):
             self.engine_config.arenaHeight / 2.0
         )
         self.agent_data["tank_2"].config.angle = np.pi
+        self.agent_data["tank_2"].config.lidarRange = 35.0
 
     def __get_agent_from_id(self, id):
         """Search for matching TankData.id in agent_data."""
