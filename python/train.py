@@ -12,6 +12,8 @@ from supersuit import frame_stack_v1
 from stable_baselines3 import PPO
 from stable_baselines3.ppo import MlpPolicy
 
+# TODO: log videos to tensorboard, and other useful things https://stable-baselines3.readthedocs.io/en/master/guide/tensorboard.html
+
 
 def train_env_supersuit(steps: int = 100_000, seed: int | None = 0, **env_kwargs):
     """Train an agent using the Parallel API."""
@@ -31,11 +33,11 @@ def train_env_supersuit(steps: int = 100_000, seed: int | None = 0, **env_kwargs
         MlpPolicy, env, verbose=3, batch_size=256, device="cpu", tensorboard_log="logs/"
     )
 
-    model.learn(total_timesteps=steps)
+    run_name = f"{env.unwrapped.metadata.get('name')}_{time.strftime('%Y%m%d-%H%M%S')}"
 
-    model.save(
-        f"weights/{env.unwrapped.metadata.get('name')}_{time.strftime('%Y%m%d-%H%M%S')}"
-    )
+    model.learn(total_timesteps=steps, tb_log_name=run_name)
+
+    model.save(f"weights/{run_name}")
 
     print("Model has been saved.")
 
