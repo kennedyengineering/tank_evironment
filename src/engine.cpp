@@ -346,28 +346,42 @@ void Engine::handleCollisions() {
       case CategoryBits::PROJECTILE: {
         TankId otherTankId =
             *static_cast<TankId *>(b2Shape_GetUserData(contactShapeId));
-        std::cout << "projectile v projectile : " << sourceTankId << " hit "
-                  << otherTankId << std::endl;
+
+        if (mConfig.verboseOutput) {
+          std::cout << "projectile v projectile : " << sourceTankId << " hit "
+                    << otherTankId << std::endl;
+        }
+
         break;
       }
 
       case CategoryBits::WALL: {
-        std::cout << "projectile v wall : " << sourceTankId << " hit wall"
-                  << std::endl;
+        if (mConfig.verboseOutput) {
+          std::cout << "projectile v wall : " << sourceTankId << " hit wall"
+                    << std::endl;
+        }
+
         break;
       }
 
       case CategoryBits::TANK_BODY: {
         TankId otherTankId =
             *static_cast<TankId *>(b2Shape_GetUserData(contactShapeId));
-        std::cout << "projectile v tank : " << sourceTankId << " hit "
-                  << otherTankId << std::endl;
+
+        if (mConfig.verboseOutput) {
+          std::cout << "projectile v tank : " << sourceTankId << " hit "
+                    << otherTankId << std::endl;
+        }
+
         break;
       }
 
       default: {
-        std::cout << "projectile v unknown" << sourceTankId << " hit unknown"
-                  << std::endl;
+        if (mConfig.verboseOutput) {
+          std::cout << "projectile v unknown" << sourceTankId << " hit unknown"
+                    << std::endl;
+        }
+
         break;
       }
       }

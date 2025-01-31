@@ -66,5 +66,8 @@ struct Config {
   b2HexColor clearColor = b2_colorBlack; // hex color
 
   float pixelDensity = 8.0f; // pixels per meter
+
+  /* Logging */
+  float verboseOutput = false;
 };
 } // namespace TankGame
