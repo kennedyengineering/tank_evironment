@@ -88,6 +88,21 @@ class TankGameEnvironment(ParallelEnv):
         )
         self.agent_data["tank_2"].config.angle = np.pi
 
+    def __get_agent_from_id(self, id):
+        """Search for matching TankData.id in agent_data."""
+
+        agents = [key for key, value in self.agent_data.items() if value.id == id]
+
+        if len(agents) == 0:
+            error("Invalid agent id.")
+
+        if len(agents) > 1:
+            error("Multiple matches for agent id.")
+
+        agent = agents[0]
+
+        return agent
+
     def reset(self, seed=None, options=None):
         """Reset the environment to a starting point."""
 
@@ -161,29 +176,15 @@ class TankGameEnvironment(ParallelEnv):
 
         for event in unique_events:
             src_agent_id = event[1]
-            src_agent = next(
-                (
-                    key
-                    for key, value in self.agent_data.items()
-                    if value.id == src_agent_id
-                ),
-                None,
-            )
-            if src_agent is None or src_agent not in self.agents:
-                error("Invalid agent id.")
+            src_agent = self.__get_agent_from_id(src_agent_id)
+            if src_agent not in self.agents:
+                error("Rewarding an invalid agent.")
             rewards[src_agent] += 1
 
             hit_agent_id = event[2]
-            hit_agent = next(
-                (
-                    key
-                    for key, value in self.agent_data.items()
-                    if value.id == hit_agent_id
-                ),
-                None,
-            )
-            if hit_agent is None or hit_agent not in self.agents:
-                error("Invalid agent id.")
+            hit_agent = self.__get_agent_from_id(hit_agent_id)
+            if hit_agent not in self.agents:
+                error("Rewarding an invalid agent.")
             rewards[hit_agent] -= 1
 
         # Check truncation conditions (overwrites termination conditions)
