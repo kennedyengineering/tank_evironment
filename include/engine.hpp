@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <vector>
 
+#include "categories.hpp"
 #include "config.hpp"
 #include "registry.hpp"
 #include "render.hpp"
@@ -39,10 +40,11 @@ public:
   int getImageChannels();
   void writeImageToPng(const std::filesystem::path &filePath);
 
-  void step();
+  std::vector<std::tuple<CategoryBits, RegistryId, RegistryId>> step();
 
 private:
-  void handleCollisions();
+  std::vector<std::tuple<CategoryBits, RegistryId, RegistryId>>
+  handleCollisions();
 
 private:
   Config mConfig;

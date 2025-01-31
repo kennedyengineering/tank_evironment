@@ -268,18 +268,22 @@ void Engine::writeImageToPng(const std::filesystem::path &filePath) {
   mRenderEngine.writeToPng(filePath);
 }
 
-void Engine::step() {
+std::vector<std::tuple<CategoryBits, RegistryId, RegistryId>> Engine::step() {
   /* Step the engine forward */
 
   // Step the physics engine
   b2World_Step(mWorldId, mConfig.timeStep, mConfig.subStep);
 
   // Resolve resultant collisions
-  handleCollisions();
+  return handleCollisions();
 }
 
-void Engine::handleCollisions() {
-  /* Handle collisions */
+std::vector<std::tuple<CategoryBits, RegistryId, RegistryId>>
+Engine::handleCollisions() {
+  /* Handle collisions
+     Returns a vector of tuples <CategoryBits, srcTankId, hitTankId>
+     If there is no collision with a tank, hitTankId is invalid
+  */
 
   // Retrieve contact events
   b2ContactEvents contactEvents = b2World_GetContactEvents(mWorldId);
@@ -332,6 +336,9 @@ void Engine::handleCollisions() {
     }
   }
 
+  // Define output
+  std::vector<std::tuple<CategoryBits, RegistryId, RegistryId>> output;
+
   // Handle collision effects
   for (const std::pair<TableEntry, std::set<TableEntry>> &pair : table) {
     b2ShapeId projectileShapeId = pair.first;
@@ -352,6 +359,9 @@ void Engine::handleCollisions() {
                     << otherTankId << std::endl;
         }
 
+        output.push_back(
+            std::make_tuple(contactCategoryBits, sourceTankId, otherTankId));
+
         break;
       }
 
@@ -360,6 +370,8 @@ void Engine::handleCollisions() {
           std::cout << "projectile v wall : " << sourceTankId << " hit wall"
                     << std::endl;
         }
+
+        output.push_back(std::make_tuple(contactCategoryBits, sourceTankId, 0));
 
         break;
       }
@@ -372,6 +384,9 @@ void Engine::handleCollisions() {
           std::cout << "projectile v tank : " << sourceTankId << " hit "
                     << otherTankId << std::endl;
         }
+
+        output.push_back(
+            std::make_tuple(contactCategoryBits, sourceTankId, otherTankId));
 
         break;
       }
@@ -404,4 +419,6 @@ void Engine::handleCollisions() {
 
     b2DestroyBody(b2Shape_GetBody(projectileShapeId));
   }
+
+  return output;
 }

@@ -11,6 +11,13 @@ namespace py = pybind11;
 PYBIND11_MODULE(python_bindings, handle) {
   handle.doc() = "Tank Game Python Bindings";
 
+  py::enum_<TankGame::CategoryBits>(handle, "CategoryBits")
+      .value("PROJECTILE", TankGame::CategoryBits::PROJECTILE)
+      .value("WALL", TankGame::CategoryBits::WALL)
+      .value("TANK_BODY", TankGame::CategoryBits::TANK_BODY)
+      .value("TANK_GUN", TankGame::CategoryBits::TANK_GUN)
+      .export_values();
+
   py::class_<TankGame::TankConfig>(handle, "TankConfig")
       .def(py::init<>())
       .def_readwrite("positionX", &TankGame::TankConfig::positionX)

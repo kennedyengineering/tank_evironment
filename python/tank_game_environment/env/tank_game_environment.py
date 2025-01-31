@@ -5,7 +5,7 @@ from .tank_game_util import TankData
 
 from pettingzoo import ParallelEnv
 from pettingzoo.utils import parallel_to_aec, aec_to_parallel, wrappers
-from gymnasium.logger import warn
+from gymnasium.logger import warn, error
 from gymnasium.spaces import Box, Dict, Discrete
 
 from copy import copy
@@ -140,15 +140,51 @@ class TankGameEnvironment(ParallelEnv):
                 self.engine.fireTankGun(self.agent_data[a].id)
 
         # Step the engine
-        self.engine.step()
+        projectile_events = self.engine.step()
 
         # Get observations
         observations = {a: self.get_observation(a) for a in self.agents}
 
-        # Check termination conditions
+        # Check termination conditions and assign rewards
         terminations = {a: False for a in self.agents}
         rewards = {a: 0 for a in self.agents}
-        # give sparse reward
+
+        filtered_events = [
+            x for x in projectile_events if x[0] == tank_game.CategoryBits.TANK_BODY
+        ]
+        unique_events = list(
+            set(filtered_events)
+        )  # Account for a tank being hit multiple times
+
+        if unique_events:
+            terminations = {a: True for a in self.agents}
+
+        for event in unique_events:
+            src_agent_id = event[1]
+            src_agent = next(
+                (
+                    key
+                    for key, value in self.agent_data.items()
+                    if value.id == src_agent_id
+                ),
+                None,
+            )
+            if src_agent is None or src_agent not in self.agents:
+                error("Invalid agent id.")
+            rewards[src_agent] += 1
+
+            hit_agent_id = event[2]
+            hit_agent = next(
+                (
+                    key
+                    for key, value in self.agent_data.items()
+                    if value.id == hit_agent_id
+                ),
+                None,
+            )
+            if hit_agent is None or hit_agent not in self.agents:
+                error("Invalid agent id.")
+            rewards[hit_agent] -= 1
 
         # Check truncation conditions (overwrites termination conditions)
         truncations = {a: False for a in self.agents}
