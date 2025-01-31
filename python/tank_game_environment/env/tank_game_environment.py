@@ -18,6 +18,8 @@ from contextlib import redirect_stdout
 with redirect_stdout(None):
     import pygame
 
+# TODO: add terminal conditions + sparse rewards (PRIORITY)
+# TODO: add variable number of tanks, remove tank if shot (remove from self.agents)
 # TODO: utilize randomness, add option for adding noise to lidar readings
 # TODO: dynamically import pygame to support multiprocessing?
 
@@ -39,12 +41,18 @@ def parallel_env_fn(**kwargs):
 
 
 class TankGameEnvironment(ParallelEnv):
-    """The metadata holds environment constants."""
+    """The metadata holds environment constants.
+    - name : for pretty printing
+    - render_modes : valid rendering modes
+    - render_fps : for "human" rendering mode
+    - max_timesteps : how many steps before truncation (-1 for no truncation)
+    """
 
     metadata = {
         "name": "tank_game_environment_v0",
         "render_modes": ["human", "rgb_array"],
         "render_fps": 30,
+        "max_timesteps": 1000,
     }
 
     def __init__(self, render_mode=None):
@@ -140,9 +148,16 @@ class TankGameEnvironment(ParallelEnv):
         # Check termination conditions
         terminations = {a: False for a in self.agents}
         rewards = {a: 0 for a in self.agents}
+        # give sparse reward
 
         # Check truncation conditions (overwrites termination conditions)
         truncations = {a: False for a in self.agents}
+        if (
+            self.timestep > self.metadata["max_timesteps"]
+            and self.metadata["max_timesteps"] != -1
+        ):
+            rewards = {a: 0 for a in self.agents}
+            truncations = {a: True for a in self.agents}
         self.timestep += 1
 
         # Get dummy infos (not used)
