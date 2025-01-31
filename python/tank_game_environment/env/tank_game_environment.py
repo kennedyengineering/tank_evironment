@@ -7,6 +7,7 @@ from pettingzoo import ParallelEnv
 from pettingzoo.utils import parallel_to_aec, aec_to_parallel, wrappers
 from gymnasium.logger import warn, error
 from gymnasium.spaces import Box, Dict, Discrete
+from gymnasium.utils import EzPickle
 
 from copy import copy
 
@@ -27,7 +28,7 @@ def aec_env_fn(**kwargs):
     """Constructs and returns wrapped AEC environment."""
     env = TankGameEnvironment(**kwargs)
     env = parallel_to_aec(env)
-    # env = wrappers.ClipOutOfBoundsWrapper(env)    # FIXME: does not work with dict action space
+    env = wrappers.ClipOutOfBoundsWrapper(env)
     env = wrappers.OrderEnforcingWrapper(env)
     return env
 
@@ -39,7 +40,7 @@ def parallel_env_fn(**kwargs):
     return env
 
 
-class TankGameEnvironment(ParallelEnv):
+class TankGameEnvironment(ParallelEnv, EzPickle):
     """The metadata holds environment constants.
     - name : for pretty printing
     - render_modes : valid rendering modes
@@ -58,6 +59,8 @@ class TankGameEnvironment(ParallelEnv):
         """The init method takes in environment arguments.
         These attributes should not be changed after initialization.
         """
+
+        EzPickle.__init__(self, render_mode=render_mode)
 
         self.render_mode = render_mode
         self.screen = None
@@ -143,16 +146,15 @@ class TankGameEnvironment(ParallelEnv):
 
             self.engine.moveLeftTankTread(
                 self.agent_data[a].id,
-                action["left_tread_speed"][0] * self.agent_data[a].config.treadMaxSpeed,
+                action[0] * self.agent_data[a].config.treadMaxSpeed,
             )
             self.engine.moveRightTankTread(
                 self.agent_data[a].id,
-                action["right_tread_speed"][0]
-                * self.agent_data[a].config.treadMaxSpeed,
+                action[1] * self.agent_data[a].config.treadMaxSpeed,
             )
 
             # TODO: implement action masking / just prevent from firing
-            if action["projectile_fire"]:
+            if action[2] > 0.0:
                 self.engine.fireTankGun(self.agent_data[a].id)
 
         # Step the engine
@@ -260,15 +262,8 @@ class TankGameEnvironment(ParallelEnv):
     @functools.lru_cache(maxsize=None)
     def action_space(self, agent):
         """Return agent's action space."""
-        return Dict(
-            {
-                # Tank body
-                "left_tread_speed": Box(-1.0, 1.0, shape=(1,), dtype=np.float32),
-                "right_tread_speed": Box(-1.0, 1.0, shape=(1,), dtype=np.float32),
-                # Projectile
-                "projectile_fire": Discrete(2),
-            }
-        )
+
+        return Box(-1.0, 1.0, shape=(3,), dtype=np.float32)
 
     def close(self):
         """Uninitialize components."""
