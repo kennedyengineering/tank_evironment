@@ -27,7 +27,7 @@ struct TankConfig {
 
   /* Lidar parameters */
   unsigned int lidarPoints = 360; // number of lidar points
-  unsigned int lidarRange = 20;   // in meters
+  float lidarRange = 20;          // in meters
 
   /* Gun parameters */
   float gunDensity = 0.001f;
