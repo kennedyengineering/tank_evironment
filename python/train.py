@@ -18,6 +18,7 @@ from stable_baselines3.ppo import MlpPolicy
 def train_env_supersuit(steps: int = 100_000, seed: int | None = 0, **env_kwargs):
     """Train an agent using the Parallel API."""
 
+    # FIXME: "human" render mode does not work: works with 1 env on 1 cpu, 2 env on 1 cpu (weird, shares the window), not 2 env on 2 cpu.
     env = parallel_env_fn(**env_kwargs)
 
     env.reset(seed)

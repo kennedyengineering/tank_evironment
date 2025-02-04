@@ -21,6 +21,7 @@ with redirect_stdout(None):
 
 # TODO: add dense rewards
 # TODO: utilize randomness, add option for adding noise to lidar readings, maybe tank position / orientation as well
+# TODO: move all pygame code to rendering method, only import if mode == "human"
 
 
 def aec_env_fn(**kwargs):
