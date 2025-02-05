@@ -207,6 +207,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
 
     def render(self):
         """Render the environment."""
+        # TODO: add debug render option. overlays FPS, etc.
 
         # Check render mode
         if self.render_mode is None:
