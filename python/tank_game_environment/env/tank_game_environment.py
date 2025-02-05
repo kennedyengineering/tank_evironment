@@ -13,6 +13,7 @@ from copy import copy
 
 import functools
 import numpy as np
+import pathlib
 
 from contextlib import redirect_stdout
 
@@ -223,7 +224,11 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
             screen_width, screen_height = self.engine.getImageDimensions()
             self.screen = pygame.display.set_mode((screen_width, screen_height))
             pygame.display.set_caption("Tank Game Environment")
-            # pygame.display.set_icon("../asset/tank_icon.png")
+
+            icon_path = (
+                pathlib.Path(__file__).parent.parent.resolve() / "asset/tank_icon.png"
+            )
+            pygame.display.set_icon(pygame.image.load(icon_path))
 
         if self.clock is None and self.render_mode == "human":
             self.clock = pygame.time.Clock()
