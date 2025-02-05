@@ -13,6 +13,8 @@ from stable_baselines3 import PPO
 from stable_baselines3.ppo import MlpPolicy
 
 # TODO: log videos to tensorboard, and other useful things https://stable-baselines3.readthedocs.io/en/master/guide/tensorboard.html
+# TODO: add checkpointing (every n steps, best, and final)
+# TODO: ^^ use a more compact filesystem (ex: runs/run_1/logs + /weights)
 
 
 def train_env_supersuit(steps: int = 100_000, seed: int | None = 0, **env_kwargs):
