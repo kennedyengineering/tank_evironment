@@ -6,7 +6,7 @@ from .tank_game_util import TankData
 from pettingzoo import ParallelEnv
 from pettingzoo.utils import parallel_to_aec, aec_to_parallel, wrappers
 from gymnasium.logger import warn, error
-from gymnasium.spaces import Box, Dict, Discrete
+from gymnasium.spaces import Box
 from gymnasium.utils import EzPickle
 
 from copy import copy
@@ -16,12 +16,8 @@ import numpy as np
 
 from contextlib import redirect_stdout
 
-with redirect_stdout(None):
-    import pygame
-
 # TODO: add dense rewards
 # TODO: utilize randomness, add option for adding noise to lidar readings, maybe tank position / orientation as well
-# TODO: move all pygame code to rendering method, only import if mode == "human"
 
 
 def aec_env_fn(**kwargs):
@@ -64,8 +60,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
 
         self.render_mode = render_mode
         self.screen = None
-        if self.render_mode == "human":
-            self.clock = pygame.time.Clock()
+        self.clock = None
 
         self.timestep = None
         self.agent_data = {
@@ -116,13 +111,6 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         for a in self.possible_agents:
             self.agent_data[a].id = self.engine.addTank(self.agent_data[a].config)
 
-        if self.screen is None:
-            pygame.init()
-        if self.render_mode == "human":
-            screen_width, screen_height = self.engine.getImageDimensions()
-            self.screen = pygame.display.set_mode((screen_width, screen_height))
-            pygame.display.set_caption("Tank Game Environment")
-
         self.timestep = 0
 
         self.agents = copy(self.possible_agents)
@@ -131,6 +119,9 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
 
         # Get dummy infos. Necessary for proper parallel_to_aec conversion.
         infos = {a: {} for a in self.agents}
+
+        if self.render_mode == "human":
+            self.render()
 
         return observations, infos
 
@@ -214,11 +205,28 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         return observations, rewards, terminations, truncations, infos
 
     def render(self):
-        """Renders the environment."""
+        """Render the environment."""
 
+        # Check render mode
         if self.render_mode is None:
             warn("You are calling render method without specifying any render mode.")
             return
+
+        # Setup PyGame
+        with redirect_stdout(None):
+            global pygame
+            import pygame
+
+        if self.screen is None and self.render_mode == "human":
+            pygame.init()
+
+            screen_width, screen_height = self.engine.getImageDimensions()
+            self.screen = pygame.display.set_mode((screen_width, screen_height))
+            pygame.display.set_caption("Tank Game Environment")
+            # pygame.display.set_icon("../asset/tank_icon.png")
+
+        if self.clock is None and self.render_mode == "human":
+            self.clock = pygame.time.Clock()
 
         # Render frame
         self.engine.clearImage()
@@ -232,10 +240,12 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         # Retrieve frame
         frame = self.engine.getImageBuffer()
 
+        # Display frame
         if self.render_mode == "human":
             surface = pygame.surfarray.make_surface(np.swapaxes(frame, 0, 1))
             self.screen.blit(surface, (0, 0))
 
+            pygame.event.pump()
             pygame.display.update()
             self.clock.tick(self.metadata["render_fps"])
 
