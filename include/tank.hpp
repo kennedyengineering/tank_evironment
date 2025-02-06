@@ -25,6 +25,7 @@ public:
 
   std::vector<b2Vec2> getLidarData();
   b2Vec2 getPosition();
+  float getOrientation();
   b2Vec2 getWorldVelocity();
   b2Vec2 getLocalVelocity();
   float getAngularVelocity();

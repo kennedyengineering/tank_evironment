@@ -296,6 +296,14 @@ b2Vec2 Tank::getPosition() {
   return b2Body_GetPosition(mTankBodyId);
 }
 
+float Tank::getOrientation() {
+  /* Get the world angle of the tank */
+
+  // Return angle
+  return b2UnwindAngle(b2Rot_GetAngle(b2Body_GetRotation(mTankBodyId)) +
+                       b2_pi / 2.0f);
+}
+
 b2Vec2 Tank::getWorldVelocity() {
   /* Get the world velocity of the tank */
 

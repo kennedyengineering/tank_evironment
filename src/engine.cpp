@@ -151,6 +151,13 @@ std::pair<float, float> Engine::getTankPosition(RegistryId tankId) {
   return std::make_pair(position.x, position.y);
 }
 
+float Engine::getTankOrientation(RegistryId tankId) {
+  /* Get the current world angle of a tank */
+
+  // Return angle (in radians [-pi, pi])
+  return mTankRegistry.get(tankId).getOrientation();
+}
+
 std::pair<float, float> Engine::getTankWorldVelocity(RegistryId tankId) {
   /* Get the current world linear velocity of a tank */
 

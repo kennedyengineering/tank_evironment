@@ -112,6 +112,7 @@ while running:
     vel_w = engine.getTankWorldVelocity(player_tank_id)
     vel_l = engine.getTankLocalVelocity(player_tank_id)
     vel_a = engine.getTankAngularVelocity(player_tank_id)
+    a = engine.getTankOrientation(player_tank_id)
 
     start_pixels = [config.pixelDensity * x for x in pos]
 
@@ -133,10 +134,10 @@ while running:
         arc_radius_pixels * 2,
         arc_radius_pixels * 2,
     )
-    if vel_a > 0:
-        pygame.draw.arc(image, (0, 0, 255), arc_rect, 0, vel_a / 2)
+    if vel_a < 0:
+        pygame.draw.arc(image, (0, 0, 255), arc_rect, vel_a / 2 - a, -a)
     else:
-        pygame.draw.arc(image, (0, 0, 255), arc_rect, vel_a / 2, 0)
+        pygame.draw.arc(image, (0, 0, 255), arc_rect, -a, vel_a / 2 - a)
 
     screen.blit(image, (0, 0))
 
