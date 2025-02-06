@@ -29,12 +29,16 @@ tank_environment
 ├── CMakeLists.txt
 ├── README.md
 ├── include                         [ CPP header files ]
-├── python                          [ Python unit tests ]
+├── python                          [ Python files ]
 ├── requirements.txt
 ├── setup.sh
 ├── src                             [ CPP source files ]
 └── test                            [ CPP unit tests ]
 ```
+
+## Additional Documentation
+- [**Tank Game Environment**](python/tank_game_environment/README.md)
+- [**Tank Game Agent**](python/tank_game_agent/README.md)
 
 ## Building
 

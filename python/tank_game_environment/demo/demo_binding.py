@@ -1,9 +1,7 @@
 # Tank Game (@kennedyengineering)
 
-# Import python_bindings
 import python_bindings as tank_game
 
-# Import other packages
 from contextlib import redirect_stdout
 
 with redirect_stdout(None):
@@ -13,6 +11,7 @@ import numpy as np
 
 # Initialize engine
 config = tank_game.Config()
+config.verboseOutput = True
 engine = tank_game.Engine(config)
 
 # Initialize tanks

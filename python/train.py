@@ -1,6 +1,6 @@
 # Tank Game (@kennedyengineering)
 
-from tank_game_environment.env.tank_game_environment import parallel_env_fn, aec_env_fn
+from tank_game_environment import tank_game_environment_v0
 
 import time
 import os
@@ -20,7 +20,7 @@ from stable_baselines3.ppo import MlpPolicy
 def train_env_supersuit(steps: int = 100_000, seed: int | None = 0, **env_kwargs):
     """Train an agent using the Parallel API."""
 
-    env = parallel_env_fn(**env_kwargs)
+    env = tank_game_environment_v0.parallel_env_fn(**env_kwargs)
 
     # TODO: Check environment is reproducable. Here the seed is set, only happens once.
     # FIXME: In "human" mode, calling reset() here initializes PyGame and breaks things later.
@@ -53,7 +53,7 @@ def train_env_supersuit(steps: int = 100_000, seed: int | None = 0, **env_kwargs
 def eval(num_games: int = 100, render_mode: str | None = None, **env_kwargs):
     """Evaluate an agent using the AEC API."""
 
-    env = aec_env_fn(render_mode=render_mode, **env_kwargs)
+    env = tank_game_environment_v0.aec_env_fn(render_mode=render_mode, **env_kwargs)
 
     env = frame_stack_v1(env, 4)
 

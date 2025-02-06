@@ -1,5 +1,6 @@
 # Tank Game (@kennedyengineering)
-import tank_game_environment_v0
+
+from .. import tank_game_environment_v0
 
 env = tank_game_environment_v0.parallel_env_fn(render_mode="human")
 observations, infos = env.reset()
