@@ -300,7 +300,7 @@ b2Vec2 Tank::getVelocity() {
   /* Get the local velocity of the tank */
 
   // Return velocity
-  return b2Vec2{0, 0};
+  return b2Body_GetLinearVelocity(mTankBodyId);
 }
 
 b2HexColor Tank::getProjectileColor() {
