@@ -107,6 +107,15 @@ while running:
     image_buff = engine.getImageBuffer()  # Get buffer
     image_buff = np.swapaxes(image_buff, 0, 1)  # Swap axis
     image = pygame.surfarray.make_surface(image_buff)
+
+    pos = engine.getTankPosition(player_tank_id)
+    vel = engine.getTankVelocity(player_tank_id)
+
+    start_pixels = [config.pixelDensity * x for x in pos]
+    end_pixels = [config.pixelDensity * x + start_pixels[i] for i, x in enumerate(vel)]
+
+    pygame.draw.line(image, (255, 0, 0), start_pixels, end_pixels)
+
     screen.blit(image, (0, 0))
 
     # Display FPS
