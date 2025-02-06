@@ -272,14 +272,20 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
 
     @functools.lru_cache(maxsize=None)
     def observation_space(self, agent):
-        """Return agent's observation space."""
+        """Return agent's observation space.
+        [0-359] - lidar (% range)
+        """
         lidar_points = self.agent_data[agent].config.lidarPoints
 
         return Box(0.0, 1.0, shape=(lidar_points,), dtype=np.float32)
 
     @functools.lru_cache(maxsize=None)
     def action_space(self, agent):
-        """Return agent's action space."""
+        """Return agent's action space.
+        [0] - left tread (% speed)
+        [1] - right tread (% speed)
+        [2] - fire gun (if positive)
+        """
 
         return Box(-1.0, 1.0, shape=(3,), dtype=np.float32)
 
