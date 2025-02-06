@@ -28,6 +28,7 @@ public:
 
   std::vector<float> scanTankLidar(RegistryId tankId);
   float getTankGunAngle(RegistryId tankId);
+  std::pair<float, float> getTankVelocity(RegistryId tankId);
 
   void clearImage();
 

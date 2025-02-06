@@ -54,6 +54,7 @@ PYBIND11_MODULE(python_bindings, handle) {
              return py::array_t<float>(scanData.size(), scanData.data());
            })
       .def("getTankGunAngle", &TankGame::Engine::getTankGunAngle)
+      .def("getTankVelocity", &TankGame::Engine::getTankVelocity)
       /* Tank Rendering */
       .def("renderProjectiles", &TankGame::Engine::renderProjectiles)
       .def("renderTank", &TankGame::Engine::renderTank)

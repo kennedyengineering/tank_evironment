@@ -142,6 +142,15 @@ float Engine::getTankGunAngle(RegistryId tankId) {
   return mTankRegistry.get(tankId).getGunAngle();
 }
 
+std::pair<float, float> Engine::getTankVelocity(RegistryId tankId) {
+  /* Get the current linear velocity of a tank */
+
+  b2Vec2 velocity = mTankRegistry.get(tankId).getVelocity();
+
+  // Return velocity (in meters per second)
+  return std::make_pair(velocity.x, velocity.y);
+}
+
 void Engine::clearImage() {
   /* Clear the image */
 

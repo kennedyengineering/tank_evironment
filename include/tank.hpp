@@ -25,6 +25,7 @@ public:
 
   std::vector<b2Vec2> getLidarData();
   b2Vec2 getPosition();
+  b2Vec2 getVelocity();
   float getGunAngle();
   b2HexColor getProjectileColor();
   b2HexColor getLidarColor();
