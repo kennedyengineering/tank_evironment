@@ -109,12 +109,20 @@ while running:
     image = pygame.surfarray.make_surface(image_buff)
 
     pos = engine.getTankPosition(player_tank_id)
-    vel = engine.getTankVelocity(player_tank_id)
+    vel_w = engine.getTankWorldVelocity(player_tank_id)
+    vel_l = engine.getTankLocalVelocity(player_tank_id)
 
     start_pixels = [config.pixelDensity * x for x in pos]
-    end_pixels = [config.pixelDensity * x + start_pixels[i] for i, x in enumerate(vel)]
 
+    end_pixels = [
+        config.pixelDensity * x + start_pixels[i] for i, x in enumerate(vel_w)
+    ]
     pygame.draw.line(image, (255, 0, 0), start_pixels, end_pixels)
+
+    end_pixels = [
+        config.pixelDensity * x + start_pixels[i] for i, x in enumerate(vel_l)
+    ]
+    pygame.draw.line(image, (0, 255, 0), start_pixels, end_pixels)
 
     screen.blit(image, (0, 0))
 
