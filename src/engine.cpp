@@ -152,7 +152,7 @@ std::pair<float, float> Engine::getTankPosition(RegistryId tankId) {
 }
 
 std::pair<float, float> Engine::getTankVelocity(RegistryId tankId) {
-  /* Get the current linear velocity of a tank */
+  /* Get the current world linear velocity of a tank */
 
   b2Vec2 velocity = mTankRegistry.get(tankId).getVelocity();
 

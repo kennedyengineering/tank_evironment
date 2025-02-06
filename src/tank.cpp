@@ -297,7 +297,7 @@ b2Vec2 Tank::getPosition() {
 }
 
 b2Vec2 Tank::getVelocity() {
-  /* Get the local velocity of the tank */
+  /* Get the world velocity of the tank */
 
   // Return velocity
   return b2Body_GetLinearVelocity(mTankBodyId);
