@@ -55,7 +55,8 @@ PYBIND11_MODULE(python_bindings, handle) {
            })
       .def("getTankGunAngle", &TankGame::Engine::getTankGunAngle)
       .def("getTankPosition", &TankGame::Engine::getTankPosition)
-      .def("getTankVelocity", &TankGame::Engine::getTankVelocity)
+      .def("getTankWorldVelocity", &TankGame::Engine::getTankWorldVelocity)
+      .def("getTankLocalVelocity", &TankGame::Engine::getTankLocalVelocity)
       /* Tank Rendering */
       .def("renderProjectiles", &TankGame::Engine::renderProjectiles)
       .def("renderTank", &TankGame::Engine::renderTank)

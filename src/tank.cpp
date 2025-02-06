@@ -296,11 +296,19 @@ b2Vec2 Tank::getPosition() {
   return b2Body_GetPosition(mTankBodyId);
 }
 
-b2Vec2 Tank::getVelocity() {
+b2Vec2 Tank::getWorldVelocity() {
   /* Get the world velocity of the tank */
 
   // Return velocity
   return b2Body_GetLinearVelocity(mTankBodyId);
+}
+
+b2Vec2 Tank::getLocalVelocity() {
+  /* Get the local velocity of the tank */
+
+  // Return velocity
+  return b2Body_GetLocalVector(mTankBodyId,
+                               b2Body_GetLinearVelocity(mTankBodyId));
 }
 
 b2HexColor Tank::getProjectileColor() {

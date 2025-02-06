@@ -151,10 +151,19 @@ std::pair<float, float> Engine::getTankPosition(RegistryId tankId) {
   return std::make_pair(position.x, position.y);
 }
 
-std::pair<float, float> Engine::getTankVelocity(RegistryId tankId) {
+std::pair<float, float> Engine::getTankWorldVelocity(RegistryId tankId) {
   /* Get the current world linear velocity of a tank */
 
-  b2Vec2 velocity = mTankRegistry.get(tankId).getVelocity();
+  b2Vec2 velocity = mTankRegistry.get(tankId).getWorldVelocity();
+
+  // Return velocity (in meters per second)
+  return std::make_pair(velocity.x, velocity.y);
+}
+
+std::pair<float, float> Engine::getTankLocalVelocity(RegistryId tankId) {
+  /* Get the current local linear velocity of a tank */
+
+  b2Vec2 velocity = mTankRegistry.get(tankId).getLocalVelocity();
 
   // Return velocity (in meters per second)
   return std::make_pair(velocity.x, velocity.y);
