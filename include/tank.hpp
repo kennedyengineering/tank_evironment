@@ -27,6 +27,7 @@ public:
   b2Vec2 getPosition();
   b2Vec2 getWorldVelocity();
   b2Vec2 getLocalVelocity();
+  float getAngularVelocity();
   float getGunAngle();
   b2HexColor getProjectileColor();
   b2HexColor getLidarColor();

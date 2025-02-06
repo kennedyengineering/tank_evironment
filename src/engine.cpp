@@ -169,6 +169,13 @@ std::pair<float, float> Engine::getTankLocalVelocity(RegistryId tankId) {
   return std::make_pair(velocity.x, velocity.y);
 }
 
+float Engine::getTankAngularVelocity(RegistryId tankId) {
+  /* Get the current angular velocity of a tank */
+
+  // Return angular velocity (in radians per second)
+  return mTankRegistry.get(tankId).getAngularVelocity();
+}
+
 void Engine::clearImage() {
   /* Clear the image */
 

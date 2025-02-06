@@ -311,6 +311,13 @@ b2Vec2 Tank::getLocalVelocity() {
                                b2Body_GetLinearVelocity(mTankBodyId));
 }
 
+float Tank::getAngularVelocity() {
+  /* Get the angular velocity of the tank */
+
+  // Return angular velocity
+  return b2Body_GetAngularVelocity(mTankBodyId);
+}
+
 b2HexColor Tank::getProjectileColor() {
   /* Get the color of the projectile (for rendering) */
 
