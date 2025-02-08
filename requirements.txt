@@ -1,6 +1,7 @@
 pre-commit==4.0.1
 pytest==8.3.4
 pytest-cov==6.0.0
+pytest-dependency==0.6.0
 numpy==2.2.1
 pillow==11.1.0
 pygame==2.6.1
