@@ -156,9 +156,11 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         # Get observations
         observations = {a: self.get_observation(a) for a in self.agents}
 
-        # Check termination conditions and assign rewards
+        # Assign rewards
+        rewards = {a: -1.0 for a in self.agents}
+
+        # Check termination conditions
         terminations = {a: False for a in self.agents}
-        rewards = {a: 0 for a in self.agents}
 
         filtered_events = [
             x for x in projectile_events if x[0] == tank_game.CategoryBits.TANK_BODY
@@ -167,30 +169,30 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
             set(filtered_events)
         )  # Account for a tank being hit multiple times
 
+        # FIXME: only give termination to the tank that was shot?
         if unique_events:
             terminations = {a: True for a in self.agents}
 
         # FIXME: if both get shot at same time, give both negative reward instead of tie?
-        for event in unique_events:
-            src_agent_id = event[1]
-            src_agent = self.__get_agent_from_id(src_agent_id)
-            if src_agent not in self.agents:
-                error("Rewarding an invalid agent.")
-            rewards[src_agent] += 1
+        # for event in unique_events:
+        #     src_agent_id = event[1]
+        #     src_agent = self.__get_agent_from_id(src_agent_id)
+        #     if src_agent not in self.agents:
+        #         error("Rewarding an invalid agent.")
+        #     rewards[src_agent] += 1
 
-            hit_agent_id = event[2]
-            hit_agent = self.__get_agent_from_id(hit_agent_id)
-            if hit_agent not in self.agents:
-                error("Rewarding an invalid agent.")
-            rewards[hit_agent] -= 1
+        #     hit_agent_id = event[2]
+        #     hit_agent = self.__get_agent_from_id(hit_agent_id)
+        #     if hit_agent not in self.agents:
+        #         error("Rewarding an invalid agent.")
+        #     rewards[hit_agent] -= 1
 
-        # Check truncation conditions (overwrites termination conditions)
+        # Check truncation conditions
         truncations = {a: False for a in self.agents}
         if (
             self.timestep > self.metadata["max_timesteps"]
             and self.metadata["max_timesteps"] != -1
         ):
-            rewards = {a: 0 for a in self.agents}
             truncations = {a: True for a in self.agents}
         self.timestep += 1
 
