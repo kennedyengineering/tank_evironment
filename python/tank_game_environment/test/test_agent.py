@@ -2,6 +2,7 @@
 
 from ..agent.agent_base import ScriptedAgent
 from ..agent.agent_static import StaticAgent
+from ..agent.agent_random import RandomAgent
 
 from gymnasium.spaces import Box
 
@@ -26,6 +27,35 @@ class TestScriptedAgent:
 
         with pytest.raises(NotImplementedError):
             base.policy([])
+
+
+class TestRandomAgent:
+    @pytest.mark.dependency(depends=["TestScriptedAgent::test_initialization"])
+    def test_initialization(self):
+        random = RandomAgent(Box(0, 1), Box(0, 1))
+
+    @pytest.mark.dependency(depends=["TestRandomAgent::test_initialization"])
+    def test_inheritance(self):
+        random = RandomAgent(Box(0, 1), Box(0, 1))
+        assert isinstance(random, ScriptedAgent)
+
+    @pytest.mark.dependency(depends=["TestRandomAgent::test_initialization"])
+    def test_random_policy(self):
+        random = RandomAgent(Box(0, 1), Box(0, 1))
+
+        random.action_space.seed(0)
+        policy_outputs1 = [random.policy([]) for _ in range(100)]
+        policy_outputs2 = [random.policy([]) for _ in range(100)]
+        random.action_space.seed(0)
+        policy_outputs3 = [random.policy([]) for _ in range(100)]
+
+        assert all(
+            random.action_space.contains(output)
+            for output in policy_outputs1 + policy_outputs2 + policy_outputs3
+        ), "Some outputs are outside the action space"
+
+        assert policy_outputs1 != policy_outputs2
+        assert policy_outputs1 == policy_outputs3
 
 
 class TestStaticAgent:
