@@ -71,6 +71,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         self.possible_agents = list(self.agent_data.keys())
 
         self.engine_config = tank_game.Config()
+        self.engine_config.pixelDensity = 2.0
         self.engine_config.verboseOutput = False
 
         self.agent_data["tank_1"].config.positionX = self.engine_config.arenaWidth / 3.0
@@ -79,6 +80,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         )
         self.agent_data["tank_1"].config.angle = 0.0
         self.agent_data["tank_1"].config.lidarRange = 35.0
+        self.agent_data["tank_1"].config.lidarRadius = 1.0
 
         self.agent_data["tank_2"].config.positionX = (
             2.0 * self.engine_config.arenaWidth / 3.0
@@ -88,6 +90,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         )
         self.agent_data["tank_2"].config.angle = np.pi
         self.agent_data["tank_2"].config.lidarRange = 35.0
+        self.agent_data["tank_2"].config.lidarRadius = 1.0
 
     def __get_agent_from_id(self, id):
         """Search for matching TankData.id in agent_data."""

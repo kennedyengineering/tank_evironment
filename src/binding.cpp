@@ -25,7 +25,8 @@ PYBIND11_MODULE(python_bindings, handle) {
       .def_readwrite("angle", &TankGame::TankConfig::angle)
       .def_readwrite("treadMaxSpeed", &TankGame::TankConfig::treadMaxSpeed)
       .def_readwrite("lidarPoints", &TankGame::TankConfig::lidarPoints)
-      .def_readwrite("lidarRange", &TankGame::TankConfig::lidarRange);
+      .def_readwrite("lidarRange", &TankGame::TankConfig::lidarRange)
+      .def_readwrite("lidarRadius", &TankGame::TankConfig::lidarRadius);
 
   py::class_<TankGame::Config>(handle, "Config")
       .def(py::init<>())

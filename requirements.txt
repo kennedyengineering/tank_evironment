@@ -10,5 +10,6 @@ gymnasium==1.0.0
 supersuit==3.9.3
 stable-baselines3==2.5.0
 tensorboard==2.18.0
+moviepy==1.0.3
 --extra-index-url https://download.pytorch.org/whl/cu124
 torch==2.5.1+cu124

@@ -2,6 +2,8 @@
 
 from tank_game_environment import tank_game_environment_v1
 
+from tank_game_agent.callback.callback_video_recorder import VideoRecorderCallback
+
 import time
 import os
 
@@ -19,9 +21,8 @@ from stable_baselines3.common.callbacks import (
     EvalCallback,
 )
 
-# TODO: log videos to tensorboard, and other useful things https://stable-baselines3.readthedocs.io/en/master/guide/tensorboard.html
 # TODO: handle determinism / seeds. does there need to be a different seed for train_env and eval_env?
-# TODO: add better file structure
+# TODO: add better file structure, because saving "best weights"
 
 
 def train():
@@ -43,7 +44,7 @@ def train():
     # TODO: improve performance with subprocesses
     env = make_vec_env(tank_game_environment_v1.env_fn, n_envs=num_envs)
 
-    eval_env = tank_game_environment_v1.env_fn()
+    eval_env = tank_game_environment_v1.env_fn(render_mode="rgb_array")
     eval_env = Monitor(eval_env)
 
     env_name = eval_env.metadata["name"]
@@ -66,8 +67,10 @@ def train():
         name_prefix=run_name,
         verbose=verbose,
     )
+    video_callback = VideoRecorderCallback(eval_env=eval_env, render_freq=1)
     eval_callback = EvalCallback(
         eval_env=eval_env,
+        callback_on_new_best=video_callback,
         n_eval_episodes=num_eval_episodes,
         eval_freq=max(eval_freq // num_envs, 1),
         best_model_save_path=save_dir,
