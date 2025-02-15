@@ -32,6 +32,8 @@ tank_environment
 ├── python                          [ Python files ]
 ├── requirements.txt
 ├── setup.sh
+├── logs                            [ TensorBoard logs ]
+├── weights                         [ Model weights ]
 ├── src                             [ CPP source files ]
 └── test                            [ CPP unit tests ]
 ```
@@ -73,6 +75,10 @@ tank_environment
     ```
     pytest
     ```
+
+### Training
+
+TODO: fillout with details of train_v0, train_v1, etc
 
 ## Misc.
 
