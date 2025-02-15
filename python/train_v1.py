@@ -22,7 +22,6 @@ from stable_baselines3.common.callbacks import (
 )
 
 # TODO: handle determinism / seeds. does there need to be a different seed for train_env and eval_env?
-# TODO: add better file structure, because saving "best weights"
 
 
 def train():
@@ -49,6 +48,7 @@ def train():
 
     env_name = eval_env.metadata["name"]
     run_name = f"{env_name}_{time.strftime('%Y%m%d-%H%M%S')}"
+    save_dir = os.path.join(save_dir, run_name)
 
     # Create model
     model = PPO(
@@ -90,24 +90,24 @@ def train():
     # Close environment
     env.close()
 
+    # Run evaluation (optional)
+    eval(os.path.join(save_dir, "best_model"))
 
-def eval():
+
+def eval(model_path):
     """Evaluate an agent."""
 
     deterministic = True
     num_episodes = 1
 
     device = "cpu"
-    save_dir = "weights/"
-
-    run_name = "best_model"
 
     eval_env = tank_game_environment_v1.env_fn(render_mode="human")
     eval_env = Monitor(eval_env)
 
     eval_env_name = eval_env.metadata["name"]
 
-    model = PPO.load(os.path.join(save_dir, run_name), device=device)
+    model = PPO.load(model_path, device=device)
 
     print(f"Starting evaluation on {eval_env_name} (num_episodes={num_episodes})")
     rewards = evaluate_policy(
@@ -123,4 +123,3 @@ def eval():
 
 if __name__ == "__main__":
     train()
-    eval()
