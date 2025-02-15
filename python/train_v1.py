@@ -40,6 +40,7 @@ def train():
     verbose = 3
 
     # Create environments
+    # TODO: improve performance with subprocesses
     env = make_vec_env(tank_game_environment_v1.env_fn, n_envs=num_envs)
 
     eval_env = tank_game_environment_v1.env_fn()
