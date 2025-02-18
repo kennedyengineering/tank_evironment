@@ -21,7 +21,7 @@ from stable_baselines3.common.callbacks import (
     EvalCallback,
 )
 
-# TODO: handle determinism / seeds. does there need to be a different seed for train_env and eval_env?
+# TODO: handle determinism / seeds. does there need to be a different seed for train_env and eval_env? (set eval_env to seed, then train_env to seed + 1)
 
 
 def train():
