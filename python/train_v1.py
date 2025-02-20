@@ -7,9 +7,6 @@ from tank_game_agent.callback.callback_video_recorder import VideoRecorderCallba
 import time
 import os
 
-import supersuit as ss
-from supersuit import frame_stack_v1
-
 from stable_baselines3 import PPO
 from stable_baselines3.ppo import MlpPolicy
 from stable_baselines3.common.evaluation import evaluate_policy
