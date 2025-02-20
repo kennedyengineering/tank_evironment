@@ -9,6 +9,7 @@
 using namespace TankGame;
 
 // TODO: check for valid config values
+// TODO: add option for adding noise to lidar readings
 
 Engine::Engine(const Config &config)
     : mConfig(config),
