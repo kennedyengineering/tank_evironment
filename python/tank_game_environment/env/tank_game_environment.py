@@ -18,7 +18,6 @@ import pathlib
 from contextlib import redirect_stdout
 
 # TODO: add dense rewards
-# TODO: utilize randomness, add option for adding noise to lidar readings
 
 
 def aec_env_fn(**kwargs):
