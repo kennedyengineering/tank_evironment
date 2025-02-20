@@ -140,7 +140,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         return agent
 
     def __place_agent_deterministic(self, agent):
-        """Initialize tanks in a circle."""
+        """Place tanks in a circle."""
 
         if agent not in self.possible_agents:
             error("Invalid agent.")
