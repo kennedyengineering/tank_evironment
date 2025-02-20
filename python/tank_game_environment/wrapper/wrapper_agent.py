@@ -71,7 +71,7 @@ class AgentWrapper(Env):
         super().reset(seed=seed)
         self._scripted_policy.action_space.seed(seed=seed)
 
-        observations, infos = self._env.reset(seed, options)
+        observations, infos = self._env.reset(seed=seed, options=options)
 
         self._scripted_observation = observations[self._scripted_agent]
 

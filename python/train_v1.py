@@ -31,6 +31,7 @@ def train():
     num_envs = 4
     num_eval_episodes = 10
     steps = 1_000_000
+    seed = 0
     device = "cpu"
     log_dir = "logs/"
     save_dir = "weights/"
@@ -41,10 +42,13 @@ def train():
 
     # Create environments
     # TODO: improve performance with subprocesses
-    env = make_vec_env(tank_game_environment_v1.env_fn, n_envs=num_envs)
+    env = make_vec_env(
+        tank_game_environment_v1.env_fn, n_envs=num_envs, seed=seed, start_index=1
+    )
 
     eval_env = tank_game_environment_v1.env_fn(render_mode="rgb_array")
     eval_env = Monitor(eval_env)
+    eval_env.reset(seed=seed)
 
     env_name = eval_env.metadata["name"]
     run_name = f"{env_name}_{time.strftime('%Y%m%d-%H%M%S')}"
@@ -58,6 +62,7 @@ def train():
         batch_size=batch_size,
         device=device,
         tensorboard_log=log_dir,
+        seed=seed,
     )
 
     # Setup callbacks
