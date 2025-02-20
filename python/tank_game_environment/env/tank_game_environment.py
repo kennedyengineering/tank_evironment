@@ -56,6 +56,10 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
     The tank_metadata holds tank constants.
     - lidar_range : range of the lidar (meters)
     - lidar_pixel_radius : radius in pixels (for rendering)
+
+    The placement_metadata holds agent placement constants.
+    - wall_buffer : minimum distance between agent and wall (meters)
+    - tank_buffer : minimum distance between two agents (meters)
     """
 
     metadata = {
@@ -80,6 +84,11 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         "lidar_range": 35.0,
         "lidar_points": 360,
         "lidar_pixel_radius": 1.0,
+    }
+
+    placement_metadata = {
+        "wall_buffer": 8.0,
+        "tank_buffer": 10.0,
     }
 
     def __init__(self, render_mode=None):
@@ -193,7 +202,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         for _ in range(iters):
 
             # place away from walls
-            wall_buffer = 8.0
+            wall_buffer = self.placement_metadata["wall_buffer"]
             position = (
                 np.random.rand(
                     2,
@@ -206,7 +215,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
             )
 
             # place away from tanks
-            tank_buffer = 8.0
+            tank_buffer = self.placement_metadata["tank_buffer"]
             tank_overlaps = False
             for a in self.possible_agents:
                 distance = np.linalg.norm(
@@ -433,7 +442,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         """Return agent's observation space.
         [0-359] - lidar (% range)
         """
-        lidar_points = self.agent_data[agent].config.lidarPoints
+        lidar_points = self.tank_metadata["lidar_points"]
 
         return Box(0.0, 1.0, shape=(lidar_points,), dtype=np.float32)
 
