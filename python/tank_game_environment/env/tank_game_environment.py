@@ -86,6 +86,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
     }
 
     placement_metadata = {
+        "max_iterations": 5,
         "wall_buffer": 8.0,
         "tank_buffer": 10.0,
     }
@@ -196,7 +197,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         if agent not in self.possible_agents:
             error("Invalid agent.")
 
-        iters = 5
+        iters = self.placement_metadata["max_iterations"]
         placed = False
         for _ in range(iters):
 
