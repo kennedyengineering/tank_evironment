@@ -6,6 +6,7 @@ from tank_game_agent.callback.callback_video_recorder import VideoRecorderCallba
 
 import time
 import os
+import argparse
 
 from stable_baselines3 import PPO
 from stable_baselines3.ppo import MlpPolicy
@@ -90,26 +91,27 @@ def train():
     # Close environment
     env.close()
 
-    # Run evaluation (optional)
-    eval(os.path.join(save_dir, "best_model"))
-
 
 def eval(model_path):
     """Evaluate an agent."""
 
+    # Configuration variables
     deterministic = True
     num_episodes = 1
-
     device = "cpu"
 
+    # Create environment
     eval_env = tank_game_environment_v1.env_fn(render_mode="human")
     eval_env = Monitor(eval_env)
 
     eval_env_name = eval_env.metadata["name"]
 
+    # Load model
+    print(f"Loading model {model_path}.")
     model = PPO.load(model_path, device=device)
 
-    print(f"Starting evaluation on {eval_env_name} (num_episodes={num_episodes})")
+    # Run evaluation
+    print(f"Starting evaluation on {eval_env_name}. (num_episodes={num_episodes})")
     rewards = evaluate_policy(
         model,
         eval_env,
@@ -122,4 +124,25 @@ def eval(model_path):
 
 
 if __name__ == "__main__":
-    train()
+
+    parser = argparse.ArgumentParser(description="Train or evaluate a model.")
+
+    # Create subparsers for 'train' and 'eval' modes
+    subparsers = parser.add_subparsers(dest="mode", required=True)
+
+    # Training mode
+    train_parser = subparsers.add_parser("train", help="Run model training.")
+
+    # Evaluation mode
+    eval_parser = subparsers.add_parser("eval", help="Run model evaluation.")
+    eval_parser.add_argument("model_path", type=str, help="Path to the trained model.")
+
+    # Parse arguments
+    args = parser.parse_args()
+
+    if args.mode == "train":
+        print("Training mode selected.")
+        train()
+    elif args.mode == "eval":
+        print("Evaluation mode selected.")
+        eval(args.model_path)
