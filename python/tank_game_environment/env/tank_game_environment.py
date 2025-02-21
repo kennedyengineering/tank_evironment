@@ -438,24 +438,56 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
     def get_observation(self, agent):
         """Get observation for agent."""
 
-        lidar_scan = self.engine.scanTankLidar(self.agent_data[agent].id)
-        lidar_range = self.agent_data[agent].config.lidarRange
+        # FIXME: remove clipping to account for brief moments when values are beyond defined ranges?
+
+        id = self.agent_data[agent].id
+        config = self.agent_data[agent].config
+
+        # obtain lidar observation
+        lidar_scan = self.engine.scanTankLidar(id)
+        lidar_range = config.lidarRange
 
         lidar_scan = np.clip(
             lidar_scan, 0.0, lidar_range
         )  # Due to precision errors in simulator, returned distance may be slightly larger than lidar_range
         lidar_scan /= lidar_range  # Normalize between 0.0 and 1.0
 
-        return lidar_scan
+        # obtain velocity observation
+        velocity = self.engine.getTankLocalVelocity(id)
+        velocity_range = config.treadMaxSpeed
+
+        velocity = np.clip(
+            velocity, -velocity_range, velocity_range
+        )  # Due to precision errors in simulator, returned velocity may be slightly larger than lidar_range
+        velocity /= velocity_range  # Normalize between 0.0 and 1.0
+
+        # obtain angular velocity observation
+        angular_velocity = self.engine.getTankAngularVelocity(id)
+        angular_velocity_range = 9.84575  # Empirically determined
+
+        angular_velocity = np.clip(
+            angular_velocity, -angular_velocity_range, angular_velocity_range
+        )
+        angular_velocity /= angular_velocity_range  # Normalize between 0.0 and 1.0
+
+        # return observations
+        observations = np.append(
+            lidar_scan, (velocity[0], velocity[1], angular_velocity)
+        ).astype(np.float32)
+
+        return observations
 
     @functools.lru_cache(maxsize=None)
     def observation_space(self, agent):
         """Return agent's observation space.
         [0-359] - lidar (% range)
+        [400] - local velocity X axis (% range)
+        [401] - local velocity Y axis (% range)
+        [402] - local angular velocity (% range)
         """
         lidar_points = self.tank_metadata["lidar_points"]
 
-        return Box(0.0, 1.0, shape=(lidar_points,), dtype=np.float32)
+        return Box(-1.0, 1.0, shape=(lidar_points + 3,), dtype=np.float32)
 
     @functools.lru_cache(maxsize=None)
     def action_space(self, agent):
