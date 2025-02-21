@@ -69,6 +69,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         "num_tanks": 2,
         "random_position": True,
         "random_angle": True,
+        "reload_delay": 20,
     }
 
     engine_metadata = {
@@ -104,7 +105,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
 
         self.timestep = None
         self.agent_data = {
-            f"tank_{i}": TankData(-1, i, tank_game.TankConfig())
+            f"tank_{i}": TankData(-1, i, tank_game.TankConfig(), 0)
             for i in range(self.metadata["num_tanks"])
         }
         self.possible_agents = list(self.agent_data.keys())
@@ -269,12 +270,14 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         # construct engine
         self.engine = tank_game.Engine(self.engine_config)
 
-        # place and construct agents
+        # reset agents
         for a in self.possible_agents:
             self.agent_data[a].config.positionX = -1.0
             self.agent_data[a].config.positionY = -1.0
             self.agent_data[a].config.angle = 0.0
+            self.agent_data[a].reload_counter = 0
 
+        # place and construct agents
         for a in self.possible_agents:
             if self.metadata["random_position"]:
                 self.__place_agent_stochastic(a)
@@ -323,8 +326,15 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
             )
 
             # TODO: implement action masking / just prevent from firing
-            if action[2] > 0.0:
+            if action[2] > 0.0 and self.agent_data[a].reload_counter == 0:
                 self.engine.fireTankGun(self.agent_data[a].id)
+
+        # Handle reload counter
+        for a in self.agents:
+            if self.agent_data[a].reload_counter == 0:
+                self.agent_data[a].reload_counter = self.metadata["reload_delay"]
+            else:
+                self.agent_data[a].reload_counter -= 1
 
         # Step the engine
         projectile_events = self.engine.step()
