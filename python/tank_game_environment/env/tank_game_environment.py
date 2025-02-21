@@ -159,6 +159,17 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
             / 4.0
         )
 
+        wall_buffer = self.placement_metadata["wall_buffer"]
+        if radius < wall_buffer:
+            error(f"Failed to place tank. (tank to wall distance={radius})")
+
+        d_position = np.array([radius * np.cos(d_radians), radius * np.sin(d_radians)])
+        distance = np.linalg.norm(d_position - [radius, 0])
+
+        tank_buffer = self.placement_metadata["tank_buffer"]
+        if distance < tank_buffer:
+            error(f"Failed to place tank. (inter tank distance={distance})")
+
         center_position = (
             np.array(
                 [
