@@ -480,9 +480,13 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         )
         angular_velocity /= angular_velocity_range  # Normalize between 0.0 and 1.0
 
+        # obtain reload counter observation
+        reload_counter = self.agent_data[agent].reload_counter
+        reload_counter /= self.metadata["reload_delay"]
+
         # return observations
         observations = np.append(
-            lidar_scan, (velocity[0], velocity[1], angular_velocity)
+            lidar_scan, (velocity[0], velocity[1], angular_velocity, reload_counter)
         ).astype(np.float32)
 
         return observations
@@ -494,10 +498,11 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         [400] - local velocity X axis (% range)
         [401] - local velocity Y axis (% range)
         [402] - local angular velocity (% range)
+        [403] - reload counter (% range)
         """
         lidar_points = self.tank_metadata["lidar_points"]
 
-        return Box(-1.0, 1.0, shape=(lidar_points + 3,), dtype=np.float32)
+        return Box(-1.0, 1.0, shape=(lidar_points + 4,), dtype=np.float32)
 
     @functools.lru_cache(maxsize=None)
     def action_space(self, agent):
