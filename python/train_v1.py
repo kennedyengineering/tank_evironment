@@ -3,6 +3,7 @@
 from tank_game_environment import tank_game_environment_v1
 
 from tank_game_agent.callback.callback_video_recorder import VideoRecorderCallback
+from tank_game_agent.callback.callback_hparam_recorder import HParamRecorderCallback
 
 import time
 import os
@@ -97,6 +98,21 @@ def train(checkpoint_path=None):
         )
 
     # Setup callbacks
+    hparam_callback = HParamRecorderCallback(
+        hparam_dict={
+            "environment": env_name,
+            "seed": seed,
+            "n_envs": num_envs,
+            "n_eval_episodes": num_eval_episodes,
+            "eval_freq": eval_freq,
+            "steps": steps,
+            "checkpoint_path": str(checkpoint_path),
+            "checkpoint_freq": save_freq,
+            "device": device,
+        }
+        | ppo_config,
+        metric_dict={"eval/mean_ep_length": 0, "eval/mean_reward": 0},
+    )
     checkpoint_callback = CheckpointCallback(
         save_freq=max(save_freq // num_envs, 1),
         save_path=save_dir,
@@ -112,7 +128,7 @@ def train(checkpoint_path=None):
         best_model_save_path=save_dir,
         verbose=verbose,
     )
-    callbacks = CallbackList([checkpoint_callback, eval_callback])
+    callbacks = CallbackList([hparam_callback, checkpoint_callback, eval_callback])
 
     # Train model
     print(f"Starting training on {env_name}. ({run_name})")
