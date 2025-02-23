@@ -34,8 +34,19 @@ def train():
     save_dir = "weights/"
     save_freq = 100_000
     eval_freq = 10_000
-    batch_size = 256
     verbose = 3
+
+    # PPO variables
+    learning_rate = 3e-4
+    n_steps = 2048
+    batch_size = 256
+    n_epochs = 10
+    gamma = 0.99
+    gae_lambda = 0.95
+    clip_range = 0.2
+    ent_coef = 0.0
+    vf_coef = 0.5
+    max_grad_norm = 0.5
 
     # Create environments
     env = make_vec_env(
@@ -66,7 +77,16 @@ def train():
         MlpPolicy,
         env,
         verbose=verbose,
+        learning_rate=learning_rate,
+        n_steps=n_steps,
         batch_size=batch_size,
+        n_epochs=n_epochs,
+        gamma=gamma,
+        gae_lambda=gae_lambda,
+        clip_range=clip_range,
+        ent_coef=ent_coef,
+        vf_coef=vf_coef,
+        max_grad_norm=max_grad_norm,
         device=device,
         tensorboard_log=log_dir,
         seed=seed,
