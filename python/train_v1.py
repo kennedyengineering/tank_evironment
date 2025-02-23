@@ -25,6 +25,8 @@ from stable_baselines3.common.vec_env import SubprocVecEnv
 def train(checkpoint_path=None):
     """Train an agent."""
 
+    # TODO: make variables configurable at runtime
+
     # Configuration variables
     num_envs = 12
     num_eval_episodes = 10
