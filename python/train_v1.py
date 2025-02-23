@@ -42,15 +42,22 @@ def train():
         tank_game_environment_v1.env_fn,
         n_envs=num_envs,
         seed=seed,
-        start_index=1,
         vec_env_cls=SubprocVecEnv,
     )
 
-    eval_env = tank_game_environment_v1.env_fn(render_mode="rgb_array")
-    eval_env = Monitor(eval_env)
-    eval_env.reset(seed=seed)
+    eval_env = make_vec_env(
+        tank_game_environment_v1.env_fn,
+        n_envs=num_envs,
+        seed=seed,
+        start_index=seed + num_envs,
+        vec_env_cls=SubprocVecEnv,
+    )
 
-    env_name = eval_env.metadata["name"]
+    render_env = tank_game_environment_v1.env_fn(render_mode="rgb_array")
+    render_env = Monitor(render_env)
+    render_env.reset(seed=seed + num_envs + 1)
+
+    env_name = render_env.metadata["name"]
     run_name = f"{env_name}_{time.strftime('%Y%m%d-%H%M%S')}"
     save_dir = os.path.join(save_dir, run_name)
 
@@ -72,7 +79,7 @@ def train():
         name_prefix=run_name,
         verbose=verbose,
     )
-    video_callback = VideoRecorderCallback(eval_env=eval_env, render_freq=1)
+    video_callback = VideoRecorderCallback(eval_env=render_env, render_freq=1)
     eval_callback = EvalCallback(
         eval_env=eval_env,
         callback_on_new_best=video_callback,
