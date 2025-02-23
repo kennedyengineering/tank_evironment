@@ -25,7 +25,7 @@ def train():
     """Train an agent."""
 
     # Configuration variables
-    num_envs = 4
+    num_envs = 12
     num_eval_episodes = 10
     steps = 1_000_000
     seed = 0
