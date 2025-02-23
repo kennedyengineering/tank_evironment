@@ -18,6 +18,7 @@ from stable_baselines3.common.callbacks import (
     CheckpointCallback,
     EvalCallback,
 )
+from stable_baselines3.common.vec_env import SubprocVecEnv
 
 
 def train():
@@ -37,9 +38,12 @@ def train():
     verbose = 3
 
     # Create environments
-    # TODO: improve performance with subprocesses
     env = make_vec_env(
-        tank_game_environment_v1.env_fn, n_envs=num_envs, seed=seed, start_index=1
+        tank_game_environment_v1.env_fn,
+        n_envs=num_envs,
+        seed=seed,
+        start_index=1,
+        vec_env_cls=SubprocVecEnv,
     )
 
     eval_env = tank_game_environment_v1.env_fn(render_mode="rgb_array")
