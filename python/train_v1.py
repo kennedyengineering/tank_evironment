@@ -38,7 +38,7 @@ def train():
 
     # PPO variables
     learning_rate = 3e-4
-    n_steps = 2048
+    n_steps = 1024
     batch_size = 256
     n_epochs = 10
     gamma = 0.99
