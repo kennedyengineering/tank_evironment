@@ -21,14 +21,14 @@ from stable_baselines3.common.callbacks import (
 from stable_baselines3.common.vec_env import SubprocVecEnv
 
 
-def train():
+def train(checkpoint_path=None):
     """Train an agent."""
 
     # Configuration variables
     num_envs = 12
     num_eval_episodes = 10
     steps = 1_000_000
-    seed = 0
+    seed = 0  # if continuing from a checkpoint might want to specify a different seed
     device = "cpu"
     log_dir = "logs/"
     save_dir = "weights/"
@@ -36,17 +36,19 @@ def train():
     eval_freq = 10_000
     verbose = 3
 
-    # PPO variables
-    learning_rate = 3e-4
-    n_steps = 1024
-    batch_size = 256
-    n_epochs = 10
-    gamma = 0.99
-    gae_lambda = 0.95
-    clip_range = 0.2
-    ent_coef = 0.0
-    vf_coef = 0.5
-    max_grad_norm = 0.5
+    # PPO configuration variables
+    ppo_config = {
+        "learning_rate": 3e-4,
+        "n_steps": 1024,
+        "batch_size": 256,
+        "n_epochs": 10,
+        "gamma": 0.99,
+        "gae_lambda": 0.95,
+        "clip_range": 0.2,
+        "ent_coef": 0.01,
+        "vf_coef": 0.5,
+        "max_grad_norm": 0.5,
+    }
 
     # Create environments
     env = make_vec_env(
@@ -73,24 +75,26 @@ def train():
     save_dir = os.path.join(save_dir, run_name)
 
     # Create model
-    model = PPO(
-        MlpPolicy,
-        env,
-        verbose=verbose,
-        learning_rate=learning_rate,
-        n_steps=n_steps,
-        batch_size=batch_size,
-        n_epochs=n_epochs,
-        gamma=gamma,
-        gae_lambda=gae_lambda,
-        clip_range=clip_range,
-        ent_coef=ent_coef,
-        vf_coef=vf_coef,
-        max_grad_norm=max_grad_norm,
-        device=device,
-        tensorboard_log=log_dir,
-        seed=seed,
-    )
+    if checkpoint_path is None:
+        model = PPO(
+            policy=MlpPolicy,
+            env=env,
+            verbose=verbose,
+            device=device,
+            tensorboard_log=log_dir,
+            seed=seed,
+            **ppo_config,
+        )
+    else:
+        model = PPO.load(
+            path=checkpoint_path,
+            env=env,
+            verbose=verbose,
+            device=device,
+            tensorboard_log=log_dir,
+            seed=seed,
+            **ppo_config,
+        )
 
     # Setup callbacks
     checkpoint_callback = CheckpointCallback(
@@ -112,7 +116,12 @@ def train():
 
     # Train model
     print(f"Starting training on {env_name}. ({run_name})")
-    model.learn(total_timesteps=steps, tb_log_name=run_name, callback=callbacks)
+    model.learn(
+        total_timesteps=steps,
+        tb_log_name=run_name,
+        callback=callbacks,
+        reset_num_timesteps=bool(checkpoint_path is None),
+    )
     print(f"Finished training on {env_name}. ({run_name})")
 
     # Save model
@@ -163,6 +172,9 @@ if __name__ == "__main__":
 
     # Training mode
     train_parser = subparsers.add_parser("train", help="Run model training.")
+    train_parser.add_argument(
+        "model_path", type=str, nargs="?", help="Path to the model checkpoint."
+    )
 
     # Evaluation mode
     eval_parser = subparsers.add_parser("eval", help="Run model evaluation.")
@@ -173,7 +185,7 @@ if __name__ == "__main__":
 
     if args.mode == "train":
         print("Training mode selected.")
-        train()
+        train(args.model_path)
     elif args.mode == "eval":
         print("Evaluation mode selected.")
         eval(args.model_path)
