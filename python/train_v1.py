@@ -155,7 +155,7 @@ def eval(model_path):
 
     # Configuration variables
     deterministic = True
-    num_episodes = 1
+    num_episodes = 5
     device = "cpu"
 
     # Create environment
