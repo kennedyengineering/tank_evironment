@@ -45,6 +45,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
     - max_timesteps : how many steps before truncation (-1 for no truncation)
     - random_position : initialize tanks in a random position
     - random_angle : initialize tank with a random rotation
+    - reload_delay : how many steps before tank can fire (0 for no delay)
 
     The engine_metadata holds engine constants.
     - arena_width : width of arena (meters)
@@ -325,7 +326,6 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
                 action[1] * self.agent_data[a].config.treadMaxSpeed,
             )
 
-            # TODO: implement action masking / just prevent from firing
             if action[2] > 0.0 and self.agent_data[a].reload_counter == 0:
                 self.engine.fireTankGun(self.agent_data[a].id)
 
@@ -482,7 +482,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
 
         # obtain reload counter observation
         reload_counter = self.agent_data[agent].reload_counter
-        reload_counter /= self.metadata["reload_delay"]
+        reload_counter /= max(self.metadata["reload_delay"], 1)
 
         # return observations
         observations = np.append(
