@@ -3,6 +3,7 @@
 from tank_game_environment import tank_game_environment_v1
 
 from tank_game_agent.callback.callback_video_recorder import VideoRecorderCallback
+from tank_game_agent.callback.callback_hparam_recorder import HParamRecorderCallback
 
 import time
 import os
@@ -18,57 +19,109 @@ from stable_baselines3.common.callbacks import (
     CheckpointCallback,
     EvalCallback,
 )
+from stable_baselines3.common.vec_env import SubprocVecEnv
 
 
-def train():
+def train(checkpoint_path=None):
     """Train an agent."""
 
+    # TODO: make variables configurable at runtime
+
     # Configuration variables
-    num_envs = 4
+    num_envs = 12
     num_eval_episodes = 10
     steps = 1_000_000
-    seed = 0
+    seed = 0  # if continuing from a checkpoint might want to specify a different seed
     device = "cpu"
     log_dir = "logs/"
     save_dir = "weights/"
     save_freq = 100_000
     eval_freq = 10_000
-    batch_size = 256
     verbose = 3
 
+    # PPO configuration variables
+    ppo_config = {
+        "learning_rate": 3e-4,
+        "n_steps": 1024,
+        "batch_size": 256,
+        "n_epochs": 10,
+        "gamma": 0.99,
+        "gae_lambda": 0.95,
+        "clip_range": 0.2,
+        "ent_coef": 0.01,
+        "vf_coef": 0.5,
+        "max_grad_norm": 0.5,
+    }
+
     # Create environments
-    # TODO: improve performance with subprocesses
     env = make_vec_env(
-        tank_game_environment_v1.env_fn, n_envs=num_envs, seed=seed, start_index=1
+        tank_game_environment_v1.env_fn,
+        n_envs=num_envs,
+        seed=seed,
+        vec_env_cls=SubprocVecEnv,
     )
 
-    eval_env = tank_game_environment_v1.env_fn(render_mode="rgb_array")
-    eval_env = Monitor(eval_env)
-    eval_env.reset(seed=seed)
+    eval_env = make_vec_env(
+        tank_game_environment_v1.env_fn,
+        n_envs=num_envs,
+        seed=seed,
+        start_index=seed + num_envs,
+        vec_env_cls=SubprocVecEnv,
+    )
 
-    env_name = eval_env.metadata["name"]
+    render_env = tank_game_environment_v1.env_fn(render_mode="rgb_array")
+    render_env = Monitor(render_env)
+    render_env.reset(seed=seed + num_envs + 1)
+
+    env_name = render_env.metadata["name"]
     run_name = f"{env_name}_{time.strftime('%Y%m%d-%H%M%S')}"
     save_dir = os.path.join(save_dir, run_name)
 
     # Create model
-    model = PPO(
-        MlpPolicy,
-        env,
-        verbose=verbose,
-        batch_size=batch_size,
-        device=device,
-        tensorboard_log=log_dir,
-        seed=seed,
-    )
+    if checkpoint_path is None:
+        model = PPO(
+            policy=MlpPolicy,
+            env=env,
+            verbose=verbose,
+            device=device,
+            tensorboard_log=log_dir,
+            seed=seed,
+            **ppo_config,
+        )
+    else:
+        model = PPO.load(
+            path=checkpoint_path,
+            env=env,
+            verbose=verbose,
+            device=device,
+            tensorboard_log=log_dir,
+            seed=seed,
+            **ppo_config,
+        )
 
     # Setup callbacks
+    hparam_callback = HParamRecorderCallback(
+        hparam_dict={
+            "environment": env_name,
+            "seed": seed,
+            "n_envs": num_envs,
+            "n_eval_episodes": num_eval_episodes,
+            "eval_freq": eval_freq,
+            "steps": steps,
+            "checkpoint_path": str(checkpoint_path),
+            "checkpoint_freq": save_freq,
+            "device": device,
+        }
+        | ppo_config,
+        metric_dict={"eval/mean_ep_length": 0, "eval/mean_reward": 0},
+    )
     checkpoint_callback = CheckpointCallback(
         save_freq=max(save_freq // num_envs, 1),
         save_path=save_dir,
         name_prefix=run_name,
         verbose=verbose,
     )
-    video_callback = VideoRecorderCallback(eval_env=eval_env, render_freq=1)
+    video_callback = VideoRecorderCallback(eval_env=render_env, render_freq=1)
     eval_callback = EvalCallback(
         eval_env=eval_env,
         callback_on_new_best=video_callback,
@@ -77,11 +130,16 @@ def train():
         best_model_save_path=save_dir,
         verbose=verbose,
     )
-    callbacks = CallbackList([checkpoint_callback, eval_callback])
+    callbacks = CallbackList([hparam_callback, checkpoint_callback, eval_callback])
 
     # Train model
     print(f"Starting training on {env_name}. ({run_name})")
-    model.learn(total_timesteps=steps, tb_log_name=run_name, callback=callbacks)
+    model.learn(
+        total_timesteps=steps,
+        tb_log_name=run_name,
+        callback=callbacks,
+        reset_num_timesteps=bool(checkpoint_path is None),
+    )
     print(f"Finished training on {env_name}. ({run_name})")
 
     # Save model
@@ -97,7 +155,7 @@ def eval(model_path):
 
     # Configuration variables
     deterministic = True
-    num_episodes = 1
+    num_episodes = 5
     device = "cpu"
 
     # Create environment
@@ -132,6 +190,9 @@ if __name__ == "__main__":
 
     # Training mode
     train_parser = subparsers.add_parser("train", help="Run model training.")
+    train_parser.add_argument(
+        "model_path", type=str, nargs="?", help="Path to the model checkpoint."
+    )
 
     # Evaluation mode
     eval_parser = subparsers.add_parser("eval", help="Run model evaluation.")
@@ -142,7 +203,7 @@ if __name__ == "__main__":
 
     if args.mode == "train":
         print("Training mode selected.")
-        train()
+        train(args.model_path)
     elif args.mode == "eval":
         print("Evaluation mode selected.")
         eval(args.model_path)
