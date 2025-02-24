@@ -5,6 +5,8 @@ from tank_game_environment import tank_game_environment_v1
 from tank_game_agent.callback.callback_video_recorder import VideoRecorderCallback
 from tank_game_agent.callback.callback_hparam_recorder import HParamRecorderCallback
 
+from tank_game_agent.schedule.schedule_learning_rate import linear_schedule
+
 import time
 import os
 import argparse
@@ -38,6 +40,7 @@ def train(checkpoint_path=None):
     save_freq = 100_000
     eval_freq = 10_000
     verbose = 3
+    schedule_learning_rate = False
 
     # PPO configuration variables
     ppo_config = {
@@ -77,6 +80,11 @@ def train(checkpoint_path=None):
     run_name = f"{env_name}_{time.strftime('%Y%m%d-%H%M%S')}"
     save_dir = os.path.join(save_dir, run_name)
 
+    # Handle scheduling learning rate
+    ppo_config2 = ppo_config.copy()
+    if schedule_learning_rate:
+        ppo_config2["learning_rate"] = linear_schedule(ppo_config2["learning_rate"])
+
     # Create model
     if checkpoint_path is None:
         model = PPO(
@@ -86,7 +94,7 @@ def train(checkpoint_path=None):
             device=device,
             tensorboard_log=log_dir,
             seed=seed,
-            **ppo_config,
+            **ppo_config2,
         )
     else:
         model = PPO.load(
@@ -96,7 +104,7 @@ def train(checkpoint_path=None):
             device=device,
             tensorboard_log=log_dir,
             seed=seed,
-            **ppo_config,
+            **ppo_config2,
         )
 
     # Setup callbacks
