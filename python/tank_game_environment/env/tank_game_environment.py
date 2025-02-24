@@ -497,10 +497,10 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
     def observation_space(self, agent):
         """Return agent's observation space.
         [0-359] - lidar (% range)
-        [400] - local velocity X axis (% range)
-        [401] - local velocity Y axis (% range)
-        [402] - local angular velocity (% range)
-        [403] - reload counter (% range)
+        [360] - local velocity X axis (% range)
+        [361] - local velocity Y axis (% range)
+        [362] - local angular velocity (% range)
+        [363] - reload counter (% range)
         """
         lidar_points = self.tank_metadata["lidar_points"]
 
