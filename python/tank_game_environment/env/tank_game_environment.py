@@ -469,7 +469,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         velocity = np.clip(
             velocity, -velocity_range, velocity_range
         )  # Due to precision errors in simulator, returned velocity may be slightly larger than lidar_range
-        velocity /= velocity_range  # Normalize between 0.0 and 1.0
+        velocity /= velocity_range  # Normalize between -1.0 and 1.0
 
         # obtain angular velocity observation
         angular_velocity = self.engine.getTankAngularVelocity(id)
@@ -478,11 +478,13 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         angular_velocity = np.clip(
             angular_velocity, -angular_velocity_range, angular_velocity_range
         )
-        angular_velocity /= angular_velocity_range  # Normalize between 0.0 and 1.0
+        angular_velocity /= angular_velocity_range  # Normalize between -1.0 and 1.0
 
         # obtain reload counter observation
         reload_counter = self.agent_data[agent].reload_counter
-        reload_counter /= max(self.metadata["reload_delay"], 1)
+        reload_counter /= max(
+            self.metadata["reload_delay"], 1
+        )  # Normalize between 0.0 and 1.0
 
         # return observations
         observations = np.append(
