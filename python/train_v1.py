@@ -7,6 +7,8 @@ from tank_game_agent.callback.callback_hparam_recorder import HParamRecorderCall
 
 from tank_game_agent.schedule.schedule_learning_rate import linear_schedule
 
+from tank_game_agent.feature_extactor.feature_extractor_lidar import LidarCNN
+
 import time
 import os
 import argparse
@@ -32,7 +34,7 @@ def train(checkpoint_path=None):
     # Configuration variables
     num_envs = 12
     num_eval_episodes = 10
-    steps = 1_000_000
+    steps = 6_000_000
     seed = 0  # if continuing from a checkpoint might want to specify a different seed
     device = "cpu"
     log_dir = "logs/"
@@ -40,7 +42,11 @@ def train(checkpoint_path=None):
     save_freq = 100_000
     eval_freq = 10_000
     verbose = 3
-    schedule_learning_rate = False
+    schedule_learning_rate = True
+    policy_kwargs = dict(
+        features_extractor_class=LidarCNN,
+        features_extractor_kwargs=dict(features_dim=64),
+    )
 
     # PPO configuration variables
     ppo_config = {
@@ -94,6 +100,7 @@ def train(checkpoint_path=None):
             device=device,
             tensorboard_log=log_dir,
             seed=seed,
+            policy_kwargs=policy_kwargs,
             **ppo_config2,
         )
     else:
@@ -104,6 +111,7 @@ def train(checkpoint_path=None):
             device=device,
             tensorboard_log=log_dir,
             seed=seed,
+            policy_kwargs=policy_kwargs,
             **ppo_config2,
         )
 
@@ -163,7 +171,7 @@ def eval(model_path):
 
     # Configuration variables
     deterministic = True
-    num_episodes = 5
+    num_episodes = 20
     device = "cpu"
 
     # Create environment

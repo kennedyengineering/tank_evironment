@@ -306,6 +306,23 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
 
         return observations, infos
 
+    def __shape_agent_reward(self, observation):
+        """Shapes agent reward."""
+
+        reward = 0
+
+        # penalize every timestep
+        reward -= 1
+
+        # reward movement
+        reward += observation[360] * 0.5
+        reward += observation[361] * 0.5
+
+        # punish rotation
+        # reward -= abs(observation[362])*0.2
+
+        return reward
+
     def step(self, actions):
         """Takes in actions for the agents."""
 
@@ -343,7 +360,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         observations = {a: self.get_observation(a) for a in self.agents}
 
         # Assign rewards
-        rewards = {a: -1.0 for a in self.agents}
+        rewards = {a: self.__shape_agent_reward(observations[a]) for a in self.agents}
 
         # Check termination conditions
         terminations = {a: False for a in self.agents}
@@ -360,18 +377,19 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
             terminations = {a: True for a in self.agents}
 
         # FIXME: if both get shot at same time, give both negative reward instead of tie?
-        # for event in unique_events:
-        #     src_agent_id = event[1]
-        #     src_agent = self.__get_agent_from_id(src_agent_id)
-        #     if src_agent not in self.agents:
-        #         error("Rewarding an invalid agent.")
-        #     rewards[src_agent] += 1
+        # FIXME: what if tank hits itself?
+        for event in unique_events:
+            src_agent_id = event[1]
+            src_agent = self.__get_agent_from_id(src_agent_id)
+            if src_agent not in self.agents:
+                error("Rewarding an invalid agent.")
+            rewards[src_agent] += 100
 
-        #     hit_agent_id = event[2]
-        #     hit_agent = self.__get_agent_from_id(hit_agent_id)
-        #     if hit_agent not in self.agents:
-        #         error("Rewarding an invalid agent.")
-        #     rewards[hit_agent] -= 1
+            hit_agent_id = event[2]
+            hit_agent = self.__get_agent_from_id(hit_agent_id)
+            if hit_agent not in self.agents:
+                error("Rewarding an invalid agent.")
+            rewards[hit_agent] -= 100
 
         # Check truncation conditions
         truncations = {a: False for a in self.agents}
