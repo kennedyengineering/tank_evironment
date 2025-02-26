@@ -45,7 +45,7 @@ def train(checkpoint_path=None):
     schedule_learning_rate = True
     policy_kwargs = dict(
         features_extractor_class=LidarCNN,
-        features_extractor_kwargs=dict(features_dim=64),
+        features_extractor_kwargs=dict(features_dim=128),
     )
 
     # PPO configuration variables
