@@ -43,6 +43,7 @@ def train(checkpoint_path=None):
     eval_freq = 10_000
     verbose = 3
     schedule_learning_rate = True
+    schedule_clip_range = False
     policy_kwargs = dict(
         features_extractor_class=LidarCNN,
         features_extractor_kwargs=dict(features_dim=128),
@@ -86,10 +87,12 @@ def train(checkpoint_path=None):
     run_name = f"{env_name}_{time.strftime('%Y%m%d-%H%M%S')}"
     save_dir = os.path.join(save_dir, run_name)
 
-    # Handle scheduling learning rate
+    # Handle scheduling learning rate and clip range
     ppo_config2 = ppo_config.copy()
     if schedule_learning_rate:
         ppo_config2["learning_rate"] = linear_schedule(ppo_config2["learning_rate"])
+    if schedule_clip_range:
+        ppo_config2["clip_range"] = linear_schedule(ppo_config2["clip_range"])
 
     # Create model
     if checkpoint_path is None:
