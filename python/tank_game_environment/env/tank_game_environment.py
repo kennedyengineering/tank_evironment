@@ -17,8 +17,6 @@ import pathlib
 
 from contextlib import redirect_stdout
 
-# TODO: add dense rewards
-
 
 def aec_env_fn(**kwargs):
     """Constructs and returns wrapped AEC environment."""
