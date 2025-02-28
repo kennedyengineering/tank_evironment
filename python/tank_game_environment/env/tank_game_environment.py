@@ -41,6 +41,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
     - render_modes : valid rendering modes
     - render_fps : for "human" rendering mode
     - max_timesteps : how many steps before truncation (-1 for no truncation)
+    - num_tanks : number of agents
     - random_position : initialize tanks in a random position
     - random_angle : initialize tank with a random rotation
     - reload_delay : how many steps before tank can fire (0 for no delay)
@@ -52,10 +53,13 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
     - verbose_output : enable engine stdout messages
 
     The tank_metadata holds tank constants.
+    - tread_max_speed : maximum linear velocity of an agent (meters / second)
     - lidar_range : range of the lidar (meters)
+    - lidar_points : number of points in a lidar scan
     - lidar_pixel_radius : radius in pixels (for rendering)
 
     The placement_metadata holds agent placement constants.
+    - max_iterations : number of attempts at randomly placing an agent
     - wall_buffer : minimum distance between agent and wall (meters)
     - tank_buffer : minimum distance between two agents (meters)
     """
