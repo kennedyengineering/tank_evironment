@@ -5,7 +5,7 @@ from tank_game_environment import tank_game_environment_v1
 from tank_game_agent.callback.callback_video_recorder import VideoRecorderCallback
 from tank_game_agent.callback.callback_hparam_recorder import HParamRecorderCallback
 
-from tank_game_agent.schedule.schedule_learning_rate import linear_schedule
+from tank_game_agent.schedule.schedule_linear import linear_schedule
 
 from tank_game_agent.feature_extactor.feature_extractor_lidar import LidarCNN
 
