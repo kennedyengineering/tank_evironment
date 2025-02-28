@@ -88,11 +88,11 @@ def train(checkpoint_path=None):
     save_dir = os.path.join(save_dir, run_name)
 
     # Handle scheduling learning rate and clip range
-    ppo_config2 = ppo_config.copy()
+    ppo_config_copy = ppo_config.copy()
     if schedule_learning_rate:
-        ppo_config2["learning_rate"] = linear_schedule(ppo_config2["learning_rate"])
+        ppo_config["learning_rate"] = linear_schedule(ppo_config["learning_rate"])
     if schedule_clip_range:
-        ppo_config2["clip_range"] = linear_schedule(ppo_config2["clip_range"])
+        ppo_config["clip_range"] = linear_schedule(ppo_config["clip_range"])
 
     # Create model
     if checkpoint_path is None:
@@ -104,7 +104,7 @@ def train(checkpoint_path=None):
             tensorboard_log=log_dir,
             seed=seed,
             policy_kwargs=policy_kwargs,
-            **ppo_config2,
+            **ppo_config,
         )
     else:
         model = PPO.load(
@@ -115,7 +115,7 @@ def train(checkpoint_path=None):
             tensorboard_log=log_dir,
             seed=seed,
             policy_kwargs=policy_kwargs,
-            **ppo_config2,
+            **ppo_config,
         )
 
     # Setup callbacks
@@ -131,7 +131,7 @@ def train(checkpoint_path=None):
             "checkpoint_freq": save_freq,
             "device": device,
         }
-        | ppo_config,
+        | ppo_config_copy,
         metric_dict={"eval/mean_ep_length": 0, "eval/mean_reward": 0},
     )
     checkpoint_callback = CheckpointCallback(
