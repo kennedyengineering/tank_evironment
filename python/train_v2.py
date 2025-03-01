@@ -12,6 +12,7 @@ from tank_game_agent.feature_extactor.feature_extractor_lidar import LidarCNN
 import time
 import os
 import argparse
+import numpy as np
 
 from stable_baselines3 import PPO
 from stable_baselines3.ppo import MlpPolicy
@@ -167,7 +168,7 @@ def train(checkpoint_path=None):
     env.close()
 
 
-def eval(model_path):
+def eval(model_path, opponent_model_path):
     """Evaluate an agent."""
 
     # Configuration variables
@@ -175,8 +176,14 @@ def eval(model_path):
     num_episodes = 20
     device = "cpu"
 
+    # Load opponent model
+    print(f"Loading opponent model {opponent_model_path}.")
+    opponent_model = PPO.load(opponent_model_path, device=device)
+
     # Create environment
-    eval_env = tank_game_environment_v2.env_fn(render_mode="human")
+    eval_env = tank_game_environment_v2.env_fn(
+        learned_policy=opponent_model, render_mode="human"
+    )
     eval_env = Monitor(eval_env)
 
     eval_env_name = eval_env.metadata["name"]
@@ -196,6 +203,8 @@ def eval(model_path):
         return_episode_rewards=True,
     )
     print("Rewards: ", rewards)
+    print("Average Reward: ", np.mean(rewards[0]))
+    print("Average Duration: ", np.mean(rewards[1]))
 
 
 if __name__ == "__main__":
@@ -213,7 +222,10 @@ if __name__ == "__main__":
 
     # Evaluation mode
     eval_parser = subparsers.add_parser("eval", help="Run model evaluation.")
-    eval_parser.add_argument("model_path", type=str, help="Path to the trained model.")
+    eval_parser.add_argument("model_path", type=str, help="Path to a trained model.")
+    eval_parser.add_argument(
+        "opponent_model_path", type=str, help="Path to a trained model."
+    )
 
     # Parse arguments
     args = parser.parse_args()
@@ -223,4 +235,4 @@ if __name__ == "__main__":
         train(args.model_path)
     elif args.mode == "eval":
         print("Evaluation mode selected.")
-        eval(args.model_path)
+        eval(args.model_path, args.opponent_model_path)
