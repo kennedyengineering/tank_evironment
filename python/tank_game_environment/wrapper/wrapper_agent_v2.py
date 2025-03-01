@@ -1,5 +1,6 @@
 # Tank Game (@kennedyengineering)
 
+# FIXME: remove stable-baselines3 dependent code
 from stable_baselines3.common.base_class import BaseAlgorithm
 
 from pettingzoo import ParallelEnv

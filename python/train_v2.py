@@ -24,10 +24,12 @@ from stable_baselines3.common.callbacks import (
     CheckpointCallback,
     EvalCallback,
 )
+
+# FIXME: find a way to improve FPS
 from stable_baselines3.common.vec_env import SubprocVecEnv
 
 
-def train(checkpoint_path=None):
+def train(opponent_model_path, checkpoint_path=None):
     """Train an agent."""
 
     # Configuration variables
@@ -62,12 +64,16 @@ def train(checkpoint_path=None):
         "max_grad_norm": 0.5,
     }
 
+    # Load opponent model
+    opponent_model = PPO.load(opponent_model_path, device=device)
+
     # Create environments
     env = make_vec_env(
         tank_game_environment_v2.env_fn,
         n_envs=num_envs,
         seed=seed,
-        vec_env_cls=SubprocVecEnv,
+        # vec_env_cls=SubprocVecEnv,
+        env_kwargs=dict(learned_policy=opponent_model),
     )
 
     eval_env = make_vec_env(
@@ -75,10 +81,13 @@ def train(checkpoint_path=None):
         n_envs=num_envs,
         seed=seed,
         start_index=seed + num_envs,
-        vec_env_cls=SubprocVecEnv,
+        # vec_env_cls=SubprocVecEnv,
+        env_kwargs=dict(learned_policy=opponent_model),
     )
 
-    render_env = tank_game_environment_v2.env_fn(render_mode="rgb_array")
+    render_env = tank_game_environment_v2.env_fn(
+        learned_policy=opponent_model, render_mode="rgb_array"
+    )
     render_env = Monitor(render_env)
     render_env.reset(seed=seed + num_envs + 1)
 
@@ -217,6 +226,9 @@ if __name__ == "__main__":
     # Training mode
     train_parser = subparsers.add_parser("train", help="Run model training.")
     train_parser.add_argument(
+        "opponent_model_path", type=str, help="Path to a trained model."
+    )
+    train_parser.add_argument(
         "model_path", type=str, nargs="?", help="Path to the model checkpoint."
     )
 
@@ -232,7 +244,7 @@ if __name__ == "__main__":
 
     if args.mode == "train":
         print("Training mode selected.")
-        train(args.model_path)
+        train(args.opponent_model_path, args.model_path)
     elif args.mode == "eval":
         print("Evaluation mode selected.")
         eval(args.model_path, args.opponent_model_path)
