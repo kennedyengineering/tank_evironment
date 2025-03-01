@@ -136,6 +136,7 @@ def train(opponent_model_path, checkpoint_path=None):
             "eval_freq": eval_freq,
             "steps": steps,
             "checkpoint_path": str(checkpoint_path),
+            "opponent_checkpoint_path": opponent_model_path,
             "checkpoint_freq": save_freq,
             "device": device,
         }
