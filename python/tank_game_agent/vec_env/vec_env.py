@@ -32,7 +32,12 @@ class TankVecEnv(VecEnv):
 
     actions: np.ndarray
 
-    def __init__(self, env_fns: list[Callable[[], gym.Env]], opponent_model=None):
+    def __init__(
+        self,
+        env_fns: list[Callable[[], gym.Env]],
+        opponent_model=None,
+        deterministic=True,
+    ):
         self.envs = [_patch_env(fn()) for fn in env_fns]
         if len(set([id(env.unwrapped) for env in self.envs])) != len(self.envs):
             raise ValueError(
@@ -67,13 +72,17 @@ class TankVecEnv(VecEnv):
                 for k in self.keys
             ]
         )
+        self.opponent_predict_deterministic = deterministic
 
     def step_async(self, actions: np.ndarray) -> None:
         self.actions = actions
 
     def step_wait(self) -> VecEnvStepReturn:
         # Compute opponent actions
-        opponent_actions = self.opponent_model.predict(self._opp_obs_from_buf())[0]
+        opponent_actions = self.opponent_model.predict(
+            observation=self._opp_obs_from_buf(),
+            deterministic=self.opponent_predict_deterministic,
+        )[0]
 
         # Avoid circular imports
         for env_idx in range(self.num_envs):
