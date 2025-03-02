@@ -186,19 +186,24 @@ def eval(model_path, opponent_model_path):
 
     # Configuration variables
     deterministic = True
+    opponent_deterministic = True
     num_episodes = 20
-    device = "cpu"
+    device = "cuda"
 
     # Load opponent model
     print(f"Loading opponent model {opponent_model_path}.")
     opponent_model = PPO.load(opponent_model_path, device=device)
 
     # Create environment
-    eval_env = tank_game_environment_v2.env_fn(
-        learned_policy=opponent_model, render_mode="human"
+    eval_env = make_vec_env(
+        tank_game_environment_v2.env_fn,
+        n_envs=1,
+        env_kwargs=dict(render_mode="human"),
+        vec_env_cls=TankVecEnv,
+        vec_env_kwargs=dict(
+            opponent_model=opponent_model, deterministic=opponent_deterministic
+        ),
     )
-    eval_env = Monitor(eval_env)
-
     eval_env_name = eval_env.metadata["name"]
 
     # Load model
