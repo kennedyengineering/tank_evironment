@@ -9,6 +9,8 @@ from tank_game_agent.schedule.schedule_linear import linear_schedule
 
 from tank_game_agent.feature_extactor.feature_extractor_lidar import LidarCNN
 
+from tank_game_agent.vec_env.vec_env import TankVecEnv
+
 import time
 import os
 import argparse
@@ -24,9 +26,6 @@ from stable_baselines3.common.callbacks import (
     CheckpointCallback,
     EvalCallback,
 )
-
-# FIXME: find a way to improve FPS
-from stable_baselines3.common.vec_env import SubprocVecEnv
 
 
 def train(opponent_model_path, checkpoint_path=None):
@@ -72,8 +71,8 @@ def train(opponent_model_path, checkpoint_path=None):
         tank_game_environment_v2.env_fn,
         n_envs=num_envs,
         seed=seed,
-        # vec_env_cls=SubprocVecEnv,
-        env_kwargs=dict(learned_policy=opponent_model),
+        vec_env_cls=TankVecEnv,
+        vec_env_kwargs=dict(opponent_model=opponent_model),
     )
 
     eval_env = make_vec_env(
@@ -81,15 +80,19 @@ def train(opponent_model_path, checkpoint_path=None):
         n_envs=num_envs,
         seed=seed,
         start_index=seed + num_envs,
-        # vec_env_cls=SubprocVecEnv,
-        env_kwargs=dict(learned_policy=opponent_model),
+        vec_env_cls=TankVecEnv,
+        vec_env_kwargs=dict(opponent_model=opponent_model),
     )
 
-    render_env = tank_game_environment_v2.env_fn(
-        learned_policy=opponent_model, render_mode="rgb_array"
+    render_env = make_vec_env(
+        tank_game_environment_v2.env_fn,
+        n_envs=1,
+        env_kwargs=dict(render_mode="rgb_array"),
+        seed=seed,
+        start_index=seed + num_envs + 1,
+        vec_env_cls=TankVecEnv,
+        vec_env_kwargs=dict(opponent_model=opponent_model),
     )
-    render_env = Monitor(render_env)
-    render_env.reset(seed=seed + num_envs + 1)
 
     env_name = render_env.metadata["name"]
     run_name = f"{env_name}_{time.strftime('%Y%m%d-%H%M%S')}"

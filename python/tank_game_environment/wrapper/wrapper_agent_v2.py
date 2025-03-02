@@ -1,8 +1,5 @@
 # Tank Game (@kennedyengineering)
 
-# FIXME: remove stable-baselines3 dependent code
-from stable_baselines3.common.base_class import BaseAlgorithm
-
 from pettingzoo import ParallelEnv
 from gymnasium import Env
 
@@ -24,7 +21,6 @@ class AgentWrapper(Env):
         parallel_env: ParallelEnv,
         learning_agent: str,
         learned_agent: str,
-        learned_policy: BaseAlgorithm,
     ):
         super().__init__()
 
@@ -54,46 +50,31 @@ class AgentWrapper(Env):
             )
         self._learned_agent = learned_agent
 
-        if not isinstance(learned_policy, BaseAlgorithm):
-            raise TypeError(
-                f"Expected learned_policy to be Stable-Baselines3 BaseAlgorithm, got {type(learned_policy)}"
-            )
-        self._learned_policy = learned_policy
-
-        self._learned_observation = None
-
         self.observation_space = self._env.observation_space(learning_agent)
         self.action_space = self._env.action_space(learning_agent)
 
-    def reset(self, seed=None, options=None, learned_policy=None):
+    def reset(self, seed=None, options=None):
         """
         Reset the underlying PettingZoo environment.
         """
-        # Handle seeding
-        if seed:
-            super().reset(seed=seed)
 
-        # Handle updating the opponent policy
-        if learned_policy:
-            self._learned_policy = learned_policy
+        super().reset(seed=seed)
 
         observations, infos = self._env.reset(seed=seed, options=options)
 
-        self._learned_observation = observations[self._learned_agent]
+        return (
+            observations[self._learning_agent],
+            observations[self._learned_agent],
+        ), infos[self._learning_agent]
 
-        return observations[self._learning_agent], infos[self._learning_agent]
-
-    def step(self, action):
+    def step(self, actions):
         """
         Execute one step in the environment.
         """
 
         actions = {
-            self._learning_agent: action,
-            self._learned_agent: self._learned_policy.predict(
-                self._learned_observation,
-                deterministic=True,
-            )[0],
+            self._learning_agent: actions[0],
+            self._learned_agent: actions[1],
         }
 
         observations, rewards, terminations, truncations, infos = self._env.step(
@@ -103,7 +84,10 @@ class AgentWrapper(Env):
         self._learned_observation = observations[self._learned_agent]
 
         return (
-            observations[self._learning_agent],
+            (
+                observations[self._learning_agent],
+                observations[self._learned_agent],
+            ),
             rewards[self._learning_agent],
             terminations[self._learning_agent],
             truncations[self._learning_agent],
