@@ -7,7 +7,7 @@ from tank_game_agent.callback.callback_hparam_recorder import HParamRecorderCall
 
 from tank_game_agent.schedule.schedule_linear import linear_schedule
 
-from tank_game_agent.feature_extactor.feature_extractor_lidar import LidarCNN
+from tank_game_agent.feature_extactor.feature_extractor_lidar_v1 import LidarCNN
 
 import time
 import os
