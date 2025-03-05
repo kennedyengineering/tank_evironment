@@ -2,7 +2,7 @@
 
 from .. import tank_game_environment_v0
 
-from ..wrapper.wrapper_agent import AgentWrapper
+from ..wrapper.wrapper_agent_v1 import AgentWrapper
 from ..agent.agent_random import RandomAgent
 
 from gymnasium.utils.env_checker import check_env
