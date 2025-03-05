@@ -16,6 +16,8 @@ class LidarCNN(BaseFeaturesExtractor):
         # Final output dimension = features_dim (from CNN branch) + 4 (from extra features)
         super().__init__(observation_space, features_dim + 4)
 
+        print(observation_space.shape)
+
         # Assume the last 4 are extra features
         input_size = observation_space.shape[0] - 4
 
