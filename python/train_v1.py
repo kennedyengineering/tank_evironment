@@ -29,6 +29,8 @@ from stable_baselines3.common.vec_env import SubprocVecEnv
 def train(checkpoint_path=None):
     """Train an agent."""
 
+    # TODO: configure channels consistently (in env_fn and LidarCNN)
+
     # Configuration variables
     num_envs = 12
     num_eval_episodes = 10
@@ -44,7 +46,7 @@ def train(checkpoint_path=None):
     schedule_clip_range = False
     policy_kwargs = dict(
         features_extractor_class=LidarCNN,
-        features_extractor_kwargs=dict(features_dim=128),
+        features_extractor_kwargs=dict(),
     )
 
     # PPO configuration variables

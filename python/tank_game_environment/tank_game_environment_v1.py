@@ -4,6 +4,8 @@ from tank_game_environment.env.tank_game_environment import parallel_env_fn
 from tank_game_environment.agent.agent_static import StaticAgent
 from tank_game_environment.wrapper.wrapper_agent_v1 import AgentWrapper
 
+from supersuit import frame_stack_v2
+
 import numpy as np
 
 
@@ -11,6 +13,7 @@ def env_fn(**kwargs):
     """Construct Seek and Destroy Environment"""
 
     env = parallel_env_fn(**kwargs)
+    env = frame_stack_v2(env, stack_size=4, stack_dim=-1)
 
     learning_agent = env.possible_agents[0]
     scripted_agent = env.possible_agents[1]
