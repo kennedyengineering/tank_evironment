@@ -24,6 +24,5 @@ class TestAgentWrapper:
         )
 
         env = AgentWrapper(env, learning_agent, scripted_agent, scripted_policy)
-        # FIXME: test render modes
 
         check_env(env)
