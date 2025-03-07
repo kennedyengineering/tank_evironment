@@ -1,7 +1,7 @@
 # Tank Game (@kennedyengineering)
 
 from tank_game_environment.env.tank_game_environment import parallel_env_fn
-from tank_game_environment.wrapper.wrapper_agent_v2 import AgentWrapper
+from tank_game_environment.wrapper.wrapper_agent import AgentWrapper
 
 
 def env_fn(**kwargs):

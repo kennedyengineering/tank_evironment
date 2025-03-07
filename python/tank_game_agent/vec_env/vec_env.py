@@ -86,9 +86,15 @@ class TankVecEnv(VecEnv):
 
         # Avoid circular imports
         for env_idx in range(self.num_envs):
-            (obs, opp_obs), self.buf_rews[env_idx], terminated, truncated, self.buf_infos[env_idx] = self.envs[env_idx].step(  # type: ignore[assignment]
-                (self.actions[env_idx], opponent_actions[env_idx])
+            # Apply opponent action
+            self.envs[env_idx].unwrapped.set_opponent_action(opponent_actions[env_idx])
+            # Step environment
+            obs, self.buf_rews[env_idx], terminated, truncated, self.buf_infos[env_idx] = self.envs[env_idx].step(  # type: ignore[assignment]
+                self.actions[env_idx]
             )
+            # Get opponent observation
+            opp_obs = self.envs[env_idx].unwrapped.get_opponent_observation()
+
             # convert to SB3 VecEnv api
             self.buf_dones[env_idx] = terminated or truncated
             # See https://github.com/openai/gym/issues/3102
@@ -100,7 +106,10 @@ class TankVecEnv(VecEnv):
             if self.buf_dones[env_idx]:
                 # save final observation where user can get it, then reset
                 self.buf_infos[env_idx]["terminal_observation"] = obs
-                (obs, opp_obs), self.reset_infos[env_idx] = self.envs[env_idx].reset()
+                # Reset environment
+                obs, self.reset_infos[env_idx] = self.envs[env_idx].reset()
+                # Get opponent observation
+                opp_obs = self.envs[env_idx].unwrapped.get_opponent_observation()
             self._save_obs(env_idx, obs)
             self._save_opp_obs(env_idx, opp_obs)
 
@@ -116,9 +125,14 @@ class TankVecEnv(VecEnv):
             maybe_options = (
                 {"options": self._options[env_idx]} if self._options[env_idx] else {}
             )
-            (obs, opp_obs), self.reset_infos[env_idx] = self.envs[env_idx].reset(
+
+            # Reset environment
+            obs, self.reset_infos[env_idx] = self.envs[env_idx].reset(
                 seed=self._seeds[env_idx], **maybe_options
             )
+            # Get opponent observation
+            opp_obs = self.envs[env_idx].unwrapped.get_opponent_observation()
+
             self._save_obs(env_idx, obs)
             self._save_opp_obs(env_idx, opp_obs)
         # Seeds and options are only used once
