@@ -15,7 +15,7 @@ class LidarCNN(BaseFeaturesExtractor):
         self,
         observation_space: spaces.Box,
         conv_features_count: int = 128,
-        extra_feature_count: int = 4,
+        extra_feature_count: int = 16,
         extra_observations: int = 4,
         channels: int = 4,
     ):
@@ -69,9 +69,9 @@ class LidarCNN(BaseFeaturesExtractor):
         # In the flat case extra features dimension is 4.
         # In the multi-dimensional case, extra features have shape (channels, 4)
         # which we flatten to channels*4.
-        extra_dim = channels * extra_feature_count
+        extra_dim = channels * extra_observations
         self.extra_fc = nn.Sequential(
-            nn.Linear(extra_dim, 16), nn.ReLU(), nn.Linear(16, extra_feature_count)
+            nn.Linear(extra_dim, 64), nn.ReLU(), nn.Linear(64, extra_feature_count)
         )
 
     def forward(self, observations: th.Tensor) -> th.Tensor:
