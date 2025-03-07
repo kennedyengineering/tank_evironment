@@ -2,7 +2,7 @@
 
 from tank_game_environment.env.tank_game_environment import parallel_env_fn
 from tank_game_environment.agent.agent_static import StaticAgent
-from tank_game_environment.wrapper.wrapper_agent_v1 import AgentWrapper
+from tank_game_environment.wrapper.wrapper_agent import AgentWrapper
 
 import numpy as np
 
