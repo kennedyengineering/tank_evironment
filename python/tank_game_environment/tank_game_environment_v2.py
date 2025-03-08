@@ -9,7 +9,7 @@ from typing import Optional
 
 def env_fn(
     scripted_policy_name: Optional[str] = None,
-    scripted_policy_args: Optional[dict] = None,
+    scripted_policy_kwargs: Optional[dict] = None,
     **kwargs
 ):
     """
@@ -17,7 +17,7 @@ def env_fn(
 
     Args:
         scripted_policy_name: Optional name of the scripted policy to be used.
-        scripted_policy_args: Optional dictionary of arguments for the scripted policy.
+        scripted_policy_kwargs: Optional dictionary of keyword arguments for the scripted policy.
         **kwargs: Additional keyword arguments to pass to parallel_env_fn.
 
     Returns:
@@ -37,12 +37,12 @@ def env_fn(
         observation_space = env.observation_space(opponent_agent)
         action_space = env.action_space(opponent_agent)
 
-        if scripted_policy_args is not None:
+        if scripted_policy_kwargs is not None:
             scripted_policy = create_agent(
                 scripted_policy_name,
                 observation_space,
                 action_space,
-                scripted_policy_args,
+                **scripted_policy_kwargs,
             )
         else:
             scripted_policy = create_agent(
