@@ -15,6 +15,7 @@ from stable_baselines3.common.vec_env.base_vec_env import (
 )
 from stable_baselines3.common.vec_env.patch_gym import _patch_env
 from stable_baselines3.common.vec_env.util import dict_to_obs, obs_space_info
+from stable_baselines3.common.base_class import BaseAlgorithm
 
 
 class TankVecEnv(VecEnv):
@@ -35,8 +36,8 @@ class TankVecEnv(VecEnv):
     def __init__(
         self,
         env_fns: list[Callable[[], gym.Env]],
-        opponent_model=None,
-        opponent_predict_deterministic=True,
+        opponent_model: Optional[BaseAlgorithm] = None,
+        opponent_predict_deterministic: bool = True,
     ):
         self.envs = [_patch_env(fn()) for fn in env_fns]
         if len(set([id(env.unwrapped) for env in self.envs])) != len(self.envs):
