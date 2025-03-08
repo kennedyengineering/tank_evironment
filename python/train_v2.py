@@ -47,6 +47,10 @@ def train(opponent_model_path, checkpoint_path=None):
         features_extractor_class=LidarCNN,
         features_extractor_kwargs=dict(features_dim=128),
     )
+    env_kwargs = dict(
+        scripted_policy_name="StaticAgent",
+        scripted_policy_kwargs=dict(action=[0, 0, 0]),
+    )
 
     # PPO configuration variables
     ppo_config = {
