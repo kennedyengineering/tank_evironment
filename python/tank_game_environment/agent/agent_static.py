@@ -1,12 +1,12 @@
 # Tank Game (@kennedyengineering)
 
 from .agent_base import ScriptedAgent
+from .agent_registry import register_agent
 
 from gymnasium.spaces import Space
 
-import numpy as np
 
-
+@register_agent
 class StaticAgent(ScriptedAgent):
     def __init__(self, observation_space: Space, action_space: Space, action=None):
         super().__init__(observation_space, action_space)
