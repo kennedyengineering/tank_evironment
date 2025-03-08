@@ -1,32 +1,57 @@
 # Tank Game (@kennedyengineering)
 
 from tank_game_environment.env.tank_game_environment import parallel_env_fn
-from tank_game_environment.agent.agent_static import StaticAgent
 from tank_game_environment.wrapper.wrapper_agent import AgentWrapper
+from tank_game_environment.agent.agent_registry import create_agent
 
-import numpy as np
+from typing import Optional
 
 
-def env_fn(**kwargs):
-    """Construct Seek and Destroy Environment"""
+def env_fn(
+    scripted_policy_name: Optional[str] = None,
+    scripted_policy_kwargs: Optional[dict] = None,
+    **kwargs
+):
+    """
+    Construct Track and Destroy Environment.
+
+    Args:
+        scripted_policy_name: Optional name of the scripted policy to be used.
+        scripted_policy_kwargs: Optional dictionary of keyword arguments for the scripted policy.
+        **kwargs: Additional keyword arguments to pass to parallel_env_fn.
+
+    Returns:
+        A Gymnasium environment.
+    """
 
     env = parallel_env_fn(**kwargs)
 
-    learning_agent = env.possible_agents[0]
-    scripted_agent = env.possible_agents[1]
+    # Ensure there are at least two agents.
+    if len(env.possible_agents) < 2:
+        raise ValueError("Expected at least two agents in the environment.")
 
-    observation_space = env.observation_space(scripted_agent)
-    action_space = env.action_space(scripted_agent)
+    learning_agent, opponent_agent = env.possible_agents[:2]
 
-    scripted_policy = StaticAgent(
-        observation_space,
-        action_space,
-        np.array([0.0, 0.0, 0.0], dtype=action_space.dtype),
-    )
+    scripted_policy = None
+    if scripted_policy_name:
+        observation_space = env.observation_space(opponent_agent)
+        action_space = env.action_space(opponent_agent)
 
-    wrapped_env = AgentWrapper(env, learning_agent, scripted_agent, scripted_policy)
+        if scripted_policy_kwargs is not None:
+            scripted_policy = create_agent(
+                scripted_policy_name,
+                observation_space,
+                action_space,
+                **scripted_policy_kwargs,
+            )
+        else:
+            scripted_policy = create_agent(
+                scripted_policy_name, observation_space, action_space
+            )
+
+    wrapped_env = AgentWrapper(env, learning_agent, opponent_agent, scripted_policy)
     wrapped_env.metadata = env.metadata
-    wrapped_env.metadata["name"] = "tank_game_environment_v1"
+    wrapped_env.metadata["name"] = "tank_game_environment_v2"
     wrapped_env.render_mode = env.render_mode
 
     return wrapped_env

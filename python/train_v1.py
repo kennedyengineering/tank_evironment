@@ -12,6 +12,7 @@ from tank_game_agent.feature_extactor.feature_extractor_lidar import LidarCNN
 import time
 import os
 import argparse
+import numpy as np
 
 from stable_baselines3 import PPO
 from stable_baselines3.ppo import MlpPolicy
@@ -23,7 +24,7 @@ from stable_baselines3.common.callbacks import (
     CheckpointCallback,
     EvalCallback,
 )
-from stable_baselines3.common.vec_env import SubprocVecEnv
+from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv
 
 
 def train(checkpoint_path=None):
@@ -46,6 +47,10 @@ def train(checkpoint_path=None):
         features_extractor_class=LidarCNN,
         features_extractor_kwargs=dict(features_dim=128),
     )
+    env_kwargs = dict(
+        scripted_policy_name="StaticAgent",
+        scripted_policy_kwargs=dict(action=np.array([0.0, 0.0, 0.0])),
+    )
 
     # PPO configuration variables
     ppo_config = {
@@ -65,6 +70,7 @@ def train(checkpoint_path=None):
     env = make_vec_env(
         tank_game_environment_v1.env_fn,
         n_envs=num_envs,
+        env_kwargs=env_kwargs,
         seed=seed,
         vec_env_cls=SubprocVecEnv,
     )
@@ -72,14 +78,20 @@ def train(checkpoint_path=None):
     eval_env = make_vec_env(
         tank_game_environment_v1.env_fn,
         n_envs=num_envs,
+        env_kwargs=env_kwargs,
         seed=seed,
         start_index=seed + num_envs,
         vec_env_cls=SubprocVecEnv,
     )
 
-    render_env = tank_game_environment_v1.env_fn(render_mode="rgb_array")
-    render_env = Monitor(render_env)
-    render_env.reset(seed=seed + num_envs + 1)
+    render_env = make_vec_env(
+        tank_game_environment_v1.env_fn,
+        n_envs=1,
+        env_kwargs=env_kwargs | dict(render_mode="rgb_array"),
+        seed=seed,
+        start_index=seed + num_envs + 1,
+        vec_env_cls=DummyVecEnv,
+    )
 
     env_name = render_env.metadata["name"]
     run_name = f"{env_name}_{time.strftime('%Y%m%d-%H%M%S')}"
@@ -173,11 +185,19 @@ def eval(model_path):
     # Configuration variables
     deterministic = True
     num_episodes = 20
-    device = "cpu"
+    device = "cuda"
+    env_kwargs = dict(
+        scripted_policy_name="StaticAgent",
+        scripted_policy_kwargs=dict(action=np.array([0.0, 0.0, 0.0])),
+    )
 
     # Create environment
-    eval_env = tank_game_environment_v1.env_fn(render_mode="human")
-    eval_env = Monitor(eval_env)
+    eval_env = make_vec_env(
+        tank_game_environment_v1.env_fn,
+        n_envs=1,
+        env_kwargs=env_kwargs | dict(render_mode="human"),
+        vec_env_cls=DummyVecEnv,
+    )
 
     eval_env_name = eval_env.metadata["name"]
 

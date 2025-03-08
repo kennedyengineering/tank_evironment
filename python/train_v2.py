@@ -1,6 +1,6 @@
 # Tank Game (@kennedyengineering)
 
-from tank_game_environment import tank_game_environment_v2
+from tank_game_environment import tank_game_environment_v1
 
 from tank_game_agent.callback.callback_video_recorder import VideoRecorderCallback
 from tank_game_agent.callback.callback_hparam_recorder import HParamRecorderCallback
@@ -47,10 +47,6 @@ def train(opponent_model_path, checkpoint_path=None):
         features_extractor_class=LidarCNN,
         features_extractor_kwargs=dict(features_dim=128),
     )
-    env_kwargs = dict(
-        scripted_policy_name="StaticAgent",
-        scripted_policy_kwargs=dict(action=[0, 0, 0]),
-    )
 
     # PPO configuration variables
     ppo_config = {
@@ -73,7 +69,7 @@ def train(opponent_model_path, checkpoint_path=None):
 
     # Create environments
     env = make_vec_env(
-        tank_game_environment_v2.env_fn,
+        tank_game_environment_v1.env_fn,
         n_envs=num_envs,
         seed=seed,
         vec_env_cls=TankVecEnv,
@@ -81,7 +77,7 @@ def train(opponent_model_path, checkpoint_path=None):
     )
 
     eval_env = make_vec_env(
-        tank_game_environment_v2.env_fn,
+        tank_game_environment_v1.env_fn,
         n_envs=num_envs,
         seed=seed,
         start_index=seed + num_envs,
@@ -90,7 +86,7 @@ def train(opponent_model_path, checkpoint_path=None):
     )
 
     render_env = make_vec_env(
-        tank_game_environment_v2.env_fn,
+        tank_game_environment_v1.env_fn,
         n_envs=1,
         env_kwargs=dict(render_mode="rgb_array"),
         seed=seed,
@@ -201,7 +197,7 @@ def eval(model_path, opponent_model_path):
 
     # Create environment
     eval_env = make_vec_env(
-        tank_game_environment_v2.env_fn,
+        tank_game_environment_v1.env_fn,
         n_envs=1,
         env_kwargs=dict(render_mode="human"),
         vec_env_cls=TankVecEnv,
