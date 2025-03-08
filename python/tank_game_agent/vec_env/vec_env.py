@@ -36,7 +36,7 @@ class TankVecEnv(VecEnv):
         self,
         env_fns: list[Callable[[], gym.Env]],
         opponent_model=None,
-        deterministic=True,
+        opponent_predict_deterministic=True,
     ):
         self.envs = [_patch_env(fn()) for fn in env_fns]
         if len(set([id(env.unwrapped) for env in self.envs])) != len(self.envs):
@@ -72,7 +72,7 @@ class TankVecEnv(VecEnv):
                 for k in self.keys
             ]
         )
-        self.opponent_predict_deterministic = deterministic
+        self.opponent_predict_deterministic = opponent_predict_deterministic
 
     def step_async(self, actions: np.ndarray) -> None:
         self.actions = actions
