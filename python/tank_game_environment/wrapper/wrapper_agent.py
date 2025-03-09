@@ -66,6 +66,9 @@ class AgentWrapper(Env):
         self._opponent_observation = None
         self._opponent_action = None
 
+        self.metadata = self._env.metadata
+        self.render_mode = self._env.render_mode
+
         self.observation_space = self._env.observation_space(learning_agent)
         self.action_space = self._env.action_space(learning_agent)
 
