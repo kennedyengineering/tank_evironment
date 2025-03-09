@@ -51,7 +51,7 @@ def env_fn(
 
     wrapped_env = AgentWrapper(env, learning_agent, opponent_agent, scripted_policy)
     wrapped_env.metadata = env.metadata
-    wrapped_env.metadata["name"] = "tank_game_environment_v2"
+    wrapped_env.metadata["name"] = "tank_game_environment_v1"
     wrapped_env.render_mode = env.render_mode
 
     return wrapped_env
