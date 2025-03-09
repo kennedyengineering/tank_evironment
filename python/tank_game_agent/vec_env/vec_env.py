@@ -18,6 +18,7 @@ from stable_baselines3.common.vec_env.util import dict_to_obs, obs_space_info
 from stable_baselines3.common.base_class import BaseAlgorithm
 
 
+# TODO: rename file/directory
 class TankVecEnv(VecEnv):
     """
     Creates a simple vectorized wrapper for multiple environments, calling each environment in sequence on the current
