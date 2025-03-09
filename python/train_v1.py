@@ -12,7 +12,6 @@ from tank_game_agent.feature_extactor.feature_extractor_lidar import LidarCNN
 import time
 import os
 import argparse
-import numpy as np
 
 from stable_baselines3 import PPO
 from stable_baselines3.ppo import MlpPolicy
@@ -49,7 +48,7 @@ def train(checkpoint_path=None):
     )
     env_kwargs = dict(
         scripted_policy_name="StaticAgent",
-        scripted_policy_kwargs=dict(action=np.array([0.0, 0.0, 0.0])),
+        scripted_policy_kwargs=dict(action=[0.0, 0.0, 0.0]),
     )
 
     # PPO configuration variables
@@ -188,7 +187,7 @@ def eval(model_path):
     device = "cuda"
     env_kwargs = dict(
         scripted_policy_name="StaticAgent",
-        scripted_policy_kwargs=dict(action=np.array([0.0, 0.0, 0.0])),
+        scripted_policy_kwargs=dict(action=[0.0, 0.0, 0.0]),
     )
 
     # Create environment
