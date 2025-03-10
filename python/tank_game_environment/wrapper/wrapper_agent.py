@@ -106,6 +106,9 @@ class AgentWrapper(Env):
         # Store opponent observation
         self._opponent_observation = observations[self._opponent_agent]
 
+        # Reset opponent action
+        self._opponent_action = None
+
         return observations[self._learning_agent], infos[self._learning_agent]
 
     def step(self, action):
@@ -119,6 +122,9 @@ class AgentWrapper(Env):
                 self._opponent_observation
             )
 
+        if not self._opponent_action:
+            raise RuntimeError("No opponent action determined.")
+
         actions = {
             self._learning_agent: action,
             self._opponent_agent: self._opponent_action,
@@ -131,6 +137,9 @@ class AgentWrapper(Env):
 
         # Store opponent observation
         self._opponent_observation = observations[self._opponent_agent]
+
+        # Reset opponent action
+        self._opponent_action = None
 
         return (
             observations[self._learning_agent],
