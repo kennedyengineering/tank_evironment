@@ -31,6 +31,8 @@ def train(opponent_model_path, checkpoint_path=None):
     """Train an agent."""
 
     # TODO: put in a configuration file
+    # TODO: combine v2 and v1
+
     # Configuration variables
     num_envs = 12
     num_eval_episodes = 10
