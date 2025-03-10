@@ -62,8 +62,6 @@ def train(opponent_model_path, checkpoint_path=None):
         "max_grad_norm": 0.5,
     }
 
-    # TODO: determine how to handle scripted vs learned opponents. currently scripted policy overrides external control.
-
     # Load opponent model
     opponent_model = PPO.load(opponent_model_path, device=device)
 
