@@ -30,6 +30,7 @@ from stable_baselines3.common.callbacks import (
 def train(opponent_model_path, checkpoint_path=None):
     """Train an agent."""
 
+    # TODO: put in a configuration file
     # Configuration variables
     num_envs = 12
     num_eval_episodes = 10
