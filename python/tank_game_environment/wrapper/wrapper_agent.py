@@ -122,7 +122,7 @@ class AgentWrapper(Env):
                 self._opponent_observation
             )
 
-        if not self._opponent_action:
+        if self._opponent_action is None:
             raise RuntimeError("No opponent action determined.")
 
         actions = {
