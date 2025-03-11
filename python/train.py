@@ -65,10 +65,12 @@ def train(checkpoint_path=None):
     # Create environments
     def env_fn(n_envs=1, seed=0, **env_kwargs):
         env = tank_game_environment_v0.parallel_env_fn(**env_kwargs)
-        env.reset(seed)
+        env.reset(seed=seed)
 
         env = ss.pettingzoo_env_to_vec_env_v1(env)
         env = ss.concat_vec_envs_v1(env, n_envs, base_class="stable_baselines3")
+        env.seed = lambda seed: None  # Compatibility hack
+
         env = VecMonitor(env)
 
         return env
@@ -96,7 +98,7 @@ def train(checkpoint_path=None):
             verbose=verbose,
             device=device,
             tensorboard_log=log_dir,
-            # seed=seed,
+            seed=seed,
             policy_kwargs=policy_kwargs,
             **ppo_config,
         )
@@ -107,7 +109,7 @@ def train(checkpoint_path=None):
             verbose=verbose,
             device=device,
             tensorboard_log=log_dir,
-            # seed=seed,
+            seed=seed,
             policy_kwargs=policy_kwargs,
             **ppo_config,
         )
