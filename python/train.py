@@ -1,6 +1,6 @@
 # Tank Game (@kennedyengineering)
 
-from tank_game_environment import tank_game_environment_v1
+from tank_game_environment import tank_game_environment_v0
 
 from tank_game_agent.callback.callback_video_recorder import VideoRecorderCallback
 from tank_game_agent.callback.callback_hparam_recorder import HParamRecorderCallback
@@ -9,12 +9,9 @@ from tank_game_agent.schedule.schedule_linear import linear_schedule
 
 from tank_game_agent.feature_extactor.feature_extractor_lidar import LidarCNN
 
-from tank_game_agent.vec_env.vec_env import TankVecEnv
-
 import time
 import os
 import argparse
-import numpy as np
 
 from stable_baselines3 import PPO
 from stable_baselines3.ppo import MlpPolicy
@@ -25,13 +22,13 @@ from stable_baselines3.common.callbacks import (
     CheckpointCallback,
     EvalCallback,
 )
+from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv, VecMonitor
+
+import supersuit as ss
 
 
-def train(opponent_model_path, checkpoint_path=None):
+def train(checkpoint_path=None):
     """Train an agent."""
-
-    # TODO: put in a configuration file
-    # TODO: combine v2 and v1
 
     # Configuration variables
     num_envs = 12
@@ -65,38 +62,22 @@ def train(opponent_model_path, checkpoint_path=None):
         "max_grad_norm": 0.5,
     }
 
-    # Load opponent model
-    opponent_model = PPO.load(opponent_model_path, device=device)
-
     # Create environments
-    env = make_vec_env(
-        tank_game_environment_v1.env_fn,
-        n_envs=num_envs,
-        seed=seed,
-        vec_env_cls=TankVecEnv,
-        vec_env_kwargs=dict(opponent_model=opponent_model),
-    )
+    def env_fn(n_envs=1, seed=0, **env_kwargs):
+        env = tank_game_environment_v0.parallel_env_fn(**env_kwargs)
+        env.reset(seed)
 
-    eval_env = make_vec_env(
-        tank_game_environment_v1.env_fn,
-        n_envs=num_envs,
-        seed=seed,
-        start_index=seed + num_envs,
-        vec_env_cls=TankVecEnv,
-        vec_env_kwargs=dict(opponent_model=opponent_model),
-    )
+        env = ss.pettingzoo_env_to_vec_env_v1(env)
+        env = ss.concat_vec_envs_v1(env, n_envs, base_class="stable_baselines3")
+        env = VecMonitor(env)
 
-    render_env = make_vec_env(
-        tank_game_environment_v1.env_fn,
-        n_envs=1,
-        env_kwargs=dict(render_mode="rgb_array"),
-        seed=seed,
-        start_index=seed + num_envs + 1,
-        vec_env_cls=TankVecEnv,
-        vec_env_kwargs=dict(opponent_model=opponent_model),
-    )
+        return env
 
-    env_name = render_env.metadata["name"]
+    env = env_fn(n_envs=num_envs, seed=seed)
+    eval_env = env_fn(n_envs=num_envs, seed=seed + num_envs)
+    render_env = env_fn(n_envs=1, seed=seed + num_envs + 1, render_mode="rgb_array")
+
+    env_name = render_env.unwrapped.metadata["name"]
     run_name = f"{env_name}_{time.strftime('%Y%m%d-%H%M%S')}"
     save_dir = os.path.join(save_dir, run_name)
 
@@ -115,7 +96,7 @@ def train(opponent_model_path, checkpoint_path=None):
             verbose=verbose,
             device=device,
             tensorboard_log=log_dir,
-            seed=seed,
+            # seed=seed,
             policy_kwargs=policy_kwargs,
             **ppo_config,
         )
@@ -126,7 +107,7 @@ def train(opponent_model_path, checkpoint_path=None):
             verbose=verbose,
             device=device,
             tensorboard_log=log_dir,
-            seed=seed,
+            # seed=seed,
             policy_kwargs=policy_kwargs,
             **ppo_config,
         )
@@ -141,7 +122,6 @@ def train(opponent_model_path, checkpoint_path=None):
             "eval_freq": eval_freq,
             "steps": steps,
             "checkpoint_path": str(checkpoint_path),
-            "opponent_checkpoint_path": opponent_model_path,
             "checkpoint_freq": save_freq,
             "device": device,
         }
@@ -183,30 +163,26 @@ def train(opponent_model_path, checkpoint_path=None):
     env.close()
 
 
-def eval(model_path, opponent_model_path):
+def eval(model_path):
     """Evaluate an agent."""
 
     # Configuration variables
     deterministic = True
-    opponent_deterministic = True
     num_episodes = 20
     device = "cuda"
-
-    # Load opponent model
-    print(f"Loading opponent model {opponent_model_path}.")
-    opponent_model = PPO.load(opponent_model_path, device=device)
+    env_kwargs = dict(
+        scripted_policy_name="StaticAgent",
+        scripted_policy_kwargs=dict(action=[0.0, 0.0, 0.0]),
+    )
 
     # Create environment
     eval_env = make_vec_env(
         tank_game_environment_v1.env_fn,
         n_envs=1,
-        env_kwargs=dict(render_mode="human"),
-        vec_env_cls=TankVecEnv,
-        vec_env_kwargs=dict(
-            opponent_model=opponent_model,
-            opponent_predict_deterministic=opponent_deterministic,
-        ),
+        env_kwargs=env_kwargs | dict(render_mode="human"),
+        vec_env_cls=DummyVecEnv,
     )
+
     eval_env_name = eval_env.metadata["name"]
 
     # Load model
@@ -224,8 +200,6 @@ def eval(model_path, opponent_model_path):
         return_episode_rewards=True,
     )
     print("Rewards: ", rewards)
-    print("Average Reward: ", np.mean(rewards[0]))
-    print("Average Duration: ", np.mean(rewards[1]))
 
 
 if __name__ == "__main__":
@@ -238,25 +212,19 @@ if __name__ == "__main__":
     # Training mode
     train_parser = subparsers.add_parser("train", help="Run model training.")
     train_parser.add_argument(
-        "opponent_model_path", type=str, help="Path to a trained model."
-    )
-    train_parser.add_argument(
         "model_path", type=str, nargs="?", help="Path to the model checkpoint."
     )
 
     # Evaluation mode
     eval_parser = subparsers.add_parser("eval", help="Run model evaluation.")
-    eval_parser.add_argument("model_path", type=str, help="Path to a trained model.")
-    eval_parser.add_argument(
-        "opponent_model_path", type=str, help="Path to a trained model."
-    )
+    eval_parser.add_argument("model_path", type=str, help="Path to the trained model.")
 
     # Parse arguments
     args = parser.parse_args()
 
     if args.mode == "train":
         print("Training mode selected.")
-        train(args.opponent_model_path, args.model_path)
+        train(args.model_path)
     elif args.mode == "eval":
         print("Evaluation mode selected.")
-        eval(args.model_path, args.opponent_model_path)
+        eval(args.model_path)
