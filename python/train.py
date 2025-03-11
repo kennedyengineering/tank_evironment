@@ -15,14 +15,12 @@ import argparse
 
 from stable_baselines3 import PPO
 from stable_baselines3.ppo import MlpPolicy
-from stable_baselines3.common.evaluation import evaluate_policy
-from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.callbacks import (
     CallbackList,
     CheckpointCallback,
     EvalCallback,
 )
-from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv, VecMonitor
+from stable_baselines3.common.vec_env import VecMonitor
 
 import supersuit as ss
 
@@ -69,7 +67,7 @@ def train(checkpoint_path=None):
 
         env = ss.pettingzoo_env_to_vec_env_v1(env)
         env = ss.concat_vec_envs_v1(env, n_envs, base_class="stable_baselines3")
-        env.seed = lambda seed: None  # Compatibility hack
+        env.seed = lambda _: None  # Compatibility hack
 
         env = VecMonitor(env)
 
@@ -165,45 +163,6 @@ def train(checkpoint_path=None):
     env.close()
 
 
-def eval(model_path):
-    """Evaluate an agent."""
-
-    # Configuration variables
-    deterministic = True
-    num_episodes = 20
-    device = "cuda"
-    env_kwargs = dict(
-        scripted_policy_name="StaticAgent",
-        scripted_policy_kwargs=dict(action=[0.0, 0.0, 0.0]),
-    )
-
-    # Create environment
-    eval_env = make_vec_env(
-        tank_game_environment_v1.env_fn,
-        n_envs=1,
-        env_kwargs=env_kwargs | dict(render_mode="human"),
-        vec_env_cls=DummyVecEnv,
-    )
-
-    eval_env_name = eval_env.metadata["name"]
-
-    # Load model
-    print(f"Loading model {model_path}.")
-    model = PPO.load(model_path, device=device)
-
-    # Run evaluation
-    print(f"Starting evaluation on {eval_env_name}. (num_episodes={num_episodes})")
-    rewards = evaluate_policy(
-        model,
-        eval_env,
-        n_eval_episodes=num_episodes,
-        deterministic=deterministic,
-        render=False,
-        return_episode_rewards=True,
-    )
-    print("Rewards: ", rewards)
-
-
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Train or evaluate a model.")
@@ -217,16 +176,9 @@ if __name__ == "__main__":
         "model_path", type=str, nargs="?", help="Path to the model checkpoint."
     )
 
-    # Evaluation mode
-    eval_parser = subparsers.add_parser("eval", help="Run model evaluation.")
-    eval_parser.add_argument("model_path", type=str, help="Path to the trained model.")
-
     # Parse arguments
     args = parser.parse_args()
 
     if args.mode == "train":
         print("Training mode selected.")
         train(args.model_path)
-    elif args.mode == "eval":
-        print("Evaluation mode selected.")
-        eval(args.model_path)
