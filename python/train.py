@@ -63,11 +63,15 @@ def train(checkpoint_path=None):
     # Create environments
     def env_fn(n_envs=1, seed=0, **env_kwargs):
         env = tank_game_environment_v0.parallel_env_fn(**env_kwargs)
-        env.reset(seed=seed)
+        env.reset(
+            seed=seed
+        )  # FIXME: In "human" mode, calling reset() here initializes PyGame and breaks things later.
 
         env = ss.pettingzoo_env_to_vec_env_v1(env)
         env = ss.concat_vec_envs_v1(env, n_envs, base_class="stable_baselines3")
-        env.seed = lambda _: None  # Compatibility hack
+        env.seed = (
+            lambda _: None
+        )  # FIXME: Compatibility hack, get PettingZoo and Stable-Baselines3 to cooperate.
 
         env = VecMonitor(env)
 
