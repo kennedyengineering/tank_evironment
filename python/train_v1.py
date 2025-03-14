@@ -22,7 +22,7 @@ from stable_baselines3.common.callbacks import (
     CheckpointCallback,
     EvalCallback,
 )
-from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv
+from stable_baselines3.common.vec_env import DummyVecEnv
 
 
 def train(checkpoint_path=None):
@@ -70,25 +70,22 @@ def train(checkpoint_path=None):
         n_envs=num_envs,
         env_kwargs=env_kwargs,
         seed=seed,
-        vec_env_cls=SubprocVecEnv,
+        vec_env_cls=DummyVecEnv,
     )
 
     eval_env = make_vec_env(
         tank_game_environment_v1.env_fn,
         n_envs=num_envs,
         env_kwargs=env_kwargs,
-        seed=seed,
-        start_index=seed
-        + num_envs,  # FIXME: iterate seed instead of start_index (leave at default = 0), env and eval env have identical seeding. start_index only changes seeding for environment action space. will break from the repeatability of previous experiments though.
-        vec_env_cls=SubprocVecEnv,
+        seed=seed + num_envs,
+        vec_env_cls=DummyVecEnv,
     )
 
     render_env = make_vec_env(
         tank_game_environment_v1.env_fn,
         n_envs=1,
         env_kwargs=env_kwargs | dict(render_mode="rgb_array"),
-        seed=seed,
-        start_index=seed + num_envs + 1,
+        seed=seed + 2 * num_envs,
         vec_env_cls=DummyVecEnv,
     )
 
@@ -111,7 +108,7 @@ def train(checkpoint_path=None):
             verbose=verbose,
             device=device,
             tensorboard_log=log_dir,
-            seed=seed,  # FIXME: Also, investigate how this seed affects the seeding of env
+            seed=seed,
             policy_kwargs=policy_kwargs,
             **ppo_config,
         )
