@@ -66,7 +66,7 @@ def train(opponent_model_path, checkpoint_path=None):
     }
 
     # Load opponent model
-    opponent_model = PPO.load(opponent_model_path, device=device)
+    opponent_model = PPO.load(opponent_model_path, device=device, seed=seed)
 
     # Create environments
     env = make_vec_env(
@@ -80,8 +80,7 @@ def train(opponent_model_path, checkpoint_path=None):
     eval_env = make_vec_env(
         tank_game_environment_v1.env_fn,
         n_envs=num_envs,
-        seed=seed,
-        start_index=seed + num_envs,
+        seed=seed + num_envs,
         vec_env_cls=TankVecEnv,
         vec_env_kwargs=dict(opponent_model=opponent_model),
     )
@@ -90,8 +89,7 @@ def train(opponent_model_path, checkpoint_path=None):
         tank_game_environment_v1.env_fn,
         n_envs=1,
         env_kwargs=dict(render_mode="rgb_array"),
-        seed=seed,
-        start_index=seed + num_envs + 1,
+        seed=seed + 2 * num_envs,
         vec_env_cls=TankVecEnv,
         vec_env_kwargs=dict(opponent_model=opponent_model),
     )
