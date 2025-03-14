@@ -61,7 +61,8 @@ def train(checkpoint_path=None):
     }
 
     # Create environments
-    # FIXME: concat_vec_envs copies env n_envs times, so the seed is identical for all of envs in vec_env
+    # FIXME: concat_vec_envs copies env n_envs times, so the seed is identical for all of envs in vec_env.
+    # FIXME: maybe create/modify vec_env to replace supersuit code; have one agent control both players.
     def env_fn(n_envs=1, seed=0, **env_kwargs):
         env = tank_game_environment_v0.parallel_env_fn(**env_kwargs)
         env.reset(
