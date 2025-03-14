@@ -61,6 +61,7 @@ def train(checkpoint_path=None):
     }
 
     # Create environments
+    # FIXME: concat_vec_envs copies env n_envs times, so the seed is identical for all of envs in vec_env
     def env_fn(n_envs=1, seed=0, **env_kwargs):
         env = tank_game_environment_v0.parallel_env_fn(**env_kwargs)
         env.reset(
@@ -79,7 +80,7 @@ def train(checkpoint_path=None):
 
     env = env_fn(n_envs=num_envs, seed=seed)
     eval_env = env_fn(n_envs=num_envs, seed=seed + num_envs)
-    render_env = env_fn(n_envs=1, seed=seed + num_envs + 1, render_mode="rgb_array")
+    render_env = env_fn(n_envs=1, seed=seed + 2 * num_envs, render_mode="rgb_array")
 
     env_name = render_env.unwrapped.metadata["name"]
     run_name = f"{env_name}_{time.strftime('%Y%m%d-%H%M%S')}"
