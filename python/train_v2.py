@@ -50,6 +50,10 @@ def train(opponent_model_path, checkpoint_path=None):
         features_extractor_class=LidarCNN,
         features_extractor_kwargs=dict(features_dim=128),
     )
+    vec_env_kwargs = dict(
+        opponent_model=PPO.load(opponent_model_path, device=device, seed=seed),
+        opponent_predict_deterministic=True,
+    )
 
     # PPO configuration variables
     ppo_config = {
@@ -65,16 +69,13 @@ def train(opponent_model_path, checkpoint_path=None):
         "max_grad_norm": 0.5,
     }
 
-    # Load opponent model
-    opponent_model = PPO.load(opponent_model_path, device=device, seed=seed)
-
     # Create environments
     env = make_vec_env(
         tank_game_environment_v1.env_fn,
         n_envs=num_envs,
         seed=seed,
         vec_env_cls=TankVecEnv,
-        vec_env_kwargs=dict(opponent_model=opponent_model),
+        vec_env_kwargs=vec_env_kwargs,
     )
 
     eval_env = make_vec_env(
@@ -82,7 +83,7 @@ def train(opponent_model_path, checkpoint_path=None):
         n_envs=num_envs,
         seed=seed + num_envs,
         vec_env_cls=TankVecEnv,
-        vec_env_kwargs=dict(opponent_model=opponent_model),
+        vec_env_kwargs=vec_env_kwargs,
     )
 
     render_env = make_vec_env(
@@ -91,7 +92,7 @@ def train(opponent_model_path, checkpoint_path=None):
         env_kwargs=dict(render_mode="rgb_array"),
         seed=seed + 2 * num_envs,
         vec_env_cls=TankVecEnv,
-        vec_env_kwargs=dict(opponent_model=opponent_model),
+        vec_env_kwargs=vec_env_kwargs,
     )
 
     env_name = render_env.metadata["name"]
