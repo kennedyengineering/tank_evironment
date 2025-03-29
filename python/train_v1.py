@@ -24,6 +24,11 @@ from stable_baselines3.common.callbacks import (
 )
 from stable_baselines3.common.vec_env import DummyVecEnv
 
+from sb3_contrib import RecurrentPPO
+from sb3_contrib.ppo_recurrent.policies import MlpLstmPolicy
+
+import torch
+
 
 def train(checkpoint_path=None):
     """Train an agent."""
@@ -33,7 +38,7 @@ def train(checkpoint_path=None):
     num_eval_episodes = 10
     steps = 6_000_000
     seed = 0  # if continuing from a checkpoint might want to specify a different seed
-    device = "cuda"
+    device = "cpu"
     log_dir = "logs/"
     save_dir = "weights/"
     save_freq = 100_000
@@ -53,8 +58,8 @@ def train(checkpoint_path=None):
     # PPO configuration variables
     ppo_config = {
         "learning_rate": 3e-4,
-        "n_steps": 1024,
-        "batch_size": 256,
+        "n_steps": 128,
+        "batch_size": 128,
         "n_epochs": 10,
         "gamma": 0.99,
         "gae_lambda": 0.95,
@@ -63,6 +68,8 @@ def train(checkpoint_path=None):
         "vf_coef": 0.5,
         "max_grad_norm": 0.5,
     }
+
+    torch.set_num_threads(2)
 
     # Create environments
     env = make_vec_env(
@@ -102,8 +109,8 @@ def train(checkpoint_path=None):
 
     # Create model
     if checkpoint_path is None:
-        model = PPO(
-            policy=MlpPolicy,
+        model = RecurrentPPO(
+            policy=MlpLstmPolicy,
             env=env,
             verbose=verbose,
             device=device,
