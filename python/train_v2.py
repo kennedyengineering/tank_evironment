@@ -48,7 +48,7 @@ def train(opponent_model_path, checkpoint_path=None):
     schedule_clip_range = False
     policy_kwargs = dict(
         features_extractor_class=LidarCNN,
-        features_extractor_kwargs=dict(features_dim=128),
+        features_extractor_kwargs=dict(),
     )
     vec_env_kwargs = dict(
         opponent_model=PPO.load(opponent_model_path, device=device, seed=seed),
