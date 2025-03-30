@@ -27,6 +27,7 @@ from stable_baselines3.common.vec_env import DummyVecEnv
 import numpy as np
 
 from tank_game_agent.analysis.plot_observations import plot_observations
+from tank_game_agent.analysis.plot_actions import plot_actions
 
 
 def train(checkpoint_path=None):
@@ -209,9 +210,11 @@ def eval(model_path):
 
     # Callback
     obs = []
+    act = []
 
     def cb(l, _):
         obs.append(l["observations"])
+        act.append(l["actions"])
 
     # Run evaluation
     print(f"Starting evaluation on {eval_env_name}. (num_episodes={num_episodes})")
@@ -226,10 +229,15 @@ def eval(model_path):
     )
     print("Rewards: ", rewards)
 
+    # Plot observations
     obs = np.array(obs)
     obs = np.squeeze(obs)
-
     plot_observations(obs)
+
+    # Plot actions
+    act = np.array(act)
+    act = np.squeeze(act)
+    plot_actions(act)
 
 
 if __name__ == "__main__":
