@@ -64,7 +64,7 @@ class VideoRecorderCallback(BaseCallback):
                 "trajectory/video",
                 Video(
                     th.from_numpy(np.asarray([screens])),
-                    fps=self._eval_env.metadata["render_fps"],
+                    fps=self._eval_env.unwrapped.metadata["render_fps"],
                 ),
                 exclude=("stdout", "log", "json", "csv"),
             )

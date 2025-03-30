@@ -317,7 +317,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         reward -= 1
 
         # reward movement
-        reward += observation[360] * 0.5
+        reward += abs(observation[360]) * 0.5
         reward += observation[361] * 0.5
 
         # punish rotation

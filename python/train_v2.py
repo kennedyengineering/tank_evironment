@@ -1,6 +1,6 @@
 # Tank Game (@kennedyengineering)
 
-from tank_game_environment import tank_game_environment_v2
+from tank_game_environment import tank_game_environment_v1
 
 from tank_game_agent.callback.callback_video_recorder import VideoRecorderCallback
 from tank_game_agent.callback.callback_hparam_recorder import HParamRecorderCallback
@@ -30,6 +30,9 @@ from stable_baselines3.common.callbacks import (
 def train(opponent_model_path, checkpoint_path=None):
     """Train an agent."""
 
+    # TODO: put in a configuration file
+    # TODO: combine v2 and v1
+
     # Configuration variables
     num_envs = 12
     num_eval_episodes = 10
@@ -47,6 +50,10 @@ def train(opponent_model_path, checkpoint_path=None):
         features_extractor_class=LidarCNN,
         features_extractor_kwargs=dict(features_dim=128),
     )
+    vec_env_kwargs = dict(
+        opponent_model=PPO.load(opponent_model_path, device=device, seed=seed),
+        opponent_predict_deterministic=True,
+    )
 
     # PPO configuration variables
     ppo_config = {
@@ -62,35 +69,30 @@ def train(opponent_model_path, checkpoint_path=None):
         "max_grad_norm": 0.5,
     }
 
-    # Load opponent model
-    opponent_model = PPO.load(opponent_model_path, device=device)
-
     # Create environments
     env = make_vec_env(
-        tank_game_environment_v2.env_fn,
+        tank_game_environment_v1.env_fn,
         n_envs=num_envs,
         seed=seed,
         vec_env_cls=TankVecEnv,
-        vec_env_kwargs=dict(opponent_model=opponent_model),
+        vec_env_kwargs=vec_env_kwargs,
     )
 
     eval_env = make_vec_env(
-        tank_game_environment_v2.env_fn,
+        tank_game_environment_v1.env_fn,
         n_envs=num_envs,
-        seed=seed,
-        start_index=seed + num_envs,
+        seed=seed + num_envs,
         vec_env_cls=TankVecEnv,
-        vec_env_kwargs=dict(opponent_model=opponent_model),
+        vec_env_kwargs=vec_env_kwargs,
     )
 
     render_env = make_vec_env(
-        tank_game_environment_v2.env_fn,
+        tank_game_environment_v1.env_fn,
         n_envs=1,
         env_kwargs=dict(render_mode="rgb_array"),
-        seed=seed,
-        start_index=seed + num_envs + 1,
+        seed=seed + 2 * num_envs,
         vec_env_cls=TankVecEnv,
-        vec_env_kwargs=dict(opponent_model=opponent_model),
+        vec_env_kwargs=vec_env_kwargs,
     )
 
     env_name = render_env.metadata["name"]
@@ -195,12 +197,13 @@ def eval(model_path, opponent_model_path):
 
     # Create environment
     eval_env = make_vec_env(
-        tank_game_environment_v2.env_fn,
+        tank_game_environment_v1.env_fn,
         n_envs=1,
         env_kwargs=dict(render_mode="human"),
         vec_env_cls=TankVecEnv,
         vec_env_kwargs=dict(
-            opponent_model=opponent_model, deterministic=opponent_deterministic
+            opponent_model=opponent_model,
+            opponent_predict_deterministic=opponent_deterministic,
         ),
     )
     eval_env_name = eval_env.metadata["name"]

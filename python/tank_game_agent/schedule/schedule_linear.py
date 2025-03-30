@@ -5,6 +5,7 @@
 from typing import Callable
 
 
+# TODO: decay to an optional final value which is less than initial value
 def linear_schedule(initial_value: float) -> Callable[[float], float]:
     """
     Linear schedule.
