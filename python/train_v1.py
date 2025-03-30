@@ -24,6 +24,10 @@ from stable_baselines3.common.callbacks import (
 )
 from stable_baselines3.common.vec_env import DummyVecEnv
 
+import numpy as np
+
+from tank_game_agent.analysis.plot_observations import plot_observations
+
 
 def train(checkpoint_path=None):
     """Train an agent."""
@@ -180,7 +184,8 @@ def eval(model_path):
 
     # Configuration variables
     deterministic = True
-    num_episodes = 20
+    num_episodes = 1
+    seed = 100
     device = "cuda"
     env_kwargs = dict(
         scripted_policy_name="StaticAgent",
@@ -191,6 +196,7 @@ def eval(model_path):
     eval_env = make_vec_env(
         tank_game_environment_v1.env_fn,
         n_envs=1,
+        seed=seed,
         env_kwargs=env_kwargs | dict(render_mode="human"),
         vec_env_cls=DummyVecEnv,
     )
@@ -201,6 +207,12 @@ def eval(model_path):
     print(f"Loading model {model_path}.")
     model = PPO.load(model_path, device=device)
 
+    # Callback
+    obs = []
+
+    def cb(l, _):
+        obs.append(l["observations"])
+
     # Run evaluation
     print(f"Starting evaluation on {eval_env_name}. (num_episodes={num_episodes})")
     rewards = evaluate_policy(
@@ -210,8 +222,14 @@ def eval(model_path):
         deterministic=deterministic,
         render=False,
         return_episode_rewards=True,
+        callback=cb,
     )
     print("Rewards: ", rewards)
+
+    obs = np.array(obs)
+    obs = np.squeeze(obs)
+
+    plot_observations(obs)
 
 
 if __name__ == "__main__":
