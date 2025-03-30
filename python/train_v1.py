@@ -209,12 +209,12 @@ def eval(model_path):
     model = PPO.load(model_path, device=device)
 
     # Callback
-    obs = []
-    act = []
+    observations = []
+    actions = []
 
-    def cb(l, _):
-        obs.append(l["observations"])
-        act.append(l["actions"])
+    def logging_callback(locals, _):
+        observations.append(locals["observations"])
+        actions.append(locals["actions"])
 
     # Run evaluation
     print(f"Starting evaluation on {eval_env_name}. (num_episodes={num_episodes})")
@@ -225,19 +225,19 @@ def eval(model_path):
         deterministic=deterministic,
         render=False,
         return_episode_rewards=True,
-        callback=cb,
+        callback=logging_callback,
     )
     print("Rewards: ", rewards)
 
     # Plot observations
-    obs = np.array(obs)
-    obs = np.squeeze(obs)
-    plot_observations(obs)
+    observations = np.array(observations)
+    observations = np.squeeze(observations)
+    plot_observations(observations)
 
     # Plot actions
-    act = np.array(act)
-    act = np.squeeze(act)
-    plot_actions(act)
+    actions = np.array(actions)
+    actions = np.squeeze(actions)
+    plot_actions(actions)
 
 
 if __name__ == "__main__":
