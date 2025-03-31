@@ -27,6 +27,11 @@ from stable_baselines3.common.vec_env import DummyVecEnv
 import numpy as np
 
 from tank_game_agent.analysis.plot_observations import plot_observations
+from tank_game_agent.analysis.plot_latent import (
+    plot_conv,
+    plot_latent,
+    plot_latent_heatmap,
+)
 from tank_game_agent.analysis.plot_actions import plot_actions
 
 
@@ -212,9 +217,34 @@ def eval(model_path):
     observations = []
     actions = []
 
+    conv1 = []
+    conv2 = []
+    conv_mlp = []
+    extra = []
+
     def logging_callback(locals, _):
+        import torch
+
         observations.append(locals["observations"])
+
         actions.append(locals["actions"])
+
+        x = torch.from_numpy(observations[-1])
+        x = x.to(device=model.device)
+        x = model.policy.features_extractor.process_lidar(x)
+        x = model.policy.features_extractor.forward_conv1(x)
+        conv1.append(x.cpu().detach().numpy())
+
+        x = model.policy.features_extractor.forward_conv2(x)
+        conv2.append(x.cpu().detach().numpy())
+
+        x = model.policy.features_extractor.forward_conv_mlp(x)
+        conv_mlp.append(x.cpu().detach().numpy())
+
+        x = torch.from_numpy(observations[-1])
+        x = x.to(device=model.device)
+        x = model.policy.features_extractor.forward_extra(x)
+        extra.append(x.cpu().detach().numpy())
 
     # Run evaluation
     print(f"Starting evaluation on {eval_env_name}. (num_episodes={num_episodes})")
@@ -238,6 +268,26 @@ def eval(model_path):
     actions = np.array(actions)
     actions = np.squeeze(actions)
     plot_actions(actions)
+
+    # Plot conv1 output
+    conv1 = np.array(conv1)
+    conv1 = np.squeeze(conv1)
+    plot_conv(conv1)
+
+    # Plot conv2 output
+    conv2 = np.array(conv2)
+    conv2 = np.squeeze(conv2)
+    plot_conv(conv2)
+
+    # Plot conv mlp output
+    conv_mlp = np.array(conv_mlp)
+    conv_mlp = np.squeeze(conv_mlp)
+    plot_latent_heatmap(conv_mlp)
+
+    # Plot extra
+    extra = np.array(extra)
+    extra = np.squeeze(extra)
+    plot_latent(extra)
 
 
 if __name__ == "__main__":

@@ -19,17 +19,6 @@ def plot_observations(observations: NDArray[np.float64]) -> None:
     Returns:
         None: This function displays plots but does not return any value.
     """
-    # Set global figure styling
-    plt.style.use("seaborn-v0_8-darkgrid")  # Professional-looking style
-    plt.rcParams.update(
-        {
-            "font.size": 14,  # Increase font size for readability
-            "axes.labelsize": 14,  # Label font size
-            "axes.titlesize": 16,  # Title font size
-            "xtick.labelsize": 12,  # X-axis tick font size
-            "ytick.labelsize": 12,  # Y-axis tick font size
-        }
-    )
 
     ### --- Lidar Heatmap --- ###
     lidar = observations[:, :360].T  # Transpose to align degrees vertically
