@@ -211,7 +211,7 @@ def eval(model_path):
 
     # Load model
     print(f"Loading model {model_path}.")
-    model = PPO.load(model_path, device=device)
+    model = PPO.load(model_path, device=device, seed=seed)
 
     # Callback
     observations = []
