@@ -251,7 +251,7 @@ void Tank::scanLidar(float range) {
   // Populate vector
   for (size_t pointNum = 0; pointNum < mTankConfig.lidarPoints; pointNum++) {
     // Compute angle
-    float angle = angleResolution * pointNum;
+    float angle = angleResolution * pointNum - b2_pi / 2.0f;
 
     // Compute translation vector
     b2Rot rotation = b2MakeRot(angle);
