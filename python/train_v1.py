@@ -188,6 +188,7 @@ def eval(model_path):
     # Configuration variables
     deterministic = True
     num_episodes = 20
+    seed = 100
     device = "cuda"
     env_kwargs = dict(
         scripted_policy_name="StaticAgent",
@@ -198,6 +199,7 @@ def eval(model_path):
     eval_env = make_vec_env(
         tank_game_environment_v1.env_fn,
         n_envs=1,
+        seed=seed,
         env_kwargs=env_kwargs | dict(render_mode="human"),
         vec_env_cls=DummyVecEnv,
     )
@@ -206,7 +208,7 @@ def eval(model_path):
 
     # Load model
     print(f"Loading model {model_path}.")
-    model = PPO.load(model_path, device=device)
+    model = PPO.load(model_path, device=device, seed=seed)
 
     # Run evaluation
     print(f"Starting evaluation on {eval_env_name}. (num_episodes={num_episodes})")
