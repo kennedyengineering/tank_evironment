@@ -139,12 +139,13 @@ class TemporalLidarCNN(BaseFeaturesExtractor):
         self,
         observation_space: spaces.Box,
         num_channels=[16, 32, 32],
+        length=50,
         kernel_size=(5, 5),
         dilation_base=3,
         features=128,
         dropout=0.1,
     ):
-
+        self.length = length
         super().__init__(observation_space, features + 4)
 
         # Process lidar features through the temporal convolutional network
@@ -163,7 +164,7 @@ class TemporalLidarCNN(BaseFeaturesExtractor):
     def forward(self, observations: torch.Tensor) -> torch.Tensor:
 
         # Reshape observations
-        observations = observations.view(-1, 50, 364)
+        observations = observations.view(-1, self.length, 364)
 
         # Process LIDAR data (assumed to be the first 360 values)
         x = observations[:, :, :360]  # shape: (batch, -1, 360)

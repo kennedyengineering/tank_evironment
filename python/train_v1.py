@@ -43,14 +43,15 @@ def train(checkpoint_path=None):
     verbose = 3
     schedule_learning_rate = True
     schedule_clip_range = False
+    history = 50
     policy_kwargs = dict(
         features_extractor_class=TemporalLidarCNN,
-        features_extractor_kwargs=dict(),
+        features_extractor_kwargs=dict(length=history),
     )
     env_kwargs = dict(
         scripted_policy_name="StaticAgent",
         scripted_policy_kwargs=dict(action=[0.0, 0.0, 0.0]),
-        stack_size=50,
+        stack_size=history,
     )
 
     # PPO configuration variables
