@@ -164,13 +164,16 @@ class TemporalLidarCNN(BaseFeaturesExtractor):
 
     def forward(self, observations: torch.Tensor) -> torch.Tensor:
 
+        # Reshape observations
+        observations = observations.view(-1, 50, 364)
+
         # Process LIDAR data (assumed to be the first 360 values)
         x = observations[:, :, :360]  # shape: (batch, -1, 360)
         x = x.unsqueeze(1)  # shape: (batch, 1, -1, 360)
         cnn_features = self.lidar_tcn(x)
 
         # Process extra features (assumed to be the last 4 values)
-        x = observations[:, :, 360:]
+        x = observations[:, 0, 360:]
         extra_features = self.extra_fc(x)  # Shape: (batch, -1, 4)
 
         # Concatenate processed CNN features with extra features.
