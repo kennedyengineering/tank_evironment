@@ -20,8 +20,6 @@ class CausalDilatedConv2d(nn.Module):
             dilation (tuple): (dilation_time, dilation_angle).
         """
         super(CausalDilatedConv2d, self).__init__()
-        self.kernel_size = kernel_size
-        self.dilation = dilation
 
         # The convolution layer (without built-in padding)
         self.conv = nn.Conv2d(
@@ -32,21 +30,21 @@ class CausalDilatedConv2d(nn.Module):
             bias=False,
         )
 
+        # Compute padding amounts.
+        # For the time dimension (causal, zero padding): pad only at the beginning.
+        self.pad_time = dilation[0] * (kernel_size[0] - 1)
+
+        # For the angular dimension (circular): pad equally on both sides.
+        self.pad_angle = dilation[1] * (kernel_size[1] - 1) // 2
+
     def forward(self, x):
         # x shape: (batch_size, channels, time, angle)
 
-        # Compute padding amounts.
-        # For the time dimension (causal, zero padding): pad only at the beginning.
-        pad_time = self.dilation[0] * (self.kernel_size[0] - 1)
-
-        # For the angular dimension (circular): pad equally on both sides.
-        pad_angle = self.dilation[1] * (self.kernel_size[1] - 1) // 2
-
         # Step 1: Zero padding for time.
-        x = F.pad(x, (0, 0, pad_time, 0), mode="constant", value=0)
+        x = F.pad(x, (0, 0, self.pad_time, 0), mode="constant", value=0)
 
         # Step 2: Circular padding for angle.
-        x = F.pad(x, (pad_angle, pad_angle, 0, 0), mode="circular")
+        x = F.pad(x, (self.pad_angle, self.pad_angle, 0, 0), mode="circular")
 
         # Apply the convolution.
         return self.conv(x)
@@ -124,16 +122,16 @@ class LidarTCN(nn.Module):
 
     def forward(self, x):
         # x shape: (batch_size, 1, time, angle) e.g. (B, 1, 64, 360)
-        out = self.network(x)
+        x = self.network(x)
         # out shape: (B, num_channels[-1], T, A)
 
         # Global average pooling
-        pooled = self.global_pool(out)  # shape: (B, num_channels[-1], 1, 1)
-        pooled = pooled.view(pooled.size(0), -1)  # shape: (B, num_channels[-1])
+        x = self.global_pool(x)  # shape: (B, num_channels[-1], 1, 1)
+        x = x.view(x.size(0), -1)  # shape: (B, num_channels[-1])
 
         # Final fully connected layer
-        features = self.fc(pooled)  # shape: (B, 128)
-        return features
+        x = self.fc(x)  # shape: (B, 128)
+        return x
 
 
 class TemporalLidarCNN(BaseFeaturesExtractor):
