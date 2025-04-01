@@ -25,7 +25,8 @@ from stable_baselines3.common.callbacks import (
 from stable_baselines3.common.vec_env import DummyVecEnv
 
 from sb3_contrib import RecurrentPPO
-from sb3_contrib.ppo_recurrent.policies import MlpLstmPolicy
+
+from tank_game_agent.policy.policy import TankRecurrentActorCriticPolicy
 
 import torch
 
@@ -110,7 +111,7 @@ def train(checkpoint_path=None):
     # Create model
     if checkpoint_path is None:
         model = RecurrentPPO(
-            policy=MlpLstmPolicy,
+            policy=TankRecurrentActorCriticPolicy,
             env=env,
             verbose=verbose,
             device=device,
