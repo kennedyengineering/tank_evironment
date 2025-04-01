@@ -7,7 +7,9 @@ from tank_game_agent.callback.callback_hparam_recorder import HParamRecorderCall
 
 from tank_game_agent.schedule.schedule_linear import linear_schedule
 
-from tank_game_agent.feature_extactor.feature_extractor_lidar import LidarCNN
+from tank_game_agent.feature_extactor.temporal_feature_extractor_lidar import (
+    TemporalLidarCNN,
+)
 
 import time
 import os
@@ -42,12 +44,13 @@ def train(checkpoint_path=None):
     schedule_learning_rate = True
     schedule_clip_range = False
     policy_kwargs = dict(
-        features_extractor_class=LidarCNN,
-        features_extractor_kwargs=dict(features_dim=128),
+        features_extractor_class=TemporalLidarCNN,
+        features_extractor_kwargs=dict(),
     )
     env_kwargs = dict(
         scripted_policy_name="StaticAgent",
         scripted_policy_kwargs=dict(action=[0.0, 0.0, 0.0]),
+        stack_size=50,
     )
 
     # PPO configuration variables

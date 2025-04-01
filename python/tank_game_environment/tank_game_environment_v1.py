@@ -6,10 +6,13 @@ from tank_game_environment.agent.agent_registry import create_agent
 
 from typing import Optional
 
+from supersuit import frame_stack_v2
+
 
 def env_fn(
     scripted_policy_name: Optional[str] = None,
     scripted_policy_kwargs: Optional[dict] = None,
+    stack_size: int = 1,
     **kwargs
 ):
     """
@@ -25,6 +28,7 @@ def env_fn(
     """
 
     env = parallel_env_fn(**kwargs)
+    env = frame_stack_v2(env, stack_size=stack_size, stack_dim=-1)
 
     # Ensure there are at least two agents.
     if len(env.possible_agents) < 2:
