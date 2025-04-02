@@ -206,11 +206,18 @@ def eval(model_path):
     deterministic = True
     num_episodes = 20
     seed = 100
-    device = "cuda"
+    device = "cpu"
     env_kwargs = dict(
         scripted_policy_name="StaticAgent",
         scripted_policy_kwargs=dict(action=[0.0, 0.0, 0.0]),
     )
+
+    feature_model = PPO.load(
+        "weights/tank_game_environment_v1_20250331-010051/tank_game_environment_v1_20250331-010051.zip",
+        device=device,
+        seed=seed,
+    )
+    feature_model.policy.features_extractor.eval()
 
     # Create environment
     eval_env = make_vec_env(
@@ -219,6 +226,8 @@ def eval(model_path):
         seed=seed,
         env_kwargs=env_kwargs | dict(render_mode="human"),
         vec_env_cls=DummyVecEnv,
+        wrapper_class=FeatureExtractorWrapper,
+        wrapper_kwargs=dict(feature_extractor=feature_model.policy.features_extractor),
     )
 
     eval_env_name = eval_env.metadata["name"]
