@@ -7,7 +7,9 @@ from tank_game_agent.callback.callback_hparam_recorder import HParamRecorderCall
 
 from tank_game_agent.schedule.schedule_linear import linear_schedule
 
-from tank_game_agent.feature_extactor.feature_extractor_lidar import LidarCNN
+from tank_game_agent.feature_extactor.feature_extractor_wrapper import (
+    FeatureExtractorWrapper,
+)
 
 import time
 import os
@@ -47,20 +49,29 @@ def train(checkpoint_path=None):
     schedule_learning_rate = True
     schedule_clip_range = False
     policy_kwargs = dict(
-        features_extractor_class=LidarCNN,
-        features_extractor_kwargs=dict(features_dim=128),
+        # n_lstm_layers=2,
+        # lstm_hidden_size=512,
+        # shared_lstm=True,
+        # enable_critic_lstm=False,
     )
     env_kwargs = dict(
         scripted_policy_name="StaticAgent",
         scripted_policy_kwargs=dict(action=[0.0, 0.0, 0.0]),
     )
 
+    feature_model = PPO.load(
+        "weights/tank_game_environment_v1_20250331-010051/tank_game_environment_v1_20250331-010051.zip",
+        device=device,
+        seed=seed,
+    )
+    feature_model.policy.features_extractor.eval()
+
     # PPO configuration variables
     ppo_config = {
         "learning_rate": 3e-4,
         "n_steps": 128,
         "batch_size": 128,
-        "n_epochs": 10,
+        "n_epochs": 5,
         "gamma": 0.99,
         "gae_lambda": 0.95,
         "clip_range": 0.2,
@@ -78,6 +89,8 @@ def train(checkpoint_path=None):
         env_kwargs=env_kwargs,
         seed=seed,
         vec_env_cls=DummyVecEnv,
+        wrapper_class=FeatureExtractorWrapper,
+        wrapper_kwargs=dict(feature_extractor=feature_model.policy.features_extractor),
     )
 
     eval_env = make_vec_env(
@@ -86,6 +99,8 @@ def train(checkpoint_path=None):
         env_kwargs=env_kwargs,
         seed=seed + num_envs,
         vec_env_cls=DummyVecEnv,
+        wrapper_class=FeatureExtractorWrapper,
+        wrapper_kwargs=dict(feature_extractor=feature_model.policy.features_extractor),
     )
 
     render_env = make_vec_env(
@@ -94,9 +109,11 @@ def train(checkpoint_path=None):
         env_kwargs=env_kwargs | dict(render_mode="rgb_array"),
         seed=seed + 2 * num_envs,
         vec_env_cls=DummyVecEnv,
+        wrapper_class=FeatureExtractorWrapper,
+        wrapper_kwargs=dict(feature_extractor=feature_model.policy.features_extractor),
     )
 
-    env_name = render_env.metadata["name"]
+    env_name = render_env.unwrapped.metadata["name"]
     run_name = f"{env_name}_{time.strftime('%Y%m%d-%H%M%S')}"
     save_dir = os.path.join(save_dir, run_name)
 
