@@ -14,8 +14,6 @@ Obstacle::Obstacle(ObstacleId obstacleId, const ObstacleConfig &obstacleConfig,
   // Construct the body
   b2BodyDef bodyDef = b2DefaultBodyDef();
   bodyDef.type = b2_staticBody;
-  bodyDef.position =
-      (b2Vec2){mObstacleConfig.positionX, mObstacleConfig.positionY};
 
   mObstacleBodyId = b2CreateBody(mWorldId, &bodyDef);
 
@@ -25,7 +23,8 @@ Obstacle::Obstacle(ObstacleId obstacleId, const ObstacleConfig &obstacleConfig,
   bodyShapeDef.userData = &mObstacleId;
 
   b2Circle circleDef;
-  circleDef.center = (b2Vec2){0.0f, 0.0f};
+  circleDef.center =
+      (b2Vec2){mObstacleConfig.positionX, mObstacleConfig.positionY};
   circleDef.radius = mObstacleConfig.radius;
 
   mObstacleShapeId =
@@ -48,7 +47,7 @@ b2Vec2 Obstacle::getPosition() {
   /* Get the obstacle position */
 
   // Return position
-  return b2Body_GetPosition(mObstacleBodyId);
+  return b2Shape_GetCircle(mObstacleShapeId).center;
 };
 
 float Obstacle::getRadius() {
@@ -59,7 +58,7 @@ float Obstacle::getRadius() {
 };
 
 std::vector<std::pair<b2ShapeId, b2HexColor>> Obstacle::getShapeIdsAndColors() {
-  /* Get shape of the obstacle (for rendering) */
+  /* Get shape and color of the obstacle (for rendering) */
 
   // Return shapes in order to be rendered
   return std::vector<std::pair<b2ShapeId, b2HexColor>>{
