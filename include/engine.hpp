@@ -8,6 +8,7 @@
 
 #include "categories.hpp"
 #include "config.hpp"
+#include "obstacle.hpp"
 #include "registry.hpp"
 #include "render.hpp"
 #include "tank.hpp"
@@ -17,6 +18,9 @@ class Engine {
 public:
   Engine(const Config &config);
   ~Engine();
+
+  RegistryId addObstacle(const ObstacleConfig &obstacleConfig);
+  void removeObstacle(RegistryId obstacleId);
 
   RegistryId addTank(const TankConfig &tankConfig);
   void removeTank(RegistryId tankId);
@@ -36,6 +40,7 @@ public:
 
   void clearImage();
 
+  void renderObstacle(RegistryId obstacleId);
   void renderProjectiles();
   void renderTank(RegistryId tankId);
   void renderTankLidar(RegistryId tankId);
@@ -59,6 +64,7 @@ private:
   RenderEngine mRenderEngine;
 
   Registry<Tank> mTankRegistry;
+  Registry<Obstacle> mObstacleRegistry;
 
   std::vector<b2ShapeId> mProjectileShapeIdVector;
 };

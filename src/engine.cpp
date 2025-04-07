@@ -73,6 +73,18 @@ Engine::~Engine() {
   b2DestroyWorld(mWorldId);
 }
 
+RegistryId Engine::addObstacle(const ObstacleConfig &obstacleConfig) {
+  /* Add a obstacle */
+
+  // Create a new obstacle in registry with id as argument
+  return mObstacleRegistry.emplaceWithId(obstacleConfig, mWorldId);
+}
+
+void Engine::removeObstacle(RegistryId obstacleId) {
+  /* Remove a obstacle */
+  mObstacleRegistry.remove(obstacleId);
+}
+
 RegistryId Engine::addTank(const TankConfig &tankConfig) {
   /* Add a tank */
 
@@ -189,6 +201,31 @@ void Engine::clearImage() {
 
   // Clear the image
   mRenderEngine.clearImage(mConfig.clearColor);
+}
+
+void Engine::renderObstacle(RegistryId obstacleId) {
+  /* Render all obstacles */
+
+  // Render obstacle shapes returned in vector
+  for (const std::pair<b2ShapeId, b2HexColor> &obstacleShapeIdAndColor :
+       mObstacleRegistry.get(obstacleId).getShapeIdsAndColors()) {
+
+    // Extract shapeId and color
+    b2ShapeId obstacleShapeId = obstacleShapeIdAndColor.first;
+    b2HexColor obstacleShapeColor = obstacleShapeIdAndColor.second;
+
+    // Get shape
+    b2Circle obstacleShapeCircle = b2Shape_GetCircle(obstacleShapeId);
+
+    // Convert meters to pixels
+    b2Vec2 convertedCenter =
+        b2MulSV(mConfig.pixelDensity, obstacleShapeCircle.center);
+    float convertedRadius = mConfig.pixelDensity * obstacleShapeCircle.radius;
+
+    // Render the shape
+    mRenderEngine.renderCircle(convertedCenter, convertedRadius,
+                               obstacleShapeColor);
+  }
 }
 
 void Engine::renderProjectiles() {
@@ -392,6 +429,19 @@ Engine::handleCollisions() {
           b2Shape_GetFilter(contactShapeId).categoryBits);
 
       switch (contactCategoryBits) {
+      case CategoryBits::OBSTACLE: {
+        ObstacleId obstacleId =
+            *static_cast<ObstacleId *>(b2Shape_GetUserData(contactShapeId));
+
+        if (mConfig.verboseOutput) {
+          std::cout << "projectile v obstacle : " << sourceTankId
+                    << " hit obstacle " << obstacleId << std::endl;
+        }
+
+        output.push_back(
+            std::make_tuple(contactCategoryBits, sourceTankId, obstacleId));
+      }
+
       case CategoryBits::PROJECTILE: {
         TankId otherTankId =
             *static_cast<TankId *>(b2Shape_GetUserData(contactShapeId));
