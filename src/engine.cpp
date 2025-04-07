@@ -440,6 +440,8 @@ Engine::handleCollisions() {
 
         output.push_back(
             std::make_tuple(contactCategoryBits, sourceTankId, obstacleId));
+
+        break;
       }
 
       case CategoryBits::PROJECTILE: {
