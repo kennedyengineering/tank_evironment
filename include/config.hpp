@@ -5,6 +5,16 @@
 #include <box2d/box2d.h>
 
 namespace TankGame {
+struct ObstacleConfig {
+  /* Initialization parameters */
+  float positionX = 0.0f; // in meters
+  float positionY = 0.0f; // in meters
+  float radius = 0.0f;    // in meters
+
+  /* Rendering parameters */
+  b2HexColor color = b2_colorKhaki;
+};
+
 struct TankConfig {
   /* Initialization parameters */
   float positionX = 0.0f; // in meters
