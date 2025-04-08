@@ -5,7 +5,10 @@ from .tank_game_util import TankData, ObstacleData
 
 from pettingzoo import ParallelEnv
 from pettingzoo.utils import parallel_to_aec, aec_to_parallel, wrappers
-from gymnasium.logger import warn, error
+from gymnasium.logger import (
+    warn,
+    error,
+)  # FIXME: do something about the error conditions
 from gymnasium.spaces import Box
 from gymnasium.utils import EzPickle
 
@@ -41,6 +44,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
     - render_modes : valid rendering modes
     - render_fps : for "human" rendering mode
     - max_timesteps : how many steps before truncation (-1 for no truncation)
+    - enable_random_obstacles : initialize with obstacles of random position and size
     - num_tanks : number of agents
     - random_position : initialize tanks in a random position
     - random_angle : initialize tank with a random rotation
@@ -223,9 +227,14 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         Obstacles can overlap with the arena walls.
         """
 
+        if obstacle not in self.obstacle_data:
+            error("Invalid obstacle.")
+            # FIXME: do something
+
         iters = self.placement_metadata["max_iterations"]
         placed = False
         for _ in range(iters):
+            # generate random radius
             radius = (
                 np.random.rand()
                 * (
@@ -235,6 +244,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
                 + self.obstacle_metadata["min_radius"]
             )
 
+            # generate random position
             position = np.random.rand(
                 2,
             ) * [
