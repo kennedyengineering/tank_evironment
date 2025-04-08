@@ -129,7 +129,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
 
         self.timestep = None
         self.agent_data = {
-            f"tank_{i}": TankData(-1, i, tank_game.TankConfig(), 0)
+            f"tank_{i}": TankData(-1, i, False, tank_game.TankConfig(), 0)
             for i in range(self.metadata["num_tanks"])
         }
         self.possible_agents = list(self.agent_data.keys())
@@ -227,10 +227,72 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
 
         self.agent_data[agent].config.angle = angle
 
+    def __place_agent_stochastic(self, agent):
+        """Randomly place tanks."""
+
+        if agent not in self.possible_agents:
+            error("Invalid agent.")
+
+        iters = self.placement_metadata["max_iterations"]
+        placed = False
+        for _ in range(iters):
+
+            # place away from walls
+            wall_buffer = self.placement_metadata["wall_buffer"]
+            position = (
+                np.random.rand(
+                    2,
+                )
+                * [
+                    self.engine_config.arenaWidth - wall_buffer * 2,
+                    self.engine_config.arenaHeight - wall_buffer * 2,
+                ]
+                + wall_buffer
+            )
+
+            # place away from other tanks
+            tank_buffer = self.placement_metadata["tank_buffer"]
+            tank_overlaps = False
+            for a in self.possible_agents:
+
+                # check if other tank has been placed
+                if not self.agent_data[a].placed:
+                    continue
+
+                distance = np.linalg.norm(
+                    position
+                    - [
+                        self.agent_data[a].config.positionX,
+                        self.agent_data[a].config.positionY,
+                    ]
+                )
+                if distance < tank_buffer:
+                    tank_overlaps = True
+                    break
+
+            if not tank_overlaps:
+                placed = True
+                break
+
+        if not placed:
+            error(f"Failed to place tank within {iters} iterations")
+
+        self.agent_data[agent].config.positionX = position[0]
+        self.agent_data[agent].config.positionY = position[1]
+
+    def __rotate_agent_stochastic(self, agent):
+        """Randomly rotate tanks."""
+
+        if agent not in self.possible_agents:
+            error("Invalid agent.")
+
+        angle = np.random.rand() * 2 * np.pi
+        self.agent_data[agent].config.angle = angle
+
     def __place_obstacle_stochastic(self, obstacle):
         """Randomly place obstacles.
 
-        Obstacle placement is with respect to other obstacles.
+        Obstacle placement is with respect to other obstacles and tanks.
         Obstacles can overlap with the arena walls.
         """
 
@@ -258,6 +320,33 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
                 self.engine_config.arenaHeight,
             ]
 
+            # place away from tanks
+            obstacle_buffer = self.placement_metadata["obstacle_buffer"]
+            obstacle_overlaps = False
+            for a in self.agent_data:
+
+                # check if tank has been placed
+                if not self.agent_data[a].placed:
+                    continue
+
+                # compute the buffer distance
+                distance = (
+                    np.linalg.norm(
+                        position
+                        - [
+                            self.agent_data[a].config.positionX,
+                            self.agent_data[a].config.positionY,
+                        ]
+                    )
+                    - radius
+                )
+
+                if distance < obstacle_buffer:
+                    obstacle_overlaps = True
+
+            if obstacle_overlaps:
+                continue
+
             # place away from other obstacles
             obstacle_gap = self.placement_metadata["obstacle_gap"]
             obstacle_overlaps = False
@@ -283,9 +372,11 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
                     obstacle_overlaps = True
                     break
 
-            if not obstacle_overlaps:
-                placed = True
-                break
+            if obstacle_overlaps:
+                continue
+
+            placed = True
+            break
 
         if not placed:
             error(f"Failed to place obstacle within {iters} iterations")
@@ -293,90 +384,6 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         self.obstacle_data[obstacle].config.positionX = position[0]
         self.obstacle_data[obstacle].config.positionY = position[1]
         self.obstacle_data[obstacle].config.radius = radius
-
-    def __place_agent_stochastic(self, agent):
-        """Randomly place tanks.
-
-        Tank placement is with respect to the arena walls, and placed tanks and obstacles.
-        """
-
-        if agent not in self.possible_agents:
-            error("Invalid agent.")
-
-        iters = self.placement_metadata["max_iterations"]
-        placed = False
-        for _ in range(iters):
-
-            # place away from walls
-            wall_buffer = self.placement_metadata["wall_buffer"]
-            position = (
-                np.random.rand(
-                    2,
-                )
-                * [
-                    self.engine_config.arenaWidth - wall_buffer * 2,
-                    self.engine_config.arenaHeight - wall_buffer * 2,
-                ]
-                + wall_buffer
-            )
-
-            # place away from obstacles
-            obstacle_buffer = self.placement_metadata["obstacle_buffer"]
-            obstacle_overlaps = False
-            for o in self.obstacle_data:
-                distance = (
-                    np.linalg.norm(
-                        position
-                        - [
-                            self.obstacle_data[o].config.positionX,
-                            self.obstacle_data[o].config.positionY,
-                        ]
-                    )
-                    - self.obstacle_data[o].config.radius
-                )
-
-                if distance < obstacle_buffer:
-                    obstacle_overlaps = True
-                    break
-
-            if obstacle_overlaps:
-                continue
-
-            # place away from tanks
-            tank_buffer = self.placement_metadata["tank_buffer"]
-            tank_overlaps = False
-            for a in self.possible_agents:
-                distance = np.linalg.norm(
-                    position
-                    - [
-                        self.agent_data[a].config.positionX,
-                        self.agent_data[a].config.positionY,
-                    ]
-                )
-                if distance < tank_buffer:
-                    tank_overlaps = True
-                    break
-
-            if tank_overlaps:
-                continue
-
-            placed = True
-            break
-
-        if not placed:
-            error(f"Failed to place tank within {iters} iterations")
-
-        self.agent_data[agent].config.positionX = position[0]
-        self.agent_data[agent].config.positionY = position[1]
-
-    def __rotate_agent_stochastic(self, agent):
-        """Randomly rotate tanks."""
-
-        if agent not in self.possible_agents:
-            error("Invalid agent.")
-
-        angle = np.random.rand() * 2 * np.pi
-        self.agent_data[agent].config.angle = angle
 
     def reset(self, seed=None, options=None):
         """Reset the environment to a starting point."""
@@ -390,12 +397,23 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
 
         # reset agents
         for a in self.possible_agents:
-            # FIXME: reset id field? filter for invalid id in placement method?
-            #           or just add 'placed' field?
-            self.agent_data[a].config.positionX = -1.0
-            self.agent_data[a].config.positionY = -1.0
-            self.agent_data[a].config.angle = 0.0
+            self.agent_data[a].placed = False
             self.agent_data[a].reload_counter = 0
+
+        # place and construct agents
+        for a in self.possible_agents:
+            if self.metadata["random_position"]:
+                self.__place_agent_stochastic(a)
+            else:
+                self.__place_agent_deterministic(a)
+
+            if self.metadata["random_angle"]:
+                self.__rotate_agent_stochastic(a)
+            else:
+                self.__rotate_agent_deterministic(a)
+
+            self.agent_data[a].id = self.engine.addTank(self.agent_data[a].config)
+            self.agent_data[a].placed = True
 
         # place and construct obstacles
         num_obstacles = 0
@@ -416,20 +434,6 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
                 self.obstacle_data[o].config
             )
             self.obstacle_data[o].placed = True
-
-        # place and construct agents
-        for a in self.possible_agents:
-            if self.metadata["random_position"]:
-                self.__place_agent_stochastic(a)
-            else:
-                self.__place_agent_deterministic(a)
-
-            if self.metadata["random_angle"]:
-                self.__rotate_agent_stochastic(a)
-            else:
-                self.__rotate_agent_deterministic(a)
-
-            self.agent_data[a].id = self.engine.addTank(self.agent_data[a].config)
 
         self.timestep = 0
 

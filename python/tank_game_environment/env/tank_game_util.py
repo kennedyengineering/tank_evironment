@@ -17,6 +17,7 @@ class TankData:
 
     id: int
     iid: int
+    placed: bool
     config: tank_game.TankConfig
 
     reload_counter: int
