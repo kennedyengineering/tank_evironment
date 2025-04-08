@@ -56,16 +56,23 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
     - pixel_density : pixels per meters (for rendering)
     - verbose_output : enable engine stdout messages
 
+    The obstacle_metadata holds obstacle constants.
+    - max_radius : maximum size of obstacle (meters)
+    - min_radius : minimum size of obstacle (meters)
+    - max_num_obstacles : maximum number of obstacles
+    - min_num_obstacles : minimum number of obstacles
+
     The tank_metadata holds tank constants.
     - tread_max_speed : maximum linear velocity of an agent (meters / second)
     - lidar_range : range of the lidar (meters)
     - lidar_points : number of points in a lidar scan
     - lidar_pixel_radius : radius in pixels (for rendering)
 
-    The placement_metadata holds agent placement constants.
+    The placement_metadata holds agent and obstacle placement constants.
     - max_iterations : number of attempts at randomly placing an agent
     - wall_buffer : minimum distance between agent and wall (meters)
     - tank_buffer : minimum distance between two agents (meters)
+    - obstacle_gap : minimum traversable distance between two obstacles (meters)
     """
 
     metadata = {
