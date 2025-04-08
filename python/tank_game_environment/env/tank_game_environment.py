@@ -229,7 +229,6 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
 
         if obstacle not in self.obstacle_data:
             error("Invalid obstacle.")
-            # FIXME: do something
 
         iters = self.placement_metadata["max_iterations"]
         placed = False
@@ -283,7 +282,6 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
 
         if not placed:
             error(f"Failed to place obstacle within {iters} iterations")
-            # FIXME: do something
 
         self.obstacle_data[obstacle].config.positionX = position[0]
         self.obstacle_data[obstacle].config.positionY = position[1]
@@ -360,7 +358,6 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
 
         if not placed:
             error(f"Failed to place tank within {iters} iterations")
-            # FIXME: do something
 
         self.agent_data[agent].config.positionX = position[0]
         self.agent_data[agent].config.positionY = position[1]
