@@ -20,3 +20,17 @@ class TankData:
     config: tank_game.TankConfig
 
     reload_counter: int
+
+
+@dataclass
+class ObstacleData:
+    """
+    Holds information about an obstacle.
+    - id : engine assigned ID
+    - config : obstacle configuration struct
+    """
+
+    id: int
+    iid: int
+    placed: bool
+    config: tank_game.ObstacleConfig
