@@ -6,7 +6,6 @@
 from typing import Callable
 
 
-# TODO: decay to an optional final value which is less than initial value
 def exponential_schedule(
     initial_value: float, final_value: float = 5e-8
 ) -> Callable[[float], float]:
