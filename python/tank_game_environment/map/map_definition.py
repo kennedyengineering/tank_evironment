@@ -12,7 +12,7 @@ from gymnasium.logger import error
 
 @register_map
 @dataclass
-class RandomObstacles(MapData):
+class Random(MapData):
     arena_map_data: ArenaMapData = field(
         default_factory=lambda: ArenaMapData(height=100, width=100)
     )
@@ -188,3 +188,8 @@ class RandomObstacles(MapData):
 
         # validate arena configuration
         super().__post_init__()
+
+    @classmethod
+    def get_num_tanks(cls):
+        # overrides MapData.get_num_tanks as here tank_map_data is populated during class initialization, not statically
+        return cls.random_tank_count

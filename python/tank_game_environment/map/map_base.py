@@ -65,3 +65,7 @@ class MapData:
                 0 <= obstacle_map_data.position_y <= self.arena_map_data.height
             ), "Invalid obstacle position Y"
             assert 0 < obstacle_map_data.radius, "Invalid obstacle radius"
+
+    @classmethod
+    def get_num_tanks(cls):
+        return len(cls.tank_map_data)
