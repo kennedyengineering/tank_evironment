@@ -3,6 +3,8 @@
 from dataclasses import dataclass, field
 from math import pi
 
+# TODO: replace maps/ directory with config files?
+
 
 @dataclass
 class ArenaMapData:
