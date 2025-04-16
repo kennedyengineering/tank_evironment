@@ -2,7 +2,9 @@
 
 from .. import tank_game_environment_v0
 
-env = tank_game_environment_v0.parallel_env_fn(render_mode="human", map_id="Boulder")
+env = tank_game_environment_v0.parallel_env_fn(
+    render_mode="human", map_id="GridStaggered"
+)
 observations, infos = env.reset()
 
 while env.agents:
