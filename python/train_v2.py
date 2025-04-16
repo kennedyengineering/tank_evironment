@@ -182,7 +182,7 @@ def train(opponent_model_path, checkpoint_path=None):
     env.close()
 
 
-def eval(model_path, opponent_model_path):
+def eval(model_path, opponent_model_path, map_name):
     """Evaluate an agent."""
 
     # Configuration variables
@@ -201,7 +201,7 @@ def eval(model_path, opponent_model_path):
         tank_game_environment_v1.env_fn,
         n_envs=1,
         seed=seed,
-        env_kwargs=dict(render_mode="human"),
+        env_kwargs=dict(render_mode="human", map_id=map_name),
         vec_env_cls=TankVecEnv,
         vec_env_kwargs=dict(
             opponent_model=opponent_model,
@@ -251,6 +251,9 @@ if __name__ == "__main__":
     eval_parser.add_argument(
         "opponent_model_path", type=str, help="Path to a trained model."
     )
+    eval_parser.add_argument(
+        "--map", type=str, default="Random", help="Name of the map."
+    )
 
     # Parse arguments
     args = parser.parse_args()
@@ -260,4 +263,4 @@ if __name__ == "__main__":
         train(args.opponent_model_path, args.model_path)
     elif args.mode == "eval":
         print("Evaluation mode selected.")
-        eval(args.model_path, args.opponent_model_path)
+        eval(args.model_path, args.opponent_model_path, args.map)
