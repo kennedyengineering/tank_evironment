@@ -1,1 +1,1 @@
-from . import map_definition
+from .maps import random
