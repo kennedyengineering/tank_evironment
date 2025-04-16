@@ -7,8 +7,6 @@ import numpy as np
 from dataclasses import dataclass, field
 from gymnasium.logger import error
 
-# TODO: non-obstacle version
-
 
 @register_map
 @dataclass
@@ -188,3 +186,10 @@ class Random(MapData):
 
         # validate arena configuration
         super().__post_init__()
+
+
+@register_map
+@dataclass
+class RandomNoObstacles(Random):
+    max_random_obstacle_count: int = 0
+    min_random_obstacle_count: int = 0
