@@ -38,7 +38,9 @@ class MapData:
 
     arena_map_data: ArenaMapData
 
+    tank_count: int
     tank_map_data: list[TankMapData] = field(default_factory=list)
+
     obstacle_map_data: list[ObstacleMapData] = field(default_factory=list)
 
     def __post_init__(self):
@@ -54,7 +56,9 @@ class MapData:
             assert (
                 0 <= tank_map_data.position_y <= self.arena_map_data.height
             ), "Invalid tank position Y"
-            assert 0 <= tank_map_data.angle <= 2 * pi, "Invalid tank angle"
+            assert -2 * pi <= tank_map_data.angle <= 2 * pi, "Invalid tank angle"
+
+        assert self.tank_count == len(self.tank_map_data), "Incorrect tank count"
 
         # Validate obstacle configuration
         for obstacle_map_data in self.obstacle_map_data:
@@ -68,4 +72,4 @@ class MapData:
 
     @classmethod
     def get_num_tanks(cls):
-        return len(cls.tank_map_data)
+        return cls.tank_count

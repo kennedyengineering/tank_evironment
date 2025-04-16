@@ -18,7 +18,7 @@ class Random(MapData):
     )
 
     # tank metadata
-    random_tank_count: int = 2
+    tank_count: int = 2
 
     # obstacle metadata
     max_random_obstacle_count: int = 5
@@ -168,7 +168,7 @@ class Random(MapData):
 
     def __post_init__(self):
         # place tanks
-        for _ in range(self.random_tank_count):
+        for _ in range(self.tank_count):
             position, angle = self.__place_tank()
             self.tank_map_data.append(
                 TankMapData(position_x=position[0], position_y=position[1], angle=angle)
@@ -188,8 +188,3 @@ class Random(MapData):
 
         # validate arena configuration
         super().__post_init__()
-
-    @classmethod
-    def get_num_tanks(cls):
-        # overrides MapData.get_num_tanks as here tank_map_data is populated during class initialization, not statically
-        return cls.random_tank_count
