@@ -1,7 +1,7 @@
 # Tank Game (@kennedyengineering)
 
-from .map_base import MapData, TankMapData, ObstacleMapData, ArenaMapData
-from .map_registry import register_map
+from ..map_base import MapData, TankMapData, ObstacleMapData, ArenaMapData
+from ..map_registry import register_map
 
 import numpy as np
 from dataclasses import dataclass, field
