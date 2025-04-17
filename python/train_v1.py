@@ -25,7 +25,7 @@ from stable_baselines3.common.callbacks import (
 from stable_baselines3.common.vec_env import DummyVecEnv
 
 
-def train(checkpoint_path=None):
+def train(checkpoint_path, map_name):
     """Train an agent."""
 
     # Configuration variables
@@ -48,6 +48,7 @@ def train(checkpoint_path=None):
     env_kwargs = dict(
         scripted_policy_name="StaticAgent",
         scripted_policy_kwargs=dict(action=[0.0, 0.0, 0.0]),
+        map_id=map_name,
     )
 
     # PPO configuration variables
@@ -228,6 +229,9 @@ if __name__ == "__main__":
     train_parser.add_argument(
         "model_path", type=str, nargs="?", help="Path to the model checkpoint."
     )
+    train_parser.add_argument(
+        "--map", type=str, default="Random", help="Name of the map."
+    )
 
     # Evaluation mode
     eval_parser = subparsers.add_parser("eval", help="Run model evaluation.")
@@ -241,7 +245,7 @@ if __name__ == "__main__":
 
     if args.mode == "train":
         print("Training mode selected.")
-        train(args.model_path)
+        train(args.model_path, args.map)
     elif args.mode == "eval":
         print("Evaluation mode selected.")
         eval(args.model_path, args.map)

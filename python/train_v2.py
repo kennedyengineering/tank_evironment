@@ -27,7 +27,7 @@ from stable_baselines3.common.callbacks import (
 )
 
 
-def train(opponent_model_path, checkpoint_path=None):
+def train(opponent_model_path, checkpoint_path, map_name):
     """Train an agent."""
 
     # TODO: put in a configuration file
@@ -74,6 +74,7 @@ def train(opponent_model_path, checkpoint_path=None):
         tank_game_environment_v1.env_fn,
         n_envs=num_envs,
         seed=seed,
+        env_kwargs=dict(map_id=map_name),
         vec_env_cls=TankVecEnv,
         vec_env_kwargs=vec_env_kwargs,
     )
@@ -82,6 +83,7 @@ def train(opponent_model_path, checkpoint_path=None):
         tank_game_environment_v1.env_fn,
         n_envs=num_envs,
         seed=seed + num_envs,
+        env_kwargs=dict(map_id=map_name),
         vec_env_cls=TankVecEnv,
         vec_env_kwargs=vec_env_kwargs,
     )
@@ -89,8 +91,8 @@ def train(opponent_model_path, checkpoint_path=None):
     render_env = make_vec_env(
         tank_game_environment_v1.env_fn,
         n_envs=1,
-        env_kwargs=dict(render_mode="rgb_array"),
         seed=seed + 2 * num_envs,
+        env_kwargs=dict(render_mode="rgb_array", map_id=map_name),
         vec_env_cls=TankVecEnv,
         vec_env_kwargs=vec_env_kwargs,
     )
@@ -244,6 +246,9 @@ if __name__ == "__main__":
     train_parser.add_argument(
         "model_path", type=str, nargs="?", help="Path to the model checkpoint."
     )
+    train_parser.add_argument(
+        "--map", type=str, default="Random", help="Name of the map."
+    )
 
     # Evaluation mode
     eval_parser = subparsers.add_parser("eval", help="Run model evaluation.")
@@ -260,7 +265,7 @@ if __name__ == "__main__":
 
     if args.mode == "train":
         print("Training mode selected.")
-        train(args.opponent_model_path, args.model_path)
+        train(args.opponent_model_path, args.model_path, args.map)
     elif args.mode == "eval":
         print("Evaluation mode selected.")
         eval(args.model_path, args.opponent_model_path, args.map)
