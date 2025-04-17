@@ -27,7 +27,7 @@ def cosine_schedule(
         :return: current value
         """
         return final_value + 0.5 * (initial_value - final_value) * (
-            1 + np.cos(progress_remaining * np.pi)
+            1 + np.cos((1 - progress_remaining) * np.pi)
         )
 
     return func
