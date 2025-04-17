@@ -25,7 +25,7 @@ from stable_baselines3.common.vec_env import VecMonitor
 import supersuit as ss
 
 
-def train(checkpoint_path=None):
+def train(checkpoint_path, map_name):
     """Train an agent."""
 
     # Configuration variables
@@ -79,9 +79,11 @@ def train(checkpoint_path=None):
 
         return env
 
-    env = env_fn(n_envs=num_envs, seed=seed)
-    eval_env = env_fn(n_envs=num_envs, seed=seed + num_envs)
-    render_env = env_fn(n_envs=1, seed=seed + 2 * num_envs, render_mode="rgb_array")
+    env = env_fn(n_envs=num_envs, seed=seed, map_id=map_name)
+    eval_env = env_fn(n_envs=num_envs, seed=seed + num_envs, map_id=map_name)
+    render_env = env_fn(
+        n_envs=1, seed=seed + 2 * num_envs, render_mode="rgb_array", map_id=map_name
+    )
 
     env_name = render_env.unwrapped.metadata["name"]
     run_name = f"{env_name}_{time.strftime('%Y%m%d-%H%M%S')}"
@@ -181,10 +183,13 @@ if __name__ == "__main__":
     train_parser.add_argument(
         "model_path", type=str, nargs="?", help="Path to the model checkpoint."
     )
+    train_parser.add_argument(
+        "--map", type=str, default="Random", help="Name of the map."
+    )
 
     # Parse arguments
     args = parser.parse_args()
 
     if args.mode == "train":
         print("Training mode selected.")
-        train(args.model_path)
+        train(args.model_path, args.map)

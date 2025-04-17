@@ -12,11 +12,18 @@ PYBIND11_MODULE(python_bindings, handle) {
   handle.doc() = "Tank Game Python Bindings";
 
   py::enum_<TankGame::CategoryBits>(handle, "CategoryBits")
+      .value("OBSTACLE", TankGame::CategoryBits::OBSTACLE)
       .value("PROJECTILE", TankGame::CategoryBits::PROJECTILE)
       .value("WALL", TankGame::CategoryBits::WALL)
       .value("TANK_BODY", TankGame::CategoryBits::TANK_BODY)
       .value("TANK_GUN", TankGame::CategoryBits::TANK_GUN)
       .export_values();
+
+  py::class_<TankGame::ObstacleConfig>(handle, "ObstacleConfig")
+      .def(py::init<>())
+      .def_readwrite("positionX", &TankGame::ObstacleConfig::positionX)
+      .def_readwrite("positionY", &TankGame::ObstacleConfig::positionY)
+      .def_readwrite("radius", &TankGame::ObstacleConfig::radius);
 
   py::class_<TankGame::TankConfig>(handle, "TankConfig")
       .def(py::init<>())
@@ -37,6 +44,9 @@ PYBIND11_MODULE(python_bindings, handle) {
 
   py::class_<TankGame::Engine>(handle, "Engine")
       .def(py::init<const TankGame::Config &>())
+      /* Add & Remove Obstacles */
+      .def("addObstacle", &TankGame::Engine::addObstacle)
+      .def("removeObstacle", &TankGame::Engine::removeObstacle)
       /* Add & Remove Tanks */
       .def("addTank", &TankGame::Engine::addTank)
       .def("removeTank", &TankGame::Engine::removeTank)
@@ -60,6 +70,8 @@ PYBIND11_MODULE(python_bindings, handle) {
       .def("getTankWorldVelocity", &TankGame::Engine::getTankWorldVelocity)
       .def("getTankLocalVelocity", &TankGame::Engine::getTankLocalVelocity)
       .def("getTankAngularVelocity", &TankGame::Engine::getTankAngularVelocity)
+      /* Obstacle Rendering */
+      .def("renderObstacle", &TankGame::Engine::renderObstacle)
       /* Tank Rendering */
       .def("renderProjectiles", &TankGame::Engine::renderProjectiles)
       .def("renderTank", &TankGame::Engine::renderTank)

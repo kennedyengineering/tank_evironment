@@ -14,6 +14,21 @@ config = tank_game.Config()
 config.verboseOutput = True
 engine = tank_game.Engine(config)
 
+# Initialize obstacles
+obstacle_config_0 = tank_game.ObstacleConfig()
+obstacle_config_0.positionX = config.arenaWidth / 2
+obstacle_config_0.positionY = config.arenaHeight / 2
+obstacle_config_0.radius = 10
+
+obstacle_id_0 = engine.addObstacle(obstacle_config_0)
+
+obstacle_config_1 = tank_game.ObstacleConfig()
+obstacle_config_1.positionX = 5
+obstacle_config_1.positionY = 5
+obstacle_config_1.radius = 5
+
+obstacle_id_1 = engine.addObstacle(obstacle_config_1)
+
 # Initialize tanks
 player_tank_config = tank_game.TankConfig()
 player_tank_config.positionX = config.arenaWidth / 3
@@ -94,6 +109,9 @@ while running:
 
     # Render scene
     engine.clearImage()
+
+    engine.renderObstacle(obstacle_id_0)
+    engine.renderObstacle(obstacle_id_1)
 
     engine.renderTank(player_tank_id)
     engine.renderTank(other_tank_id)
