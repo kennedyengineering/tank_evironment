@@ -6,6 +6,7 @@ from tank_game_agent.callback.callback_video_recorder import VideoRecorderCallba
 from tank_game_agent.callback.callback_hparam_recorder import HParamRecorderCallback
 
 from tank_game_agent.schedule.schedule_linear import linear_schedule
+from tank_game_agent.schedule.schedule_cosine import cosine_schedule
 
 from tank_game_agent.feature_extactor.feature_extractor_lidar import LidarCNN
 
@@ -48,7 +49,7 @@ def train(checkpoint_path, map_name):
     schedule_clip_range = False
     policy_kwargs = dict(
         features_extractor_class=LidarCNN,
-        features_extractor_kwargs=dict(features_dim=128),
+        features_extractor_kwargs=dict(features_dim=256),
     )
     env_kwargs = dict(
         scripted_policy_name="StaticAgent",
@@ -59,9 +60,9 @@ def train(checkpoint_path, map_name):
     # PPO configuration variables
     ppo_config = {
         "learning_rate": 3e-4,
-        "n_steps": 128,
-        "batch_size": 128,
-        "n_epochs": 10,
+        "n_steps": 512,
+        "batch_size": 512,
+        "n_epochs": 5,
         "gamma": 0.99,
         "gae_lambda": 0.95,
         "clip_range": 0.2,
@@ -70,7 +71,7 @@ def train(checkpoint_path, map_name):
         "max_grad_norm": 0.5,
     }
 
-    torch.set_num_threads(2)
+    torch.set_num_threads(6)
 
     # Create environments
     env = make_vec_env(
@@ -97,14 +98,14 @@ def train(checkpoint_path, map_name):
         vec_env_cls=DummyVecEnv,
     )
 
-    env_name = render_env.metadata["name"]
+    env_name = render_env.unwrapped.metadata["name"]
     run_name = f"{env_name}_{time.strftime('%Y%m%d-%H%M%S')}"
     save_dir = os.path.join(save_dir, run_name)
 
     # Handle scheduling learning rate and clip range
     ppo_config_copy = ppo_config.copy()
     if schedule_learning_rate:
-        ppo_config["learning_rate"] = linear_schedule(ppo_config["learning_rate"])
+        ppo_config["learning_rate"] = cosine_schedule(ppo_config["learning_rate"])
     if schedule_clip_range:
         ppo_config["clip_range"] = linear_schedule(ppo_config["clip_range"])
 
@@ -190,7 +191,7 @@ def eval(model_path, map_name):
     deterministic = True
     num_episodes = 20
     seed = 100
-    device = "cuda"
+    device = "cpu"
     env_kwargs = dict(
         scripted_policy_name="StaticAgent",
         scripted_policy_kwargs=dict(action=[0.0, 0.0, 0.0]),

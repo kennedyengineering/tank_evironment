@@ -24,24 +24,24 @@ class LidarCNN(BaseFeaturesExtractor):
 
         # Convolutional Block 1
         self.conv1 = nn.Conv1d(
-            in_channels=1, out_channels=16, kernel_size=5, stride=1, padding=0
+            in_channels=1, out_channels=32, kernel_size=5, stride=1, padding=0
         )
-        self.bn1 = nn.BatchNorm1d(16)
+        self.bn1 = nn.BatchNorm1d(32)
         self.pool1 = nn.MaxPool1d(kernel_size=2)
 
         # Convolutional Block 2
         self.conv2 = nn.Conv1d(
-            in_channels=16, out_channels=32, kernel_size=5, stride=1, padding=0
+            in_channels=32, out_channels=64, kernel_size=5, stride=1, padding=0
         )
-        self.bn2 = nn.BatchNorm1d(32)
+        self.bn2 = nn.BatchNorm1d(64)
         self.pool2 = nn.MaxPool1d(kernel_size=2)
 
         # Dropout for regularization.
         self.dropout = nn.Dropout(0.5)
 
         # Fully connected layers for the CNN branch.
-        self.fc1 = nn.Linear(32 * final_length, 128)
-        self.fc2 = nn.Linear(128, features_dim)
+        self.fc1 = nn.Linear(64 * final_length, 256)
+        self.fc2 = nn.Linear(256, features_dim)
 
         # Process extra features through a small network to normalize them.
         self.extra_fc = nn.Sequential(nn.Linear(4, 16), nn.ReLU(), nn.Linear(16, 4))
@@ -56,20 +56,20 @@ class LidarCNN(BaseFeaturesExtractor):
         # Circular padding so that length remains the same.
         x = F.pad(x, (2, 2), mode="circular")
         x = self.conv1(x)
-        # x = self.bn1(x)
+        x = self.bn1(x)
         x = F.relu(x)
         x = self.pool1(x)  # reduces length by factor of 2
 
         # --- Convolutional Block 2 ---
         x = F.pad(x, (2, 2), mode="circular")
         x = self.conv2(x)
-        # x = self.bn2(x)
+        x = self.bn2(x)
         x = F.relu(x)
         x = self.pool2(x)  # reduces length further by factor of 2
 
         # Flatten the CNN output.
         x = x.view(x.size(0), -1)
-        # x = self.dropout(x)
+        x = self.dropout(x)
         x = F.relu(self.fc1(x))
         cnn_features = self.fc2(x)  # Shape: (batch, features_dim)
 
