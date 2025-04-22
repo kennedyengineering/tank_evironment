@@ -30,7 +30,7 @@ from sb3_contrib.ppo_recurrent.policies import MlpLstmPolicy
 import torch
 
 
-def train(checkpoint_path=None):
+def train(checkpoint_path, map_name):
     """Train an agent."""
 
     # Configuration variables
@@ -53,6 +53,7 @@ def train(checkpoint_path=None):
     env_kwargs = dict(
         scripted_policy_name="StaticAgent",
         scripted_policy_kwargs=dict(action=[0.0, 0.0, 0.0]),
+        map_id=map_name,
     )
 
     # PPO configuration variables
@@ -182,7 +183,7 @@ def train(checkpoint_path=None):
     env.close()
 
 
-def eval(model_path):
+def eval(model_path, map_name):
     """Evaluate an agent."""
 
     # Configuration variables
@@ -200,7 +201,7 @@ def eval(model_path):
         tank_game_environment_v1.env_fn,
         n_envs=1,
         seed=seed,
-        env_kwargs=env_kwargs | dict(render_mode="human"),
+        env_kwargs=env_kwargs | dict(render_mode="human", map_id=map_name),
         vec_env_cls=DummyVecEnv,
     )
 
@@ -235,17 +236,23 @@ if __name__ == "__main__":
     train_parser.add_argument(
         "model_path", type=str, nargs="?", help="Path to the model checkpoint."
     )
+    train_parser.add_argument(
+        "--map", type=str, default="Random", help="Name of the map."
+    )
 
     # Evaluation mode
     eval_parser = subparsers.add_parser("eval", help="Run model evaluation.")
     eval_parser.add_argument("model_path", type=str, help="Path to the trained model.")
+    eval_parser.add_argument(
+        "--map", type=str, default="Random", help="Name of the map."
+    )
 
     # Parse arguments
     args = parser.parse_args()
 
     if args.mode == "train":
         print("Training mode selected.")
-        train(args.model_path)
+        train(args.model_path, args.map)
     elif args.mode == "eval":
         print("Evaluation mode selected.")
-        eval(args.model_path)
+        eval(args.model_path, args.map)

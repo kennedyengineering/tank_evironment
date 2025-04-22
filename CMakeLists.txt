@@ -51,6 +51,7 @@ FetchContent_MakeAvailable(googletest)
 add_library(tank_game_lib SHARED
     src/engine.cpp
     src/tank.cpp
+    src/obstacle.cpp
     src/render.cpp
 )
 

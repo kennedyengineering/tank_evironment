@@ -3,9 +3,14 @@ import python_bindings as tank_game
 
 from .tank_game_util import TankData
 
+from ..map.map_registry import registry as map_registry
+
 from pettingzoo import ParallelEnv
 from pettingzoo.utils import parallel_to_aec, aec_to_parallel, wrappers
-from gymnasium.logger import warn, error
+from gymnasium.logger import (
+    warn,
+    error,
+)  # FIXME: do something about the error conditions
 from gymnasium.spaces import Box
 from gymnasium.utils import EzPickle
 
@@ -41,14 +46,9 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
     - render_modes : valid rendering modes
     - render_fps : for "human" rendering mode
     - max_timesteps : how many steps before truncation (-1 for no truncation)
-    - num_tanks : number of agents
-    - random_position : initialize tanks in a random position
-    - random_angle : initialize tank with a random rotation
     - reload_delay : how many steps before tank can fire (0 for no delay)
 
     The engine_metadata holds engine constants.
-    - arena_width : width of arena (meters)
-    - arena_height : height of arena (meters)
     - pixel_density : pixels per meters (for rendering)
     - verbose_output : enable engine stdout messages
 
@@ -57,11 +57,6 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
     - lidar_range : range of the lidar (meters)
     - lidar_points : number of points in a lidar scan
     - lidar_pixel_radius : radius in pixels (for rendering)
-
-    The placement_metadata holds agent placement constants.
-    - max_iterations : number of attempts at randomly placing an agent
-    - wall_buffer : minimum distance between agent and wall (meters)
-    - tank_buffer : minimum distance between two agents (meters)
     """
 
     metadata = {
@@ -69,15 +64,10 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         "render_modes": ["human", "rgb_array"],
         "render_fps": 30,
         "max_timesteps": 1000,
-        "num_tanks": 2,
-        "random_position": True,
-        "random_angle": True,
         "reload_delay": 20,
     }
 
     engine_metadata = {
-        "arena_width": 100.0,
-        "arena_height": 100.0,
         "pixel_density": 2.0,
         "verbose_output": False,
     }
@@ -89,45 +79,106 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         "lidar_pixel_radius": 1.0,
     }
 
-    placement_metadata = {
-        "max_iterations": 5,
-        "wall_buffer": 8.0,
-        "tank_buffer": 10.0,
-    }
-
-    def __init__(self, render_mode=None):
+    def __init__(self, render_mode: str = None, map_id: str = "Random"):
         """The init method takes in environment arguments.
         These attributes should not be changed after initialization.
         """
 
-        EzPickle.__init__(self, render_mode=render_mode)
+        EzPickle.__init__(self, render_mode=render_mode, map_id=map_id)
 
+        # load map class
+        if map_id not in map_registry:
+            error("Invalid map id.")
+        self.map_cls = map_registry[map_id]
+
+        # define engine variables
+        self.engine = None
+        self.agent_data = None
+        self.obstacle_ids = None
+
+        # define rendering variables
         self.render_mode = render_mode
         self.screen = None
         self.clock = None
 
+        # define environment variables
+        self.possible_agents = [
+            f"tank_{i}" for i in range(self.map_cls.get_num_tanks())
+        ]
+        self.agents = None
         self.timestep = None
-        self.agent_data = {
-            f"tank_{i}": TankData(-1, i, tank_game.TankConfig(), 0)
-            for i in range(self.metadata["num_tanks"])
-        }
+
+    def __construct_map(self):
+        """Configures the arena according to the specification defined in the map."""
+
+        # initialize map
+        map_inst = self.map_cls()
+
+        # construct engine
+        engine_config = tank_game.Config()
+        engine_config.arenaWidth = map_inst.arena_map_data.width
+        engine_config.arenaHeight = map_inst.arena_map_data.height
+        engine_config.pixelDensity = self.engine_metadata["pixel_density"]
+        engine_config.verboseOutput = self.engine_metadata["verbose_output"]
+
+        self.engine = tank_game.Engine(engine_config)
+
+        # construct agents
+        self.agent_data = dict()
+        for agent_data_key, tank_map_data in zip(
+            self.possible_agents, map_inst.tank_map_data
+        ):
+            tank_config = tank_game.TankConfig()
+            tank_config.positionX = tank_map_data.position_x
+            tank_config.positionY = tank_map_data.position_y
+            tank_config.angle = tank_map_data.angle
+            tank_config.treadMaxSpeed = self.tank_metadata["tread_max_speed"]
+            tank_config.lidarPoints = self.tank_metadata["lidar_points"]
+            tank_config.lidarRange = self.tank_metadata["lidar_range"]
+            tank_config.lidarRadius = self.tank_metadata["lidar_pixel_radius"]
+
+            tank_id = self.engine.addTank(tank_config)
+
+            self.agent_data[agent_data_key] = TankData(tank_id, 0)
+
+        # construct obstacles
+        self.obstacle_ids = list()
+        for obstacle_map_data in map_inst.obstacle_map_data:
+            obstacle_config = tank_game.ObstacleConfig()
+            obstacle_config.positionX = obstacle_map_data.position_x
+            obstacle_config.positionY = obstacle_map_data.position_y
+            obstacle_config.radius = obstacle_map_data.radius
+
+            obstacle_id = self.engine.addObstacle(obstacle_config)
+
+            self.obstacle_ids.append(obstacle_id)
+
+    def reset(self, seed=None, options=None):
+        """Reset the environment to a starting point."""
+
+        # set seed
+        if seed is not None:
+            np.random.seed(seed=seed)
+
+        # reset engine variables
+        self.__construct_map()
+
+        # reset environment variables
         self.possible_agents = list(self.agent_data.keys())
+        self.agents = copy(self.possible_agents)
+        self.timestep = 0
 
-        self.engine_config = tank_game.Config()
-        self.engine_config.arenaWidth = self.engine_metadata["arena_width"]
-        self.engine_config.arenaHeight = self.engine_metadata["arena_height"]
-        self.engine_config.pixelDensity = self.engine_metadata["pixel_density"]
-        self.engine_config.verboseOutput = self.engine_metadata["verbose_output"]
+        # get initial observations
+        observations = {a: self.get_observation(a) for a in self.agents}
 
-        for a in self.possible_agents:
-            self.agent_data[a].config.treadMaxSpeed = self.tank_metadata[
-                "tread_max_speed"
-            ]
-            self.agent_data[a].config.lidarPoints = self.tank_metadata["lidar_points"]
-            self.agent_data[a].config.lidarRange = self.tank_metadata["lidar_range"]
-            self.agent_data[a].config.lidarRadius = self.tank_metadata[
-                "lidar_pixel_radius"
-            ]
+        # get dummy infos (necessary for proper parallel_to_aec conversion)
+        infos = {a: {} for a in self.agents}
+
+        # render environment (optional)
+        if self.render_mode == "human":
+            self.render()
+
+        return observations, infos
 
     def __get_agent_from_id(self, id):
         """Search for matching TankData.id in agent_data."""
@@ -144,172 +195,10 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
 
         return agent
 
-    def __place_agent_deterministic(self, agent):
-        """Place tanks in a circle."""
-
-        if agent not in self.possible_agents:
-            error("Invalid agent.")
-
-        iid = self.agent_data[agent].iid
-
-        d_radians = 2 * np.pi / self.metadata["num_tanks"]
-        radians = d_radians * iid
-
-        radius = (
-            min(
-                self.engine_metadata["arena_width"],
-                self.engine_metadata["arena_height"],
-            )
-            / 4.0
-        )
-
-        wall_buffer = self.placement_metadata["wall_buffer"]
-        if radius < wall_buffer:
-            error(f"Failed to place tank. (tank to wall distance={radius})")
-
-        d_position = np.array([radius * np.cos(d_radians), radius * np.sin(d_radians)])
-        distance = np.linalg.norm(d_position - [radius, 0])
-
-        tank_buffer = self.placement_metadata["tank_buffer"]
-        if distance < tank_buffer:
-            error(f"Failed to place tank. (inter tank distance={distance})")
-
-        center_position = (
-            np.array(
-                [
-                    self.engine_metadata["arena_width"],
-                    self.engine_metadata["arena_height"],
-                ]
-            )
-            / 2.0
-        )
-        position = (
-            np.array([radius * np.cos(radians), radius * np.sin(radians)])
-            + center_position
-        )
-
-        self.agent_data[agent].config.positionX = position[0]
-        self.agent_data[agent].config.positionY = position[1]
-
-    def __rotate_agent_deterministic(self, agent):
-        """Rotate tanks along a circle."""
-
-        if agent not in self.possible_agents:
-            error("Invalid agent.")
-
-        iid = self.agent_data[agent].iid
-
-        d_radians = 2 * np.pi / self.metadata["num_tanks"]
-        radians = d_radians * iid
-
-        angle = radians - np.pi
-
-        self.agent_data[agent].config.angle = angle
-
-    def __place_agent_stochastic(self, agent):
-        """Randomly place tanks."""
-
-        if agent not in self.possible_agents:
-            error("Invalid agent.")
-
-        iters = self.placement_metadata["max_iterations"]
-        placed = False
-        for _ in range(iters):
-
-            # place away from walls
-            wall_buffer = self.placement_metadata["wall_buffer"]
-            position = (
-                np.random.rand(
-                    2,
-                )
-                * [
-                    self.engine_config.arenaWidth - wall_buffer * 2,
-                    self.engine_config.arenaHeight - wall_buffer * 2,
-                ]
-                + wall_buffer
-            )
-
-            # place away from tanks
-            tank_buffer = self.placement_metadata["tank_buffer"]
-            tank_overlaps = False
-            for a in self.possible_agents:
-                distance = np.linalg.norm(
-                    position
-                    - [
-                        self.agent_data[a].config.positionX,
-                        self.agent_data[a].config.positionY,
-                    ]
-                )
-                if distance < tank_buffer:
-                    tank_overlaps = True
-                    break
-
-            if not tank_overlaps:
-                placed = True
-                break
-
-        if not placed:
-            error(f"Failed to place tank within {iters} iterations")
-
-        self.agent_data[agent].config.positionX = position[0]
-        self.agent_data[agent].config.positionY = position[1]
-
-    def __rotate_agent_stochastic(self, agent):
-        """Randomly rotate tanks."""
-
-        if agent not in self.possible_agents:
-            error("Invalid agent.")
-
-        angle = np.random.rand() * 2 * np.pi
-        self.agent_data[agent].config.angle = angle
-
-    def reset(self, seed=None, options=None):
-        """Reset the environment to a starting point."""
-
-        # set seed
-        if seed is not None:
-            np.random.seed(seed=seed)
-
-        # construct engine
-        self.engine = tank_game.Engine(self.engine_config)
-
-        # reset agents
-        for a in self.possible_agents:
-            self.agent_data[a].config.positionX = -1.0
-            self.agent_data[a].config.positionY = -1.0
-            self.agent_data[a].config.angle = 0.0
-            self.agent_data[a].reload_counter = 0
-
-        # place and construct agents
-        for a in self.possible_agents:
-            if self.metadata["random_position"]:
-                self.__place_agent_stochastic(a)
-            else:
-                self.__place_agent_deterministic(a)
-
-            if self.metadata["random_angle"]:
-                self.__rotate_agent_stochastic(a)
-            else:
-                self.__rotate_agent_deterministic(a)
-
-            self.agent_data[a].id = self.engine.addTank(self.agent_data[a].config)
-
-        self.timestep = 0
-
-        self.agents = copy(self.possible_agents)
-
-        observations = {a: self.get_observation(a) for a in self.agents}
-
-        # Get dummy infos. Necessary for proper parallel_to_aec conversion.
-        infos = {a: {} for a in self.agents}
-
-        if self.render_mode == "human":
-            self.render()
-
-        return observations, infos
-
     def __shape_agent_reward(self, observation):
         """Shapes agent reward."""
+
+        # TODO: add metadata for simple reward shaping configuration
 
         reward = 0
 
@@ -338,11 +227,11 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
 
             self.engine.moveLeftTankTread(
                 self.agent_data[a].id,
-                action[0] * self.agent_data[a].config.treadMaxSpeed,
+                action[0] * self.tank_metadata["tread_max_speed"],
             )
             self.engine.moveRightTankTread(
                 self.agent_data[a].id,
-                action[1] * self.agent_data[a].config.treadMaxSpeed,
+                action[1] * self.tank_metadata["tread_max_speed"],
             )
 
             if action[2] > 0.0 and self.agent_data[a].reload_counter == 0:
@@ -445,9 +334,13 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         # Render frame
         self.engine.clearImage()
 
+        for id in self.obstacle_ids:
+            self.engine.renderObstacle(id)
+
         for a in self.agents:
-            self.engine.renderTank(self.agent_data[a].id)
-            self.engine.renderTankLidar(self.agent_data[a].id)
+            id = self.agent_data[a].id
+            self.engine.renderTank(id)
+            self.engine.renderTankLidar(id)
 
         self.engine.renderProjectiles()
 
@@ -471,11 +364,10 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         # FIXME: remove clipping to account for brief moments when values are beyond defined ranges?
 
         id = self.agent_data[agent].id
-        config = self.agent_data[agent].config
 
         # obtain lidar observation
         lidar_scan = self.engine.scanTankLidar(id)
-        lidar_range = config.lidarRange
+        lidar_range = self.tank_metadata["lidar_range"]
 
         lidar_scan = np.clip(
             lidar_scan, 0.0, lidar_range
@@ -484,7 +376,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
 
         # obtain velocity observation
         velocity = self.engine.getTankLocalVelocity(id)
-        velocity_range = config.treadMaxSpeed
+        velocity_range = self.tank_metadata["tread_max_speed"]
 
         velocity = np.clip(
             velocity, -velocity_range, velocity_range
