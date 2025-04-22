@@ -24,24 +24,24 @@ class LidarCNN(BaseFeaturesExtractor):
 
         # Convolutional Block 1
         self.conv1 = nn.Conv1d(
-            in_channels=1, out_channels=16, kernel_size=5, stride=1, padding=0
+            in_channels=1, out_channels=32, kernel_size=5, stride=1, padding=0
         )
-        self.bn1 = nn.BatchNorm1d(16)
+        self.bn1 = nn.BatchNorm1d(32)
         self.pool1 = nn.MaxPool1d(kernel_size=2)
 
         # Convolutional Block 2
         self.conv2 = nn.Conv1d(
-            in_channels=16, out_channels=32, kernel_size=5, stride=1, padding=0
+            in_channels=32, out_channels=64, kernel_size=5, stride=1, padding=0
         )
-        self.bn2 = nn.BatchNorm1d(32)
+        self.bn2 = nn.BatchNorm1d(64)
         self.pool2 = nn.MaxPool1d(kernel_size=2)
 
         # Dropout for regularization.
         self.dropout = nn.Dropout(0.5)
 
         # Fully connected layers for the CNN branch.
-        self.fc1 = nn.Linear(32 * final_length, 128)
-        self.fc2 = nn.Linear(128, features_dim)
+        self.fc1 = nn.Linear(64 * final_length, 256)
+        self.fc2 = nn.Linear(256, features_dim)
 
         # Process extra features through a small network to normalize them.
         self.extra_fc = nn.Sequential(nn.Linear(4, 16), nn.ReLU(), nn.Linear(16, 4))

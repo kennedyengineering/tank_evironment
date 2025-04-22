@@ -6,6 +6,7 @@ from tank_game_agent.callback.callback_video_recorder import VideoRecorderCallba
 from tank_game_agent.callback.callback_hparam_recorder import HParamRecorderCallback
 
 from tank_game_agent.schedule.schedule_linear import linear_schedule
+from tank_game_agent.schedule.schedule_cosine import cosine_schedule
 
 from tank_game_agent.feature_extactor.feature_extractor_wrapper import (
     FeatureExtractorWrapper,
@@ -61,7 +62,7 @@ def train(checkpoint_path, map_name):
     )
 
     feature_model = PPO.load(
-        "weights/tank_game_environment_v1_20250331-010051/tank_game_environment_v1_20250331-010051.zip",
+        "weights/tank_game_environment_v1_20250417-053308/tank_game_environment_v1_20250417-053308.zip",
         device=device,
         seed=seed,
     )
@@ -70,8 +71,8 @@ def train(checkpoint_path, map_name):
     # PPO configuration variables
     ppo_config = {
         "learning_rate": 3e-4,
-        "n_steps": 128,
-        "batch_size": 128,
+        "n_steps": 512,
+        "batch_size": 512,
         "n_epochs": 5,
         "gamma": 0.99,
         "gae_lambda": 0.95,
@@ -81,7 +82,7 @@ def train(checkpoint_path, map_name):
         "max_grad_norm": 0.5,
     }
 
-    torch.set_num_threads(2)
+    torch.set_num_threads(6)
 
     # Create environments
     env = make_vec_env(
@@ -121,7 +122,7 @@ def train(checkpoint_path, map_name):
     # Handle scheduling learning rate and clip range
     ppo_config_copy = ppo_config.copy()
     if schedule_learning_rate:
-        ppo_config["learning_rate"] = linear_schedule(ppo_config["learning_rate"])
+        ppo_config["learning_rate"] = cosine_schedule(ppo_config["learning_rate"])
     if schedule_clip_range:
         ppo_config["clip_range"] = linear_schedule(ppo_config["clip_range"])
 
