@@ -215,7 +215,7 @@ def eval(model_path, map_name):
     )
 
     feature_model = PPO.load(
-        "weights/tank_game_environment_v1_20250331-010051/tank_game_environment_v1_20250331-010051.zip",
+        "weights/tank_game_environment_v1_20250417-053308/tank_game_environment_v1_20250417-053308.zip",
         device=device,
         seed=seed,
     )
