@@ -8,8 +8,8 @@ from tank_game_agent.callback.callback_hparam_recorder import HParamRecorderCall
 from tank_game_agent.schedule.schedule_linear import linear_schedule
 from tank_game_agent.schedule.schedule_cosine import cosine_schedule
 
-from tank_game_agent.feature_extactor.feature_extractor_wrapper import (
-    FeatureExtractorWrapper,
+from tank_game_agent.feature_extactor.feature_extractor_frozen import (
+    FrozenFeatureExtractor,
 )
 
 import time
@@ -50,6 +50,11 @@ def train(checkpoint_path, map_name):
     schedule_learning_rate = True
     schedule_clip_range = False
     policy_kwargs = dict(
+        features_extractor_class=FrozenFeatureExtractor,
+        features_extractor_kwargs=dict(
+            checkpoint="weights/tank_game_environment_v1_20250417-053308/tank_game_environment_v1_20250417-053308.zip",
+            device=device,
+        ),
         # n_lstm_layers=2,
         # lstm_hidden_size=512,
         # shared_lstm=True,
@@ -60,13 +65,6 @@ def train(checkpoint_path, map_name):
         scripted_policy_kwargs=dict(action=[0.0, 0.0, 0.0]),
         map_id=map_name,
     )
-
-    feature_model = PPO.load(
-        "weights/tank_game_environment_v1_20250417-053308/tank_game_environment_v1_20250417-053308.zip",
-        device=device,
-        seed=seed,
-    )
-    feature_model.policy.features_extractor.eval()
 
     # PPO configuration variables
     ppo_config = {
@@ -91,8 +89,6 @@ def train(checkpoint_path, map_name):
         env_kwargs=env_kwargs,
         seed=seed,
         vec_env_cls=DummyVecEnv,
-        wrapper_class=FeatureExtractorWrapper,
-        wrapper_kwargs=dict(feature_extractor=feature_model.policy.features_extractor),
     )
 
     eval_env = make_vec_env(
@@ -101,8 +97,6 @@ def train(checkpoint_path, map_name):
         env_kwargs=env_kwargs,
         seed=seed + num_envs,
         vec_env_cls=DummyVecEnv,
-        wrapper_class=FeatureExtractorWrapper,
-        wrapper_kwargs=dict(feature_extractor=feature_model.policy.features_extractor),
     )
 
     render_env = make_vec_env(
@@ -111,8 +105,6 @@ def train(checkpoint_path, map_name):
         env_kwargs=env_kwargs | dict(render_mode="rgb_array"),
         seed=seed + 2 * num_envs,
         vec_env_cls=DummyVecEnv,
-        wrapper_class=FeatureExtractorWrapper,
-        wrapper_kwargs=dict(feature_extractor=feature_model.policy.features_extractor),
     )
 
     env_name = render_env.unwrapped.metadata["name"]
@@ -214,13 +206,6 @@ def eval(model_path, map_name):
         scripted_policy_kwargs=dict(action=[0.0, 0.0, 0.0]),
     )
 
-    feature_model = PPO.load(
-        "weights/tank_game_environment_v1_20250417-053308/tank_game_environment_v1_20250417-053308.zip",
-        device=device,
-        seed=seed,
-    )
-    feature_model.policy.features_extractor.eval()
-
     # Create environment
     eval_env = make_vec_env(
         tank_game_environment_v1.env_fn,
@@ -228,8 +213,6 @@ def eval(model_path, map_name):
         seed=seed,
         env_kwargs=env_kwargs | dict(render_mode="human", map_id=map_name),
         vec_env_cls=DummyVecEnv,
-        wrapper_class=FeatureExtractorWrapper,
-        wrapper_kwargs=dict(feature_extractor=feature_model.policy.features_extractor),
     )
 
     eval_env_name = eval_env.metadata["name"]
