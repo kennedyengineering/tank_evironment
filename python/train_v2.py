@@ -31,6 +31,8 @@ from stable_baselines3.common.callbacks import (
 from sb3_contrib import RecurrentPPO
 from sb3_contrib.ppo_recurrent.policies import MlpLstmPolicy
 
+import torch
+
 
 def train(opponent_model_path, checkpoint_path, map_name, feature_model_path):
     """Train an agent."""
@@ -89,6 +91,8 @@ def train(opponent_model_path, checkpoint_path, map_name, feature_model_path):
         "vf_coef": 0.5,
         "max_grad_norm": 0.5,
     }
+
+    torch.set_num_threads(6)
 
     # Create environments
     env = make_vec_env(
