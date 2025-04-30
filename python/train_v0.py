@@ -27,6 +27,9 @@ from stable_baselines3.common.vec_env import VecMonitor
 
 import supersuit as ss
 
+from sb3_contrib import RecurrentPPO
+from sb3_contrib.ppo_recurrent.policies import MlpLstmPolicy
+
 
 def train(checkpoint_path, map_name, feature_model_path):
     """Train an agent."""
@@ -115,8 +118,8 @@ def train(checkpoint_path, map_name, feature_model_path):
 
     # Create model
     if checkpoint_path is None:
-        model = PPO(
-            policy=MlpPolicy,
+        model = RecurrentPPO(
+            policy=MlpLstmPolicy,
             env=env,
             verbose=verbose,
             device=device,
@@ -126,7 +129,7 @@ def train(checkpoint_path, map_name, feature_model_path):
             **ppo_config,
         )
     else:
-        model = PPO.load(
+        model = RecurrentPPO.load(
             path=checkpoint_path,
             env=env,
             verbose=verbose,
