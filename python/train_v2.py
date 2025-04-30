@@ -81,9 +81,9 @@ def train(opponent_model_path, checkpoint_path, map_name, feature_model_path):
     # PPO configuration variables
     ppo_config = {
         "learning_rate": 3e-4,
-        "n_steps": 1024,
-        "batch_size": 256,
-        "n_epochs": 10,
+        "n_steps": 512,
+        "batch_size": 512,
+        "n_epochs": 5,
         "gamma": 0.99,
         "gae_lambda": 0.95,
         "clip_range": 0.2,
