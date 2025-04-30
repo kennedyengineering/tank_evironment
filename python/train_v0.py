@@ -8,7 +8,9 @@ from tank_game_agent.callback.callback_hparam_recorder import HParamRecorderCall
 from tank_game_agent.schedule.schedule_linear import linear_schedule
 from tank_game_agent.schedule.schedule_cosine import cosine_schedule
 
-from tank_game_agent.feature_extactor.feature_extractor_lidar import LidarCNN
+from tank_game_agent.feature_extactor.feature_extractor_wrapper import (
+    FeatureExtractorWrapper,
+)
 
 import time
 import os
@@ -26,7 +28,7 @@ from stable_baselines3.common.vec_env import VecMonitor
 import supersuit as ss
 
 
-def train(checkpoint_path, map_name):
+def train(checkpoint_path, map_name, feature_model_path):
     """Train an agent."""
 
     # Configuration variables
@@ -34,7 +36,7 @@ def train(checkpoint_path, map_name):
     num_eval_episodes = 10
     steps = 6_000_000
     seed = 0  # if continuing from a checkpoint might want to specify a different seed
-    device = "cuda"
+    device = "cpu"
     log_dir = "logs/"
     save_dir = "weights/"
     save_freq = 100_000
@@ -43,9 +45,19 @@ def train(checkpoint_path, map_name):
     schedule_learning_rate = True
     schedule_clip_range = False
     policy_kwargs = dict(
-        features_extractor_class=LidarCNN,
-        features_extractor_kwargs=dict(features_dim=128),
+        # n_lstm_layers=2,
+        # lstm_hidden_size=512,
+        # shared_lstm=True,
+        # enable_critic_lstm=False,
     )
+    env_kwargs = dict(map_id=map_name)
+
+    feature_model = PPO.load(
+        feature_model_path,
+        device=device,
+        seed=seed,
+    )
+    feature_model.policy.features_extractor.eval()
 
     # PPO configuration variables
     ppo_config = {
@@ -70,6 +82,10 @@ def train(checkpoint_path, map_name):
             seed=seed
         )  # FIXME: In "human" mode, calling reset() here initializes PyGame and breaks things later.
 
+        env = FeatureExtractorWrapper(
+            env, feature_extractor=feature_model.policy.features_extractor
+        )
+
         env = ss.pettingzoo_env_to_vec_env_v1(env)
         env = ss.concat_vec_envs_v1(env, n_envs, base_class="stable_baselines3")
         env.seed = (
@@ -80,10 +96,10 @@ def train(checkpoint_path, map_name):
 
         return env
 
-    env = env_fn(n_envs=num_envs, seed=seed, map_id=map_name)
-    eval_env = env_fn(n_envs=num_envs, seed=seed + num_envs, map_id=map_name)
+    env = env_fn(n_envs=num_envs, seed=seed, **env_kwargs)
+    eval_env = env_fn(n_envs=num_envs, seed=seed + num_envs, **env_kwargs)
     render_env = env_fn(
-        n_envs=1, seed=seed + 2 * num_envs, render_mode="rgb_array", map_id=map_name
+        n_envs=1, seed=seed + 2 * num_envs, render_mode="rgb_array", **env_kwargs
     )
 
     env_name = render_env.unwrapped.metadata["name"]
@@ -187,10 +203,16 @@ if __name__ == "__main__":
     train_parser.add_argument(
         "--map", type=str, default="Random", help="Name of the map."
     )
+    train_parser.add_argument(
+        "--feature-model",
+        type=str,
+        default="weights/tank_game_environment_v1_20250417-053308/tank_game_environment_v1_20250417-053308.zip",
+        help="Path to the model with the feature extractor checkpoint.",
+    )
 
     # Parse arguments
     args = parser.parse_args()
 
     if args.mode == "train":
         print("Training mode selected.")
-        train(args.model_path, args.map)
+        train(args.model_path, args.map, args.feature_model)
