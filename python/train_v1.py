@@ -32,7 +32,7 @@ from sb3_contrib.ppo_recurrent.policies import MlpLstmPolicy
 import torch
 
 
-def train(checkpoint_path, map_name):
+def train(checkpoint_path, map_name, feature_model_path):
     """Train an agent."""
 
     # Configuration variables
@@ -61,7 +61,7 @@ def train(checkpoint_path, map_name):
     )
 
     feature_model = PPO.load(
-        "weights/tank_game_environment_v1_20250417-053308/tank_game_environment_v1_20250417-053308.zip",
+        feature_model_path,
         device=device,
         seed=seed,
     )
@@ -201,7 +201,7 @@ def train(checkpoint_path, map_name):
     env.close()
 
 
-def eval(model_path, map_name):
+def eval(model_path, map_name, feature_model_path):
     """Evaluate an agent."""
 
     # Configuration variables
@@ -217,7 +217,7 @@ def eval(model_path, map_name):
     )
 
     feature_model = PPO.load(
-        "weights/tank_game_environment_v1_20250417-053308/tank_game_environment_v1_20250417-053308.zip",
+        feature_model_path,
         device=device,
         seed=seed,
     )
@@ -273,6 +273,12 @@ if __name__ == "__main__":
     train_parser.add_argument(
         "--map", type=str, default="Random", help="Name of the map."
     )
+    train_parser.add_argument(
+        "--feature-model",
+        type=str,
+        default="weights/tank_game_environment_v1_20250417-053308/tank_game_environment_v1_20250417-053308.zip",
+        help="Path to the model with the feature extractor checkpoint.",
+    )
 
     # Evaluation mode
     eval_parser = subparsers.add_parser("eval", help="Run model evaluation.")
@@ -280,13 +286,19 @@ if __name__ == "__main__":
     eval_parser.add_argument(
         "--map", type=str, default="Random", help="Name of the map."
     )
+    eval_parser.add_argument(
+        "--feature-model",
+        type=str,
+        default="weights/tank_game_environment_v1_20250417-053308/tank_game_environment_v1_20250417-053308.zip",
+        help="Path to the model with the feature extractor checkpoint.",
+    )
 
     # Parse arguments
     args = parser.parse_args()
 
     if args.mode == "train":
         print("Training mode selected.")
-        train(args.model_path, args.map)
+        train(args.model_path, args.map, args.feature_model)
     elif args.mode == "eval":
         print("Evaluation mode selected.")
-        eval(args.model_path, args.map)
+        eval(args.model_path, args.map, args.feature_model)
