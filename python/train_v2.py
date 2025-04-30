@@ -6,6 +6,7 @@ from tank_game_agent.callback.callback_video_recorder import VideoRecorderCallba
 from tank_game_agent.callback.callback_hparam_recorder import HParamRecorderCallback
 
 from tank_game_agent.schedule.schedule_linear import linear_schedule
+from tank_game_agent.schedule.schedule_cosine import cosine_schedule
 
 from tank_game_agent.feature_extactor.feature_extractor_lidar import LidarCNN
 
@@ -104,7 +105,7 @@ def train(opponent_model_path, checkpoint_path, map_name):
     # Handle scheduling learning rate and clip range
     ppo_config_copy = ppo_config.copy()
     if schedule_learning_rate:
-        ppo_config["learning_rate"] = linear_schedule(ppo_config["learning_rate"])
+        ppo_config["learning_rate"] = cosine_schedule(ppo_config["learning_rate"])
     if schedule_clip_range:
         ppo_config["clip_range"] = linear_schedule(ppo_config["clip_range"])
 
