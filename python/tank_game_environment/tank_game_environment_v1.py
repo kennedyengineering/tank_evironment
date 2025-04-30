@@ -4,12 +4,15 @@ from tank_game_environment.env.tank_game_environment import parallel_env_fn
 from tank_game_environment.wrapper.wrapper_agent import AgentWrapper
 from tank_game_environment.agent.agent_registry import create_agent
 
-from typing import Optional
+from typing import Optional, List, Type, Dict, Any
+from pettingzoo.utils.wrappers import BaseParallelWrapper
 
 
 def env_fn(
     scripted_policy_name: Optional[str] = None,
     scripted_policy_kwargs: Optional[dict] = None,
+    wrappers: Optional[List[Type[BaseParallelWrapper]]] = None,
+    wrappers_kwargs: Optional[Dict[Type[BaseParallelWrapper], Dict[str, Any]]] = None,
     **kwargs
 ):
     """
@@ -18,6 +21,8 @@ def env_fn(
     Args:
         scripted_policy_name: Optional name of the scripted policy to be used.
         scripted_policy_kwargs: Optional dictionary of keyword arguments for the scripted policy.
+        wrappers: Optional wrappers to apply to base environment.
+        wrappers_kwargs: Optional wrapper initialization arguments.
         **kwargs: Additional keyword arguments to pass to parallel_env_fn.
 
     Returns:
@@ -25,6 +30,14 @@ def env_fn(
     """
 
     env = parallel_env_fn(**kwargs)
+
+    # Apply wrappers
+    if wrappers:
+        for wrapper_cls in wrappers:
+            init_kwargs = (
+                wrappers_kwargs.get(wrapper_cls, {}) if wrappers_kwargs else {}
+            )
+            env = wrapper_cls(env, **init_kwargs)
 
     # Ensure there are at least two agents.
     if len(env.possible_agents) < 2:
