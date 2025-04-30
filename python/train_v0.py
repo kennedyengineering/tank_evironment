@@ -30,6 +30,8 @@ import supersuit as ss
 from sb3_contrib import RecurrentPPO
 from sb3_contrib.ppo_recurrent.policies import MlpLstmPolicy
 
+import torch
+
 
 def train(checkpoint_path, map_name, feature_model_path):
     """Train an agent."""
@@ -75,6 +77,8 @@ def train(checkpoint_path, map_name, feature_model_path):
         "vf_coef": 0.5,
         "max_grad_norm": 0.5,
     }
+
+    torch.set_num_threads(6)
 
     # Create environments
     # FIXME: concat_vec_envs copies env n_envs times, so the seed is identical for all of envs in vec_env.
