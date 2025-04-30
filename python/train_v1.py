@@ -139,7 +139,7 @@ def train(checkpoint_path, map_name):
             **ppo_config,
         )
     else:
-        model = PPO.load(
+        model = RecurrentPPO.load(
             path=checkpoint_path,
             env=env,
             verbose=verbose,
@@ -243,7 +243,7 @@ def eval(model_path, map_name):
 
     # Load model
     print(f"Loading model {model_path}.")
-    model = PPO.load(model_path, device=device, seed=seed)
+    model = RecurrentPPO.load(model_path, device=device, seed=seed)
 
     # Run evaluation
     print(f"Starting evaluation on {eval_env_name}. (num_episodes={num_episodes})")
