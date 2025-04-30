@@ -8,7 +8,9 @@ from tank_game_agent.callback.callback_hparam_recorder import HParamRecorderCall
 from tank_game_agent.schedule.schedule_linear import linear_schedule
 from tank_game_agent.schedule.schedule_cosine import cosine_schedule
 
-from tank_game_agent.feature_extactor.feature_extractor_lidar import LidarCNN
+from tank_game_agent.feature_extactor.feature_extractor_wrapper import (
+    FeatureExtractorWrapper,
+)
 
 from tank_game_agent.vec_env.vec_env import TankVecEnv
 
@@ -28,18 +30,15 @@ from stable_baselines3.common.callbacks import (
 )
 
 
-def train(opponent_model_path, checkpoint_path, map_name):
+def train(opponent_model_path, checkpoint_path, map_name, feature_model_path):
     """Train an agent."""
-
-    # TODO: put in a configuration file
-    # TODO: combine v2 and v1
 
     # Configuration variables
     num_envs = 12
     num_eval_episodes = 10
     steps = 6_000_000
     seed = 0  # if continuing from a checkpoint might want to specify a different seed
-    device = "cuda"
+    device = "cpu"
     log_dir = "logs/"
     save_dir = "weights/"
     save_freq = 100_000
@@ -48,13 +47,32 @@ def train(opponent_model_path, checkpoint_path, map_name):
     schedule_learning_rate = True
     schedule_clip_range = False
     policy_kwargs = dict(
-        features_extractor_class=LidarCNN,
-        features_extractor_kwargs=dict(features_dim=128),
+        # n_lstm_layers=2,
+        # lstm_hidden_size=512,
+        # shared_lstm=True,
+        # enable_critic_lstm=False,
     )
     vec_env_kwargs = dict(
         opponent_model=PPO.load(opponent_model_path, device=device, seed=seed),
         opponent_predict_deterministic=True,
     )
+    env_kwargs = dict(
+        map_id=map_name,
+    )
+
+    feature_model = PPO.load(
+        feature_model_path,
+        device=device,
+        seed=seed,
+    )
+    feature_model.policy.features_extractor.eval()
+
+    env_kwargs["wrappers"] = [FeatureExtractorWrapper]
+    env_kwargs["wrappers_kwargs"] = {
+        FeatureExtractorWrapper: dict(
+            feature_extractor=feature_model.policy.features_extractor
+        )
+    }
 
     # PPO configuration variables
     ppo_config = {
@@ -75,7 +93,7 @@ def train(opponent_model_path, checkpoint_path, map_name):
         tank_game_environment_v1.env_fn,
         n_envs=num_envs,
         seed=seed,
-        env_kwargs=dict(map_id=map_name),
+        env_kwargs=env_kwargs,
         vec_env_cls=TankVecEnv,
         vec_env_kwargs=vec_env_kwargs,
     )
@@ -84,7 +102,7 @@ def train(opponent_model_path, checkpoint_path, map_name):
         tank_game_environment_v1.env_fn,
         n_envs=num_envs,
         seed=seed + num_envs,
-        env_kwargs=dict(map_id=map_name),
+        env_kwargs=env_kwargs,
         vec_env_cls=TankVecEnv,
         vec_env_kwargs=vec_env_kwargs,
     )
@@ -93,7 +111,7 @@ def train(opponent_model_path, checkpoint_path, map_name):
         tank_game_environment_v1.env_fn,
         n_envs=1,
         seed=seed + 2 * num_envs,
-        env_kwargs=dict(render_mode="rgb_array", map_id=map_name),
+        env_kwargs=env_kwargs | dict(render_mode="rgb_array"),
         vec_env_cls=TankVecEnv,
         vec_env_kwargs=vec_env_kwargs,
     )
@@ -250,6 +268,12 @@ if __name__ == "__main__":
     train_parser.add_argument(
         "--map", type=str, default="Random", help="Name of the map."
     )
+    train_parser.add_argument(
+        "--feature-model",
+        type=str,
+        default="weights/tank_game_environment_v1_20250417-053308/tank_game_environment_v1_20250417-053308.zip",
+        help="Path to the model with the feature extractor checkpoint.",
+    )
 
     # Evaluation mode
     eval_parser = subparsers.add_parser("eval", help="Run model evaluation.")
@@ -266,7 +290,7 @@ if __name__ == "__main__":
 
     if args.mode == "train":
         print("Training mode selected.")
-        train(args.opponent_model_path, args.model_path, args.map)
+        train(args.opponent_model_path, args.model_path, args.map, args.feature_model)
     elif args.mode == "eval":
         print("Evaluation mode selected.")
         eval(args.model_path, args.opponent_model_path, args.map)
