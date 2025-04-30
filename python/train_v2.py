@@ -209,7 +209,7 @@ def train(opponent_model_path, checkpoint_path, map_name, feature_model_path):
     env.close()
 
 
-def eval(model_path, opponent_model_path, map_name):
+def eval(model_path, opponent_model_path, map_name, feature_model_path):
     """Evaluate an agent."""
 
     # Configuration variables
@@ -217,29 +217,45 @@ def eval(model_path, opponent_model_path, map_name):
     opponent_deterministic = True
     num_episodes = 20
     seed = 100
-    device = "cuda"
+    device = "cpu"
+    vec_env_kwargs = dict(
+        opponent_model=PPO.load(opponent_model_path, device=device, seed=seed),
+        opponent_predict_deterministic=opponent_deterministic,
+    )
+    env_kwargs = dict(
+        map_id=map_name,
+        render_mode="human",
+    )
 
-    # Load opponent model
-    print(f"Loading opponent model {opponent_model_path}.")
-    opponent_model = PPO.load(opponent_model_path, device=device, seed=seed)
+    feature_model = PPO.load(
+        feature_model_path,
+        device=device,
+        seed=seed,
+    )
+    feature_model.policy.features_extractor.eval()
+
+    env_kwargs["wrappers"] = [FeatureExtractorWrapper]
+    env_kwargs["wrappers_kwargs"] = {
+        FeatureExtractorWrapper: dict(
+            feature_extractor=feature_model.policy.features_extractor
+        )
+    }
 
     # Create environment
     eval_env = make_vec_env(
         tank_game_environment_v1.env_fn,
         n_envs=1,
         seed=seed,
-        env_kwargs=dict(render_mode="human", map_id=map_name),
+        env_kwargs=env_kwargs,
         vec_env_cls=TankVecEnv,
-        vec_env_kwargs=dict(
-            opponent_model=opponent_model,
-            opponent_predict_deterministic=opponent_deterministic,
-        ),
+        vec_env_kwargs=vec_env_kwargs,
     )
+
     eval_env_name = eval_env.metadata["name"]
 
     # Load model
     print(f"Loading model {model_path}.")
-    model = PPO.load(model_path, device=device, seed=seed)
+    model = RecurrentPPO.load(model_path, device=device, seed=seed)
 
     # Run evaluation
     print(f"Starting evaluation on {eval_env_name}. (num_episodes={num_episodes})")
@@ -290,6 +306,12 @@ if __name__ == "__main__":
     eval_parser.add_argument(
         "--map", type=str, default="Random", help="Name of the map."
     )
+    eval_parser.add_argument(
+        "--feature-model",
+        type=str,
+        default="weights/tank_game_environment_v1_20250417-053308/tank_game_environment_v1_20250417-053308.zip",
+        help="Path to the model with the feature extractor checkpoint.",
+    )
 
     # Parse arguments
     args = parser.parse_args()
@@ -299,4 +321,4 @@ if __name__ == "__main__":
         train(args.opponent_model_path, args.model_path, args.map, args.feature_model)
     elif args.mode == "eval":
         print("Evaluation mode selected.")
-        eval(args.model_path, args.opponent_model_path, args.map)
+        eval(args.model_path, args.opponent_model_path, args.map, args.feature_model)
