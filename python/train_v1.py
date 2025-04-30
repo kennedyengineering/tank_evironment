@@ -17,7 +17,6 @@ import os
 import argparse
 
 from stable_baselines3 import PPO
-from stable_baselines3.ppo import MlpPolicy
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.callbacks import (
@@ -68,6 +67,13 @@ def train(checkpoint_path, map_name):
     )
     feature_model.policy.features_extractor.eval()
 
+    env_kwargs["wrappers"] = [FeatureExtractorWrapper]
+    env_kwargs["wrappers_kwargs"] = {
+        FeatureExtractorWrapper: dict(
+            feature_extractor=feature_model.policy.features_extractor
+        )
+    }
+
     # PPO configuration variables
     ppo_config = {
         "learning_rate": 3e-4,
@@ -91,8 +97,6 @@ def train(checkpoint_path, map_name):
         env_kwargs=env_kwargs,
         seed=seed,
         vec_env_cls=DummyVecEnv,
-        wrapper_class=FeatureExtractorWrapper,
-        wrapper_kwargs=dict(feature_extractor=feature_model.policy.features_extractor),
     )
 
     eval_env = make_vec_env(
@@ -101,8 +105,6 @@ def train(checkpoint_path, map_name):
         env_kwargs=env_kwargs,
         seed=seed + num_envs,
         vec_env_cls=DummyVecEnv,
-        wrapper_class=FeatureExtractorWrapper,
-        wrapper_kwargs=dict(feature_extractor=feature_model.policy.features_extractor),
     )
 
     render_env = make_vec_env(
@@ -111,8 +113,6 @@ def train(checkpoint_path, map_name):
         env_kwargs=env_kwargs | dict(render_mode="rgb_array"),
         seed=seed + 2 * num_envs,
         vec_env_cls=DummyVecEnv,
-        wrapper_class=FeatureExtractorWrapper,
-        wrapper_kwargs=dict(feature_extractor=feature_model.policy.features_extractor),
     )
 
     env_name = render_env.unwrapped.metadata["name"]
@@ -212,6 +212,8 @@ def eval(model_path, map_name):
     env_kwargs = dict(
         scripted_policy_name="StaticAgent",
         scripted_policy_kwargs=dict(action=[0.0, 0.0, 0.0]),
+        map_id=map_name,
+        render_mode="human",
     )
 
     feature_model = PPO.load(
@@ -221,15 +223,20 @@ def eval(model_path, map_name):
     )
     feature_model.policy.features_extractor.eval()
 
+    env_kwargs["wrappers"] = [FeatureExtractorWrapper]
+    env_kwargs["wrappers_kwargs"] = {
+        FeatureExtractorWrapper: dict(
+            feature_extractor=feature_model.policy.features_extractor
+        )
+    }
+
     # Create environment
     eval_env = make_vec_env(
         tank_game_environment_v1.env_fn,
         n_envs=1,
         seed=seed,
-        env_kwargs=env_kwargs | dict(render_mode="human", map_id=map_name),
+        env_kwargs=env_kwargs,
         vec_env_cls=DummyVecEnv,
-        wrapper_class=FeatureExtractorWrapper,
-        wrapper_kwargs=dict(feature_extractor=feature_model.policy.features_extractor),
     )
 
     eval_env_name = eval_env.metadata["name"]
