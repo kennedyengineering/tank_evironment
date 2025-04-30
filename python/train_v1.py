@@ -15,6 +15,7 @@ from tank_game_agent.feature_extactor.feature_extractor_wrapper import (
 import time
 import os
 import argparse
+import numpy as np
 
 from stable_baselines3 import PPO
 from stable_baselines3.common.evaluation import evaluate_policy
@@ -256,6 +257,8 @@ def eval(model_path, map_name, feature_model_path):
         return_episode_rewards=True,
     )
     print("Rewards: ", rewards)
+    print("Average Reward: ", np.mean(rewards[0]))
+    print("Average Duration: ", np.mean(rewards[1]))
 
 
 if __name__ == "__main__":
