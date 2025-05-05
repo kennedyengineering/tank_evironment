@@ -6,3 +6,6 @@ from .maps import wall_large
 from .maps import quincunx
 from .maps import grid_aligned
 from .maps import grid_staggered
+from .maps import run_close
+from .maps import run_medium
+from .maps import run_far
