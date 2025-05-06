@@ -245,6 +245,9 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
             else:
                 self.agent_data[a].reload_counter -= 1
 
+        # Get infos
+        infos = {a: {} for a in self.agents}
+
         # Step the engine
         projectile_events = self.engine.step()
 
@@ -280,6 +283,9 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
                 error("Rewarding an invalid agent.")
             rewards[hit_agent] -= 100
 
+            infos[src_agent]["hit"] = hit_agent
+            infos[hit_agent]["hit_by"] = src_agent
+
         # Check truncation conditions
         truncations = {a: False for a in self.agents}
         if (
@@ -288,9 +294,6 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         ):
             truncations = {a: True for a in self.agents}
         self.timestep += 1
-
-        # Get dummy infos (not used)
-        infos = {a: {} for a in self.agents}
 
         if any(terminations.values()) or all(truncations.values()):
             self.agents = []
