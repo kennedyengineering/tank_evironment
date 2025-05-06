@@ -246,6 +246,16 @@ def eval(model_path, map_name, feature_model_path):
     print(f"Loading model {model_path}.")
     model = RecurrentPPO.load(model_path, device=device, seed=seed)
 
+    # Log number of wins
+    win_log = np.zeros(num_episodes)
+
+    def log_wins_callback(locals_, _):
+        done = locals_["done"]
+        if done:
+            won = "hit" in locals_["infos"][0]
+            idx = locals_["episode_counts"][0]
+            win_log[idx] = 1 if won else 0
+
     # Run evaluation
     print(f"Starting evaluation on {eval_env_name}. (num_episodes={num_episodes})")
     rewards = evaluate_policy(
@@ -255,10 +265,14 @@ def eval(model_path, map_name, feature_model_path):
         deterministic=deterministic,
         render=False,
         return_episode_rewards=True,
+        callback=log_wins_callback,
     )
-    print("Rewards: ", rewards)
+    print("Rewards: ", rewards[0])
+    print("Episode Durations: ", rewards[1])
     print("Average Reward: ", np.mean(rewards[0]))
     print("Average Duration: ", np.mean(rewards[1]))
+    print("Win Log: ", win_log)
+    print("Win Rate: ", np.count_nonzero(win_log) / win_log.size)
 
 
 if __name__ == "__main__":
