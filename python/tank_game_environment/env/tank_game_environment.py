@@ -360,11 +360,20 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
             surface = pygame.surfarray.make_surface(np.swapaxes(frame, 0, 1))
             self.screen.blit(surface, (0, 0))
 
+            # Render tank id
             for a in self.agents:
                 id = self.agent_data[a].id
                 pos = self.engine.getTankPosition(id)
                 pos = tuple([x * self.engine_metadata["pixel_density"] for x in pos])
-                self.font.render_to(self.screen, pos, str(id), (255, 0, 0))
+
+                text = str(id)
+                text_rect = self.font.get_rect(text)
+                centered_pos = (
+                    pos[0] - text_rect.width // 2,
+                    pos[1] - text_rect.height // 2,
+                )
+
+                self.font.render_to(self.screen, centered_pos, str(id), (255, 0, 0))
 
             pygame.event.pump()
             pygame.display.update()
