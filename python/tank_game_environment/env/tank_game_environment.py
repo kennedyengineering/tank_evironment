@@ -100,6 +100,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         self.render_mode = render_mode
         self.screen = None
         self.clock = None
+        self.font = None
 
         # define environment variables
         self.possible_agents = [
@@ -331,6 +332,13 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         if self.clock is None and self.render_mode == "human":
             self.clock = pygame.time.Clock()
 
+        if self.font is None and self.render_mode == "human":
+            font_path = (
+                pathlib.Path(__file__).parent.parent.resolve()
+                / "asset/Courier_Prime/CourierPrime-Bold.ttf"
+            )
+            self.font = pygame.freetype.Font(font_path, 12)
+
         # Render frame
         self.engine.clearImage()
 
@@ -351,6 +359,12 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         if self.render_mode == "human":
             surface = pygame.surfarray.make_surface(np.swapaxes(frame, 0, 1))
             self.screen.blit(surface, (0, 0))
+
+            for a in self.agents:
+                id = self.agent_data[a].id
+                pos = self.engine.getTankPosition(id)
+                pos = tuple([x * self.engine_metadata["pixel_density"] for x in pos])
+                self.font.render_to(self.screen, pos, str(id), (255, 0, 0))
 
             pygame.event.pump()
             pygame.display.update()
