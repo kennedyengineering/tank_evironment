@@ -264,12 +264,9 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
             set(filtered_events)
         )  # Account for a tank being hit multiple times
 
-        # FIXME: only give termination to the tank that was shot?
         if unique_events:
             terminations = {a: True for a in self.agents}
 
-        # FIXME: if both get shot at same time, give both negative reward instead of tie?
-        # FIXME: what if tank hits itself?
         for event in unique_events:
             src_agent_id = event[1]
             src_agent = self.__get_agent_from_id(src_agent_id)
