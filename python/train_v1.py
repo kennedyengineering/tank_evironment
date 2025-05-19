@@ -17,6 +17,8 @@ import os
 import argparse
 import numpy as np
 
+from moviepy.video.io.ImageSequenceClip import ImageSequenceClip
+
 from stable_baselines3 import PPO
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.env_util import make_vec_env
@@ -202,8 +204,11 @@ def train(checkpoint_path, map_name, feature_model_path):
     env.close()
 
 
-def eval(model_path, map_name, feature_model_path):
+def eval(model_path, map_name, feature_model_path, record_video):
     """Evaluate an agent."""
+
+    if record_video is not None:
+        print(f"Recording video, saving to {record_video}")
 
     # Configuration variables
     deterministic = True
@@ -214,7 +219,7 @@ def eval(model_path, map_name, feature_model_path):
         scripted_policy_name="StaticAgent",
         scripted_policy_kwargs=dict(action=[0.0, 0.0, 0.0]),
         map_id=map_name,
-        render_mode="human",
+        render_mode="rgb_array" if record_video else "human",
     )
 
     feature_model = PPO.load(
@@ -256,6 +261,35 @@ def eval(model_path, map_name, feature_model_path):
             idx = locals_["episode_counts"][0]
             win_log[idx] = 1 if won else 0
 
+    # Log frames
+    frames = []
+
+    def log_frames_callback(locals_, _):
+        if record_video:
+            print("processing frame")
+            frames.append(locals_["env"].render())
+
+            done = locals_["done"]
+            if done:
+                # Save video to disk
+                idx = locals_["episode_counts"][0]
+
+                base, ext = os.path.splitext(record_video)
+                filename = f"{base}_{idx}{ext}"
+
+                clip = ImageSequenceClip(frames, fps=30)
+                clip.write_videofile(
+                    filename,
+                    audio=False,
+                )
+
+                # Reset frame buffer
+                frames.clear()
+
+    # Create callback list
+    callbacks = [log_wins_callback, log_frames_callback]
+    master_callback = lambda locals_, _: [fn(locals_, _) for fn in callbacks]
+
     # Run evaluation
     print(f"Starting evaluation on {eval_env_name}. (num_episodes={num_episodes})")
     rewards = evaluate_policy(
@@ -265,7 +299,7 @@ def eval(model_path, map_name, feature_model_path):
         deterministic=deterministic,
         render=False,
         return_episode_rewards=True,
-        callback=log_wins_callback,
+        callback=master_callback,
     )
     print("Rewards: ", rewards[0])
     print("Episode Durations: ", rewards[1])
@@ -309,6 +343,12 @@ if __name__ == "__main__":
         default="weights/tank_game_environment_v1_20250417-053308/tank_game_environment_v1_20250417-053308.zip",
         help="Path to the model with the feature extractor checkpoint.",
     )
+    eval_parser.add_argument(
+        "--record-video",
+        type=str,
+        default=None,
+        help="Path to output video file (e.g. output.mp4).",
+    )
 
     # Parse arguments
     args = parser.parse_args()
@@ -318,4 +358,4 @@ if __name__ == "__main__":
         train(args.model_path, args.map, args.feature_model)
     elif args.mode == "eval":
         print("Evaluation mode selected.")
-        eval(args.model_path, args.map, args.feature_model)
+        eval(args.model_path, args.map, args.feature_model, args.record_video)
