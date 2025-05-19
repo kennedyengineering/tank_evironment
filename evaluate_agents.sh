@@ -131,13 +131,13 @@ eval() {
 eval weights/tank_game_environment_v1_20250514-180254/tank_game_environment_v1_20250514-180254.zip model_train_v1
 
 # LSTM Finetuned Model - Train_v0                    : 20250515_233239
-# eval weights/tank_game_environment_v0_20250515-233239/tank_game_environment_v0_20250515-233239.zip model_finetuned_train_v0
+eval weights/tank_game_environment_v0_20250515-233239/tank_game_environment_v0_20250515-233239.zip model_finetuned_train_v0
 
 # LSTM Finetuned Model - Train_v0 - No Dense Rewards : 20250515_234037
-# eval weights/tank_game_environment_v0_20250515-234037/tank_game_environment_v0_20250515-234037.zip model_finetuned_train_v0_no_dense
+eval weights/tank_game_environment_v0_20250515-234037/tank_game_environment_v0_20250515-234037.zip model_finetuned_train_v0_no_dense
 
 # LSTM Finetuned Model - Train_v2                    : 20250515_234713
-# eval weights/tank_game_environment_v1_20250515-234713/tank_game_environment_v1_20250515-234713.zip model_finetuned_train_v2
+eval weights/tank_game_environment_v1_20250515-234713/tank_game_environment_v1_20250515-234713.zip model_finetuned_train_v2
 
 # LSTM Finetuned Model - Train_v2 - No Dense Rewards : 20250515_234926
-# eval weights/tank_game_environment_v1_20250515-234926/tank_game_environment_v1_20250515-234926.zip model_finetuned_train_v2_no_dense
+eval weights/tank_game_environment_v1_20250515-234926/tank_game_environment_v1_20250515-234926.zip model_finetuned_train_v2_no_dense
