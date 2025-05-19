@@ -352,9 +352,9 @@ if __name__ == "__main__":
         "--episodes", type=int, default=20, help="Number of episodes to run."
     )
     eval_parser.add_argument(
-        "--deterministic",
+        "--stochastic",
         action="store_true",
-        help="Perform deterministic inference of the agent or not.",
+        help="Perform stochastic inference of the agent or not.",
     )
 
     # Parse arguments
@@ -371,5 +371,5 @@ if __name__ == "__main__":
             args.feature_model,
             args.record_video,
             args.episodes,
-            args.deterministic,
+            not args.stochastic,
         )
