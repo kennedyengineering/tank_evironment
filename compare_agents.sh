@@ -36,7 +36,7 @@ comp() {
         local map="$3"
 
         mkdir "${video_output_path}/${run_name}"
-        python3 python/train_v1.py eval "${weights}" "${opponent_weights}" --episodes "${episodes}" --map "${map}" --record-video "${video_output_path}/${run_name}/${run_name}.mp4" --stochastic --stochastic-opponent > "${log_output_path}/${run_name}.txt"
+        python3 python/train_v2.py eval "${weights}" "${opponent_weights}" --episodes "${episodes}" --map "${map}" --record-video "${video_output_path}/${run_name}/${run_name}.mp4" --stochastic --stochastic-opponent > "${log_output_path}/${run_name}.txt"
     }
 
     ### Deterministic ###
