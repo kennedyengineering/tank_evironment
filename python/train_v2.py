@@ -42,7 +42,7 @@ def train(opponent_model_path, checkpoint_path, map_name, feature_model_path):
     # Configuration variables
     num_envs = 12
     num_eval_episodes = 10
-    steps = 6_000_000
+    steps = 12_000_000
     seed = 0  # if continuing from a checkpoint might want to specify a different seed
     device = "cpu"
     log_dir = "logs/"
@@ -57,6 +57,7 @@ def train(opponent_model_path, checkpoint_path, map_name, feature_model_path):
         # lstm_hidden_size=512,
         # shared_lstm=True,
         # enable_critic_lstm=False,
+        log_std_init=-2.0,
     )
     vec_env_kwargs = dict(
         opponent_model=PPO.load(opponent_model_path, device=device, seed=seed),
@@ -89,7 +90,7 @@ def train(opponent_model_path, checkpoint_path, map_name, feature_model_path):
         "gamma": 0.99,
         "gae_lambda": 0.95,
         "clip_range": 0.2,
-        "ent_coef": 0.01,
+        "ent_coef": 0.005,
         "vf_coef": 0.5,
         "max_grad_norm": 0.5,
     }
