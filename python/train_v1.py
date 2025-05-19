@@ -280,6 +280,7 @@ def eval(
                 clip.write_videofile(
                     filename,
                     audio=False,
+                    logger=None,
                 )
 
                 # Reset frame buffer
