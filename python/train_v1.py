@@ -266,7 +266,6 @@ def eval(model_path, map_name, feature_model_path, record_video):
 
     def log_frames_callback(locals_, _):
         if record_video:
-            print("processing frame")
             frames.append(locals_["env"].render())
 
             done = locals_["done"]
