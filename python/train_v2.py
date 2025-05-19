@@ -211,16 +211,22 @@ def train(opponent_model_path, checkpoint_path, map_name, feature_model_path):
     env.close()
 
 
-def eval(model_path, opponent_model_path, map_name, feature_model_path, record_video):
+def eval(
+    model_path,
+    opponent_model_path,
+    map_name,
+    feature_model_path,
+    record_video,
+    num_episodes,
+    deterministic,
+    opponent_deterministic,
+):
     """Evaluate an agent."""
 
     if record_video is not None:
         print(f"Recording video, saving to {record_video}")
 
     # Configuration variables
-    deterministic = True
-    opponent_deterministic = True
-    num_episodes = 20
     seed = 100
     device = "cpu"
     vec_env_kwargs = dict(
@@ -365,6 +371,19 @@ if __name__ == "__main__":
         default=None,
         help="Path to output video file (e.g. output.mp4).",
     )
+    eval_parser.add_argument(
+        "--episodes", type=int, default=20, help="Number of episodes to run."
+    )
+    eval_parser.add_argument(
+        "--deterministic",
+        action="store_true",
+        help="Perform deterministic inference of the agent or not.",
+    )
+    eval_parser.add_argument(
+        "--opponent-deterministic",
+        action="store_true",
+        help="Perform deterministic inference of the opponent agent or not.",
+    )
 
     # Parse arguments
     args = parser.parse_args()
@@ -380,4 +399,7 @@ if __name__ == "__main__":
             args.map,
             args.feature_model,
             args.record_video,
+            args.episodes,
+            args.deterministic,
+            args.opponent_deterministic,
         )
