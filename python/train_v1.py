@@ -217,7 +217,9 @@ def eval(
     device = "cpu"
     env_kwargs = dict(
         scripted_policy_name="StaticAgent",
-        scripted_policy_kwargs=dict(action=[0.0, 0.0, 0.0]),
+        scripted_policy_kwargs=dict(
+            action=[1.0, 1.0, 0.0] if "Run" in map_name else [0.0, 0.0, 0.0]
+        ),
         map_id=map_name,
         render_mode="rgb_array" if record_video else "human",
     )
