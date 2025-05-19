@@ -204,15 +204,15 @@ def train(checkpoint_path, map_name, feature_model_path):
     env.close()
 
 
-def eval(model_path, map_name, feature_model_path, record_video):
+def eval(
+    model_path, map_name, feature_model_path, record_video, num_episodes, deterministic
+):
     """Evaluate an agent."""
 
     if record_video is not None:
         print(f"Recording video, saving to {record_video}")
 
     # Configuration variables
-    deterministic = True
-    num_episodes = 20
     seed = 100
     device = "cpu"
     env_kwargs = dict(
@@ -348,6 +348,14 @@ if __name__ == "__main__":
         default=None,
         help="Path to output video file (e.g. output.mp4).",
     )
+    eval_parser.add_argument(
+        "--episodes", type=int, default=20, help="Number of episodes to run."
+    )
+    eval_parser.add_argument(
+        "--deterministic",
+        action="store_true",
+        help="Perform deterministic inference of the agent or not.",
+    )
 
     # Parse arguments
     args = parser.parse_args()
@@ -357,4 +365,11 @@ if __name__ == "__main__":
         train(args.model_path, args.map, args.feature_model)
     elif args.mode == "eval":
         print("Evaluation mode selected.")
-        eval(args.model_path, args.map, args.feature_model, args.record_video)
+        eval(
+            args.model_path,
+            args.map,
+            args.feature_model,
+            args.record_video,
+            args.episodes,
+            args.deterministic,
+        )
