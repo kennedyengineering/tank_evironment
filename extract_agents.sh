@@ -18,6 +18,9 @@ extract() {
     python3 python/extract_tensorboard.py "${log_dir}" "${output_path}"
 }
 
+# Base Model - Train_v1_base                         : 20250417_053308
+extract logs/tank_game_environment_v1_20250417-053308_1/ model_train_v1_base
+
 # LSTM Model - Train_v1                              : 20250514_180254
 extract logs/tank_game_environment_v1_20250514-180254_1/ model_train_v1
 
