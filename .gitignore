@@ -2,3 +2,5 @@ build
 .venv
 __pycache__
 .coverage
+comp_package*
+eval_package*
