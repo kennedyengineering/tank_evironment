@@ -101,6 +101,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         self.screen = None
         self.clock = None
         self.font = None
+        self.init_pygame = False
 
         # define environment variables
         self.possible_agents = [
@@ -317,9 +318,11 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
             global pygame
             import pygame
 
-        if self.screen is None and self.render_mode == "human":
+        if not self.init_pygame:
             pygame.init()
+            self.init_pygame = True
 
+        if self.screen is None and self.render_mode == "human":
             screen_width, screen_height = self.engine.getImageDimensions()
             self.screen = pygame.display.set_mode((screen_width, screen_height))
             pygame.display.set_caption("Tank Game Environment")
@@ -332,7 +335,7 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         if self.clock is None and self.render_mode == "human":
             self.clock = pygame.time.Clock()
 
-        if self.font is None and self.render_mode == "human":
+        if self.font is None:
             font_path = (
                 pathlib.Path(__file__).parent.parent.resolve()
                 / "asset/Courier_Prime/CourierPrime-Bold.ttf"
@@ -355,31 +358,36 @@ class TankGameEnvironment(ParallelEnv, EzPickle):
         # Retrieve frame
         frame = self.engine.getImageBuffer()
 
+        # Render tank ID to frame
+        surface = pygame.surfarray.make_surface(np.swapaxes(frame, 0, 1))
+
+        for a in self.agents:
+            id = self.agent_data[a].id
+            pos = self.engine.getTankPosition(id)
+            pos = tuple([x * self.engine_metadata["pixel_density"] for x in pos])
+
+            text = str(id)
+            text_rect = self.font.get_rect(text)
+            centered_pos = (
+                pos[0] - text_rect.width // 2,
+                pos[1] - text_rect.height // 2,
+            )
+
+            self.font.render_to(surface, centered_pos, str(id), (255, 0, 0))
+
         # Display frame
         if self.render_mode == "human":
-            surface = pygame.surfarray.make_surface(np.swapaxes(frame, 0, 1))
             self.screen.blit(surface, (0, 0))
-
-            # Render tank id
-            for a in self.agents:
-                id = self.agent_data[a].id
-                pos = self.engine.getTankPosition(id)
-                pos = tuple([x * self.engine_metadata["pixel_density"] for x in pos])
-
-                text = str(id)
-                text_rect = self.font.get_rect(text)
-                centered_pos = (
-                    pos[0] - text_rect.width // 2,
-                    pos[1] - text_rect.height // 2,
-                )
-
-                self.font.render_to(self.screen, centered_pos, str(id), (255, 0, 0))
 
             pygame.event.pump()
             pygame.display.update()
             self.clock.tick(self.metadata["render_fps"])
 
-        return frame if self.render_mode == "rgb_array" else None
+        return (
+            np.swapaxes(pygame.surfarray.array3d(surface), 0, 1)
+            if self.render_mode == "rgb_array"
+            else None
+        )
 
     def get_observation(self, agent):
         """Get observation for agent."""
