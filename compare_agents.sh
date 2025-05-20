@@ -8,9 +8,16 @@ comp() {
     local weights="$1"
     local opponent_weights="$2"
     local name="$3"
+    local is_base="${4:-false}"
+
     local output_path="${OUTPUT_PATH}/${name}"
     local log_output_path="${output_path}/logs"
     local video_output_path="${output_path}/videos"
+
+    local python_script="python/train_v2.py"
+    if [[ "$is_base" == "true" ]]; then
+        python_script="python/eval_v2_base_vs.py"
+    fi
 
     echo ""
     echo "Running comprehensive comparison between ${weights} and ${opponent_weights}"
@@ -27,7 +34,7 @@ comp() {
         local map="$3"
 
         mkdir "${video_output_path}/${run_name}"
-        python3 python/train_v2.py eval "${weights}" "${opponent_weights}" --episodes "${episodes}" --map "${map}" --record-video "${video_output_path}/${run_name}/${run_name}.mp4" > "${log_output_path}/${run_name}.txt"
+        python3 "${python_script}" eval "${weights}" "${opponent_weights}" --episodes "${episodes}" --map "${map}" --record-video "${video_output_path}/${run_name}/${run_name}.mp4" > "${log_output_path}/${run_name}.txt"
     }
 
     run_stochastic() {
@@ -36,7 +43,7 @@ comp() {
         local map="$3"
 
         mkdir "${video_output_path}/${run_name}"
-        python3 python/train_v2.py eval "${weights}" "${opponent_weights}" --episodes "${episodes}" --map "${map}" --record-video "${video_output_path}/${run_name}/${run_name}.mp4" --stochastic --opponent-stochastic > "${log_output_path}/${run_name}.txt"
+        python3 "${python_script}" eval "${weights}" "${opponent_weights}" --episodes "${episodes}" --map "${map}" --record-video "${video_output_path}/${run_name}/${run_name}.mp4" --stochastic --opponent-stochastic > "${log_output_path}/${run_name}.txt"
     }
 
     ### Deterministic ###
@@ -92,6 +99,9 @@ comp() {
     run_stochastic stochastic_wall_small_100 100 WallSmall
 }
 
+# Base Model - Train_v1_base                         : 20250417_053308
+model_train_v1_base_weights=weights/tank_game_environment_v1_20250417-053308/tank_game_environment_v1_20250417-053308.zip
+
 # LSTM Model - Train_v1                              : 20250514_180254
 model_train_v1_weights=weights/tank_game_environment_v1_20250514-180254/tank_game_environment_v1_20250514-180254.zip
 
@@ -107,20 +117,27 @@ model_finetuned_train_v2_weights=weights/tank_game_environment_v1_20250515-23471
 # LSTM Finetuned Model - Train_v2 - No Dense Rewards : 20250515_234926
 model_finetuned_train_v2_no_dense_weights=weights/tank_game_environment_v1_20250515-234926/tank_game_environment_v1_20250515-234926.zip
 
-# LSTM Model vs *
+# Base Model vs *
+comp "${model_train_v1_base_weights}" "${model_train_v1_weights}" model_train_v1_base_vs_model_train_v1 true
+comp "${model_train_v1_base_weights}" "${model_finetuned_train_v0_weights}" model_train_v1_base_vs_model_finetuned_train_v0 true
+comp "${model_train_v1_base_weights}" "${model_finetuned_train_v0_no_dense_weights}" model_train_v1_base_vs_model_finetuned_train_v0_no_dense true
+comp "${model_train_v1_base_weights}" "${model_finetuned_train_v2_weights}" model_train_v1_base_vs_model_finetuned_train_v2 true
+comp "${model_train_v1_base_weights}" "${model_finetuned_train_v2_no_dense_weights}" model_train_v1_base_vs_model_finetuned_train_v2_no_dense true
+
+# LSTM Model vs **
 comp "${model_train_v1_weights}" "${model_finetuned_train_v0_weights}" model_train_v1_vs_model_finetuned_train_v0
 comp "${model_train_v1_weights}" "${model_finetuned_train_v0_no_dense_weights}" model_train_v1_vs_model_finetuned_train_v0_no_dense
 comp "${model_train_v1_weights}" "${model_finetuned_train_v2_weights}" model_train_v1_vs_model_finetuned_train_v2
 comp "${model_train_v1_weights}" "${model_finetuned_train_v2_no_dense_weights}" model_train_v1_vs_model_finetuned_train_v2_no_dense
 
-# LSTM Finetuned Model - Train_v0 vs **
+# LSTM Finetuned Model - Train_v0 vs ***
 comp "${model_finetuned_train_v0_weights}" "${model_finetuned_train_v0_no_dense_weights}" model_finetuned_train_v0_vs_model_finetuned_train_v0_no_dense
 comp "${model_finetuned_train_v0_weights}" "${model_finetuned_train_v2_weights}" model_finetuned_train_v0_vs_model_finetuned_train_v2
 comp "${model_finetuned_train_v0_weights}" "${model_finetuned_train_v2_no_dense_weights}" model_finetuned_train_v0_vs_model_finetuned_train_v2_no_dense
 
-# LSTM Finetuned Model - Train_v0 - No Dense Rewards vs ***
+# LSTM Finetuned Model - Train_v0 - No Dense Rewards vs ****
 comp "${model_finetuned_train_v0_no_dense_weights}" "${model_finetuned_train_v2_weights}" model_finetuned_train_v0_no_dense_vs_model_finetuned_train_v2
 comp "${model_finetuned_train_v0_no_dense_weights}" "${model_finetuned_train_v2_no_dense_weights}" model_finetuned_train_v0_no_dense_vs_model_finetuned_train_v2_no_dense
 
-# LSTM Finetuned Model - Train_v2 vs ****
+# LSTM Finetuned Model - Train_v2 vs *****
 comp "${model_finetuned_train_v2_weights}" "${model_finetuned_train_v2_no_dense_weights}" model_finetuned_train_v2_vs_model_finetuned_train_v2_no_dense
