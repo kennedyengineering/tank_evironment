@@ -10,7 +10,7 @@ from create_comp_matrix import parse_log_text
 if __name__ == "__main__":
 
     output_dir = "analysis_data/eval_matrix/"
-    os.makedirs(output_dir)
+    os.makedirs(output_dir, exist_ok=True)
 
     paths = glob.glob("analysis_data/eval_package/*/logs/*.txt")
 
@@ -88,6 +88,24 @@ if __name__ == "__main__":
         mat = mat.reindex(index=agents, columns=subset_maps)
 
         cax = ax.imshow(mat.values, vmin=0, vmax=1, aspect="equal")
+
+        # annotate each cell with the value
+        for i in range(len(agents)):
+            for j in range(len(subset_maps)):
+                value = mat.iat[i, j]
+                if not np.isnan(value):
+                    # choose a contrasting text color
+                    color = "white" if value < 0.5 else "black"
+                    ax.text(
+                        j,
+                        i,
+                        str(value),
+                        ha="center",
+                        va="center",
+                        color=color,
+                        fontsize=3.5,
+                    )
+
         ax.set_xticks(np.arange(len(subset_maps)))
         ax.set_yticks(np.arange(len(agents)))
         ax.set_xticklabels(subset_maps, rotation=45, ha="right", fontsize=8)
@@ -104,6 +122,7 @@ if __name__ == "__main__":
     )
     plt.tight_layout(rect=[0, 0, 0.9, 1])
     plt.savefig(os.path.join(output_dir, f"eval_matrix_win_rate.png"))
+    plt.savefig(os.path.join(output_dir, f"eval_matrix_win_rate.pdf"))
 
     # --- Plot Duration ---
     fig, axes = plt.subplots(2, 1, figsize=(6, 7), sharex=False)
@@ -118,6 +137,24 @@ if __name__ == "__main__":
         mat = mat.reindex(index=agents, columns=subset_maps)
 
         cax = ax.imshow(mat.values, vmin=0, vmax=1002, aspect="equal")
+
+        # annotate each cell with the value
+        for i in range(len(agents)):
+            for j in range(len(subset_maps)):
+                value = mat.iat[i, j]
+                if not np.isnan(value):
+                    # choose a contrasting text color
+                    color = "white" if value < 500 else "black"
+                    ax.text(
+                        j,
+                        i,
+                        str(value),
+                        ha="center",
+                        va="center",
+                        color=color,
+                        fontsize=3.5,
+                    )
+
         ax.set_xticks(np.arange(len(subset_maps)))
         ax.set_yticks(np.arange(len(agents)))
         ax.set_xticklabels(subset_maps, rotation=45, ha="right", fontsize=8)
@@ -134,3 +171,4 @@ if __name__ == "__main__":
     )
     plt.tight_layout(rect=[0, 0, 0.9, 1])
     plt.savefig(os.path.join(output_dir, f"eval_matrix_duration.png"))
+    plt.savefig(os.path.join(output_dir, f"eval_matrix_duration.pdf"))
