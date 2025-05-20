@@ -9,6 +9,9 @@ from create_comp_matrix import parse_log_text
 
 if __name__ == "__main__":
 
+    output_dir = "analysis_data/eval_matrix/"
+    os.makedirs(output_dir)
+
     paths = glob.glob("analysis_data/eval_package/*/logs/*.txt")
 
     records = []
@@ -100,7 +103,7 @@ if __name__ == "__main__":
         cax, ax=axes, orientation="vertical", fraction=0.02, pad=0.02, label="Win-Rate"
     )
     plt.tight_layout(rect=[0, 0, 0.9, 1])
-    plt.show()
+    plt.savefig(os.path.join(output_dir, f"comp_matrix_win_rate.png"))
 
     # --- Plot Duration ---
     fig, axes = plt.subplots(2, 1, figsize=(6, 7), sharex=False)
@@ -130,4 +133,4 @@ if __name__ == "__main__":
         cax, ax=axes, orientation="vertical", fraction=0.02, pad=0.02, label="Steps"
     )
     plt.tight_layout(rect=[0, 0, 0.9, 1])
-    plt.show()
+    plt.savefig(os.path.join(output_dir, f"comp_matrix_duration.png"))

@@ -1,4 +1,6 @@
 comp_package
 eval_package
 tb_package
-*.png
+
+comp_matrix
+eval_matrix
