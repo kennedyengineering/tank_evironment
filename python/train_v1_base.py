@@ -186,6 +186,7 @@ def eval(model_path, map_name, record_video, num_episodes, deterministic):
 
     if record_video is not None:
         print(f"Recording video, saving to {record_video}")
+
     # Configuration variables
     seed = 100
     device = "cuda"
@@ -213,15 +214,29 @@ def eval(model_path, map_name, record_video, num_episodes, deterministic):
     print(f"Loading model {model_path}.")
     model = PPO.load(model_path, device=device, seed=seed)
 
-    # Log number of wins
+    # Log win stats
     win_log = np.zeros(num_episodes)
+    tie_log = np.zeros(num_episodes)
+    loss_log = np.zeros(num_episodes)
+    timeout_log = np.zeros(num_episodes)
 
-    def log_wins_callback(locals_, _):
+    def log_win_stats_callback(locals_, _):
         done = locals_["done"]
         if done:
-            won = "hit" in locals_["infos"][0]
+            infos = locals_["infos"][0]
             idx = locals_["episode_counts"][0]
-            win_log[idx] = 1 if won else 0
+
+            won = "hit" in infos and not "hit_by" in infos
+            win_log[idx] = int(won)
+
+            tie = "hit" in infos and "hit_by" in infos
+            tie_log[idx] = int(tie)
+
+            lost = not "hit" in infos and "hit_by" in infos
+            loss_log[idx] = int(lost)
+
+            timeout = not "hit" in infos and not "hit_by" in infos
+            timeout_log[idx] = int(timeout)
 
     # Log frames
     frames = []
@@ -249,7 +264,7 @@ def eval(model_path, map_name, record_video, num_episodes, deterministic):
                 frames.clear()
 
     # Create callback list
-    callbacks = [log_wins_callback, log_frames_callback]
+    callbacks = [log_win_stats_callback, log_frames_callback]
     master_callback = lambda locals_, _: [fn(locals_, _) for fn in callbacks]
 
     # Run evaluation
@@ -267,8 +282,14 @@ def eval(model_path, map_name, record_video, num_episodes, deterministic):
     print("Episode Durations: ", rewards[1])
     print("Average Reward: ", np.mean(rewards[0]))
     print("Average Duration: ", np.mean(rewards[1]))
-    print("Win Log: ", win_log)
+    print("Win Log:\t", win_log)
+    print("Tie Log:\t", tie_log)
+    print("Loss Log:\t", loss_log)
+    print("Timeout Log:\t", timeout_log)
     print("Win Rate: ", np.count_nonzero(win_log) / win_log.size)
+    print("Tie Rate: ", np.count_nonzero(tie_log) / tie_log.size)
+    print("Loss Rate: ", np.count_nonzero(loss_log) / loss_log.size)
+    print("Timeout Rate: ", np.count_nonzero(timeout_log) / timeout_log.size)
 
 
 if __name__ == "__main__":
