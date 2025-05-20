@@ -103,7 +103,7 @@ if __name__ == "__main__":
         cax, ax=axes, orientation="vertical", fraction=0.02, pad=0.02, label="Win-Rate"
     )
     plt.tight_layout(rect=[0, 0, 0.9, 1])
-    plt.savefig(os.path.join(output_dir, f"comp_matrix_win_rate.png"))
+    plt.savefig(os.path.join(output_dir, f"eval_matrix_win_rate.png"))
 
     # --- Plot Duration ---
     fig, axes = plt.subplots(2, 1, figsize=(6, 7), sharex=False)
@@ -133,4 +133,4 @@ if __name__ == "__main__":
         cax, ax=axes, orientation="vertical", fraction=0.02, pad=0.02, label="Steps"
     )
     plt.tight_layout(rect=[0, 0, 0.9, 1])
-    plt.savefig(os.path.join(output_dir, f"comp_matrix_duration.png"))
+    plt.savefig(os.path.join(output_dir, f"eval_matrix_duration.png"))

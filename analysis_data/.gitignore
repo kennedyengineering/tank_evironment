@@ -4,3 +4,5 @@ tb_package
 
 comp_matrix
 eval_matrix
+
+*.gz
