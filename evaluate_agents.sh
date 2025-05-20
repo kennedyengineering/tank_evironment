@@ -7,9 +7,16 @@ mkdir "${OUTPUT_PATH}"
 eval() {
     local weights="$1"
     local name="$2"
+    local is_base="${3:-false}"
+
     local output_path="${OUTPUT_PATH}/${name}"
     local log_output_path="${output_path}/logs"
     local video_output_path="${output_path}/videos"
+
+    local python_script="python/train_v1.py"
+    if [[ "$is_base" == "true" ]]; then
+        python_script="python/train_v1_base.py"
+    fi
 
     echo ""
     echo "Running comprehensive evaluation on ${weights}"
@@ -26,7 +33,7 @@ eval() {
         local map="$3"
 
         mkdir "${video_output_path}/${run_name}"
-        python3 python/train_v1.py eval "${weights}" --episodes "${episodes}" --map "${map}" --record-video "${video_output_path}/${run_name}/${run_name}.mp4" > "${log_output_path}/${run_name}.txt"
+        python3 "${python_script}" eval "${weights}" --episodes "${episodes}" --map "${map}" --record-video "${video_output_path}/${run_name}/${run_name}.mp4" > "${log_output_path}/${run_name}.txt"
     }
 
     run_stochastic() {
@@ -35,7 +42,7 @@ eval() {
         local map="$3"
 
         mkdir "${video_output_path}/${run_name}"
-        python3 python/train_v1.py eval "${weights}" --episodes "${episodes}" --map "${map}" --record-video "${video_output_path}/${run_name}/${run_name}.mp4" --stochastic > "${log_output_path}/${run_name}.txt"
+        python3 "${python_script}" eval "${weights}" --episodes "${episodes}" --map "${map}" --record-video "${video_output_path}/${run_name}/${run_name}.mp4" --stochastic > "${log_output_path}/${run_name}.txt"
     }
 
     ### Deterministic ###
@@ -126,6 +133,8 @@ eval() {
     # Stochastic Policy : Map WallSmall, 100 Episodes
     run_stochastic stochastic_wall_small_100 100 WallSmall
 }
+# Base Model - Train_v1_base                         : 20250417_053308
+eval weights/tank_game_environment_v1_20250417-053308/tank_game_environment_v1_20250417-053308.zip model_train_v1_base true
 
 # LSTM Model - Train_v1                              : 20250514_180254
 eval weights/tank_game_environment_v1_20250514-180254/tank_game_environment_v1_20250514-180254.zip model_train_v1
