@@ -106,6 +106,27 @@ if __name__ == "__main__":
             index=agents, columns=agents, fill_value=np.nan
         )
 
+        # pivot out losses, ties and episodes in the same layout
+        loss_mat = sub.pivot(index="agent1", columns="agent2", values="losses").reindex(
+            index=agents, columns=agents
+        )
+        ties_mat = sub.pivot(index="agent1", columns="agent2", values="ties").reindex(
+            index=agents, columns=agents
+        )
+        ep_mat = sub.pivot(index="agent1", columns="agent2", values="episodes").reindex(
+            index=agents, columns=agents
+        )
+
+        # compute the "reverse" win-rate for the lower half as losses / episodes
+        reverse = loss_mat.T / ep_mat.T
+
+        # fill only the strictly lower triangle of mat with reverse
+        n = len(agents)
+        for i in range(n):
+            for j in range(n):
+                if i > j and np.isnan(mat.iat[i, j]):
+                    mat.iat[i, j] = reverse.iat[i, j]
+
         # draw heatmap
         fig, ax = plt.subplots(figsize=(6, 6))
         cax = ax.imshow(mat.values, vmin=0, vmax=1, aspect="equal")
@@ -116,7 +137,7 @@ if __name__ == "__main__":
         ax.set_yticklabels(agents)
         ax.set_xlabel("Agent 2")
         ax.set_ylabel("Agent 1")
-        ax.set_title(f"Win‐rate on {map_name}")
+        ax.set_title(f"Win-rate on {map_name}")
 
         fig.colorbar(cax, ax=ax, label="Win Rate")
         plt.tight_layout()
