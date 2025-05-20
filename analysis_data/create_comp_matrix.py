@@ -43,7 +43,7 @@ def parse_log_text(log_text):
 if __name__ == "__main__":
 
     output_dir = "analysis_data/comp_matrix/"
-    os.makedirs(output_dir)
+    os.makedirs(output_dir, exist_ok=True)
 
     paths = glob.glob("analysis_data/comp_package/*/logs/*.txt")
 
@@ -137,6 +137,24 @@ if __name__ == "__main__":
         # draw heatmap
         fig, ax = plt.subplots(figsize=(6, 6))
         cax = ax.imshow(mat.values, vmin=0, vmax=1, aspect="equal")
+
+        # annotate each cell with the win rate
+        n = len(agents)
+        for i in range(n):
+            for j in range(n):
+                rate = mat.iat[i, j]
+                if not np.isnan(rate):
+                    # choose a contrasting text color
+                    color = "white" if rate < 0.5 else "black"
+                    ax.text(
+                        j,
+                        i,
+                        str(rate),
+                        ha="center",
+                        va="center",
+                        color=color,
+                        fontsize=7,
+                    )
 
         ax.set_xticks(np.arange(len(agents)))
         ax.set_yticks(np.arange(len(agents)))
