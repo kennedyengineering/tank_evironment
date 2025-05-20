@@ -76,15 +76,20 @@ class TankVecEnv(VecEnv):
         )
         self.opponent_predict_deterministic = opponent_predict_deterministic
 
+        self.states = None
+        self.episode_starts = np.ones((self.num_envs,), dtype=bool)
+
     def step_async(self, actions: np.ndarray) -> None:
         self.actions = actions
 
     def step_wait(self) -> VecEnvStepReturn:
         # Compute opponent actions
-        opponent_actions = self.opponent_model.predict(
+        opponent_actions, self.states = self.opponent_model.predict(
             observation=self._opp_obs_from_buf(),
             deterministic=self.opponent_predict_deterministic,
-        )[0]
+            state=self.states,
+            episode_start=self.episode_starts,
+        )
 
         # Avoid circular imports
         for env_idx in range(self.num_envs):
@@ -104,6 +109,9 @@ class TankVecEnv(VecEnv):
             self.buf_infos[env_idx]["TimeLimit.truncated"] = (
                 truncated and not terminated
             )
+
+            # set episode start
+            self.episode_starts[env_idx] = self.buf_dones[env_idx]
 
             if self.buf_dones[env_idx]:
                 # save final observation where user can get it, then reset
@@ -134,6 +142,10 @@ class TankVecEnv(VecEnv):
             )
             # Get opponent observation
             opp_obs = self.envs[env_idx].unwrapped.get_opponent_observation()
+            # Reset state
+            self.state = None
+            # Reset episode_starts
+            self.episode_starts = np.ones((self.num_envs,), dtype=bool)
 
             self._save_obs(env_idx, obs)
             self._save_opp_obs(env_idx, opp_obs)
