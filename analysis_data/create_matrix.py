@@ -6,6 +6,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+"""
+Read as : agent1 vs agent2, agent1 wins % of the time against agent2.
+"""
+
 
 def parse_log_text(log_text):
     """
