@@ -42,6 +42,9 @@ def parse_log_text(log_text):
 
 if __name__ == "__main__":
 
+    output_dir = "analysis_data/comp_matrix/"
+    os.makedirs(output_dir)
+
     paths = glob.glob("analysis_data/comp_package/*/logs/*.txt")
 
     records = []
@@ -152,4 +155,4 @@ if __name__ == "__main__":
             label="Win Rate",
         )
         plt.tight_layout(rect=[0, 0, 0.9, 1])
-        plt.show()
+        plt.savefig(os.path.join(output_dir, f"comp_matrix_{map_name}.png"))
