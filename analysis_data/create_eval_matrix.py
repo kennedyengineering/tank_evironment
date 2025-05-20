@@ -46,6 +46,7 @@ if __name__ == "__main__":
                 "ties": ties,
                 "losses": losses,
                 "episodes": episodes,
+                "average_duration": np.mean(info["durations"]),
             }
         )
 
@@ -71,9 +72,9 @@ if __name__ == "__main__":
     deterministic_maps = [m for m in maps if m.startswith("deterministic_")]
     stochastic_maps = [m for m in maps if m.startswith("stochastic_")]
 
+    # --- Plot Win-Rate ---
     fig, axes = plt.subplots(2, 1, figsize=(6, 7), sharex=False)
-
-    fig.suptitle("Agent Win-Rates Across Across Maps")
+    fig.suptitle("Agent Win-Rates Across Maps")
 
     for ax, subset_maps, title in zip(
         axes,
@@ -97,6 +98,36 @@ if __name__ == "__main__":
     # Shared colorbar
     fig.colorbar(
         cax, ax=axes, orientation="vertical", fraction=0.02, pad=0.02, label="Win-Rate"
+    )
+    plt.tight_layout(rect=[0, 0, 0.9, 1])
+    plt.show()
+
+    # --- Plot Duration ---
+    fig, axes = plt.subplots(2, 1, figsize=(6, 7), sharex=False)
+    fig.suptitle("Agent Average Steps to Completion Across Maps")
+
+    for ax, subset_maps, title in zip(
+        axes,
+        [deterministic_maps, stochastic_maps],
+        ["Deterministic Policy", "Stochastic Policy"],
+    ):
+        mat = df.pivot(index="agent", columns="map", values="average_duration")
+        mat = mat.reindex(index=agents, columns=subset_maps)
+
+        cax = ax.imshow(mat.values, vmin=0, vmax=1002, aspect="equal")
+        ax.set_xticks(np.arange(len(subset_maps)))
+        ax.set_yticks(np.arange(len(agents)))
+        ax.set_xticklabels(subset_maps, rotation=45, ha="right", fontsize=8)
+        ax.set_yticklabels(agents, fontsize=8)
+        ax.set_ylabel("Agent")
+        ax.set_title(title)
+
+    # Common X label on bottom subplot
+    axes[-1].set_xlabel("Map")
+
+    # Shared colorbar
+    fig.colorbar(
+        cax, ax=axes, orientation="vertical", fraction=0.02, pad=0.02, label="Steps"
     )
     plt.tight_layout(rect=[0, 0, 0.9, 1])
     plt.show()
