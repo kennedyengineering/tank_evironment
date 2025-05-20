@@ -137,12 +137,19 @@ if __name__ == "__main__":
 
         ax.set_xticks(np.arange(len(agents)))
         ax.set_yticks(np.arange(len(agents)))
-        ax.set_xticklabels(agents, rotation=90)
-        ax.set_yticklabels(agents)
-        ax.set_xlabel("Agent 2")
-        ax.set_ylabel("Agent 1")
+        ax.set_xticklabels(agents, rotation=45, ha="right", fontsize=8)
+        ax.set_yticklabels(agents, fontsize=8)
+        ax.set_xlabel("Opponent")
+        ax.set_ylabel("Agent")
         ax.set_title(f"Win-rate on {map_name}")
 
-        fig.colorbar(cax, ax=ax, label="Win Rate")
-        plt.tight_layout()
+        fig.colorbar(
+            cax,
+            ax=ax,
+            orientation="vertical",
+            fraction=0.04,
+            pad=0.02,
+            label="Win Rate",
+        )
+        plt.tight_layout(rect=[0, 0, 0.9, 1])
         plt.show()
