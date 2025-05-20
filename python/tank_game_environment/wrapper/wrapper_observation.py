@@ -31,9 +31,9 @@ class ObservationWrapper(BaseParallelWrapper):
         """
         Apply self.observation to each agent's observation.
         """
-        return {agent: self.observation(o) for agent, o in obs_dict.items()}
+        return {agent: self.observation(agent, o) for agent, o in obs_dict.items()}
 
-    def observation(self, observation):
+    def observation(self, agent, observation):
         """
         Override this method to transform a single agent's observation.
         By default, returns it unchanged.

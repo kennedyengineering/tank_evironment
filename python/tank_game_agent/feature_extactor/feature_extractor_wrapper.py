@@ -24,7 +24,7 @@ class FeatureExtractorWrapper(ObservationWrapper):
             low=-np.inf, high=np.inf, shape=dummy_feat.shape, dtype=np.float32
         )
 
-    def observation(self, observation):
+    def observation(self, agent, observation):
         # Convert observation to tensor.
         obs_tensor = torch.tensor(observation, dtype=torch.float32)
         with torch.no_grad():
