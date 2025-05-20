@@ -174,3 +174,4 @@ if __name__ == "__main__":
         )
         plt.tight_layout(rect=[0, 0, 0.9, 1])
         plt.savefig(os.path.join(output_dir, f"comp_matrix_{map_name}.png"))
+        plt.savefig(os.path.join(output_dir, f"comp_matrix_{map_name}.pdf"))
