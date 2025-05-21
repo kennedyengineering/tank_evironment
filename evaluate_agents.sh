@@ -145,8 +145,8 @@ eval weights/tank_game_environment_v0_20250515-233239/tank_game_environment_v0_2
 # LSTM Finetuned Model - Train_v0 - No Dense Rewards : 20250515_234037
 eval weights/tank_game_environment_v0_20250515-234037/tank_game_environment_v0_20250515-234037.zip model_finetuned_train_v0_no_dense
 
-# LSTM Finetuned Model - Train_v2                    : 20250515_234713
-eval weights/tank_game_environment_v1_20250515-234713/tank_game_environment_v1_20250515-234713.zip model_finetuned_train_v2
+# LSTM Finetuned Model - Train_v2                    : 20250521_013453
+eval weights/tank_game_environment_v1_20250521-013453/tank_game_environment_v1_20250521-013453.zip model_finetuned_train_v2
 
-# LSTM Finetuned Model - Train_v2 - No Dense Rewards : 20250515_234926
-eval weights/tank_game_environment_v1_20250515-234926/tank_game_environment_v1_20250515-234926.zip model_finetuned_train_v2_no_dense
+# LSTM Finetuned Model - Train_v2 - No Dense Rewards : 20250521_013649
+eval weights/tank_game_environment_v1_20250521-013649/tank_game_environment_v1_20250521-013649.zip model_finetuned_train_v2_no_dense

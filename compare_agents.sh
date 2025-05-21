@@ -111,11 +111,11 @@ model_finetuned_train_v0_weights=weights/tank_game_environment_v0_20250515-23323
 # LSTM Finetuned Model - Train_v0 - No Dense Rewards : 20250515_234037
 model_finetuned_train_v0_no_dense_weights=weights/tank_game_environment_v0_20250515-234037/tank_game_environment_v0_20250515-234037.zip
 
-# LSTM Finetuned Model - Train_v2                    : 20250515_234713
-model_finetuned_train_v2_weights=weights/tank_game_environment_v1_20250515-234713/tank_game_environment_v1_20250515-234713.zip
+# LSTM Finetuned Model - Train_v2                    : 20250521_013453
+model_finetuned_train_v2_weights=weights/tank_game_environment_v1_20250521-013453/tank_game_environment_v1_20250521-013453.zip
 
-# LSTM Finetuned Model - Train_v2 - No Dense Rewards : 20250515_234926
-model_finetuned_train_v2_no_dense_weights=weights/tank_game_environment_v1_20250515-234926/tank_game_environment_v1_20250515-234926.zip
+# LSTM Finetuned Model - Train_v2 - No Dense Rewards : 20250521_013649
+model_finetuned_train_v2_no_dense_weights=weights/tank_game_environment_v1_20250521-013649/tank_game_environment_v1_20250521-013649.zip
 
 # Base Model vs *
 comp "${model_train_v1_base_weights}" "${model_train_v1_weights}" model_train_v1_base_vs_model_train_v1 true

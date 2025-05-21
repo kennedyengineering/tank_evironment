@@ -30,8 +30,8 @@ extract logs/tank_game_environment_v0_20250515-233239_0/ model_finetuned_train_v
 # LSTM Finetuned Model - Train_v0 - No Dense Rewards : 20250515_234037
 extract logs/tank_game_environment_v0_20250515-234037_0/ model_finetuned_train_v0_no_dense
 
-# LSTM Finetuned Model - Train_v2                    : 20250515_234713
-extract logs/tank_game_environment_v1_20250515-234713_0/ model_finetuned_train_v2
+# LSTM Finetuned Model - Train_v2                    : 20250521_013453
+extract logs/tank_game_environment_v1_20250521-013453_0/ model_finetuned_train_v2
 
-# LSTM Finetuned Model - Train_v2 - No Dense Rewards : 20250515_234926
-extract logs/tank_game_environment_v1_20250515-234926_0/ model_finetuned_train_v2_no_dense
+# LSTM Finetuned Model - Train_v2 - No Dense Rewards : 20250521_013649
+extract logs/tank_game_environment_v1_20250521-013649_0/ model_finetuned_train_v2_no_dense
