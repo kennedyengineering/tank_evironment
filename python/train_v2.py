@@ -12,6 +12,8 @@ from tank_game_agent.feature_extactor.feature_extractor_wrapper import (
     FeatureExtractorWrapper,
 )
 
+from tank_game_agent.analysis.plot_actions import plot_actions
+
 from tank_game_agent.vec_env.vec_env import TankVecEnv
 
 import time
@@ -218,6 +220,7 @@ def eval(
     map_name,
     feature_model_path,
     record_video,
+    record_actions,
     num_episodes,
     deterministic,
     opponent_deterministic,
@@ -226,6 +229,9 @@ def eval(
 
     if record_video is not None:
         print(f"Recording video, saving to {record_video}")
+
+    if record_actions:
+        print(f"Recording actions, saving to {record_actions}")
 
     # Configuration variables
     seed = 100
@@ -268,6 +274,31 @@ def eval(
     # Load model
     print(f"Loading model {model_path}.")
     model = RecurrentPPO.load(model_path, device=device, seed=seed)
+
+    # Log actions
+    actions = []
+
+    def log_actions(locals_, _):
+        if record_actions:
+            actions.append(locals_["actions"])
+
+            done = locals_["done"]
+            if done:
+                # Prepare plot
+                np_actions = np.array(actions)
+                np_actions = np.squeeze(actions)
+
+                # Plot and save plot to disk
+                idx = locals_["episode_counts"][0]
+
+                base, ext = os.path.splitext(record_actions)
+                filename = f"{base}_{idx}.png"
+                plot_actions(np_actions, save_path=filename)
+                filename = f"{base}_{idx}.pdf"
+                plot_actions(np_actions, save_path=filename)
+
+                # Reset buffer
+                actions.clear()
 
     # Log win stats
     win_log = np.zeros(num_episodes)
@@ -319,7 +350,7 @@ def eval(
                 frames.clear()
 
     # Create callback list
-    callbacks = [log_win_stats_callback, log_frames_callback]
+    callbacks = [log_actions, log_win_stats_callback, log_frames_callback]
     master_callback = lambda locals_, _: [fn(locals_, _) for fn in callbacks]
 
     # Run evaluation
@@ -394,6 +425,12 @@ if __name__ == "__main__":
         help="Path to output video file (e.g. output.mp4).",
     )
     eval_parser.add_argument(
+        "--record-actions",
+        type=str,
+        default=None,
+        help="Path to output plot files (e.g. actions.png or actions.pdf).",
+    )
+    eval_parser.add_argument(
         "--episodes", type=int, default=20, help="Number of episodes to run."
     )
     eval_parser.add_argument(
@@ -421,6 +458,7 @@ if __name__ == "__main__":
             args.map,
             args.feature_model,
             args.record_video,
+            args.record_actions,
             args.episodes,
             not args.stochastic,
             not args.opponent_stochastic,
