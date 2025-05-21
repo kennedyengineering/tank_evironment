@@ -131,6 +131,10 @@ class TankVecEnv(VecEnv):
         )
 
     def reset(self) -> VecEnvObs:
+        # # Reset state and episode_starts
+        self.state = None
+        self.episode_starts = np.ones((self.num_envs,), dtype=bool)
+
         for env_idx in range(self.num_envs):
             maybe_options = (
                 {"options": self._options[env_idx]} if self._options[env_idx] else {}
@@ -142,10 +146,6 @@ class TankVecEnv(VecEnv):
             )
             # Get opponent observation
             opp_obs = self.envs[env_idx].unwrapped.get_opponent_observation()
-            # Reset state
-            self.state = None
-            # Reset episode_starts
-            self.episode_starts = np.ones((self.num_envs,), dtype=bool)
 
             self._save_obs(env_idx, obs)
             self._save_opp_obs(env_idx, opp_obs)
