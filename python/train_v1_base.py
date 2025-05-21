@@ -11,6 +11,11 @@ from tank_game_agent.schedule.schedule_cosine import cosine_schedule
 from tank_game_agent.feature_extactor.feature_extractor_lidar import LidarCNN
 
 from tank_game_agent.analysis.plot_actions import plot_actions
+from tank_game_agent.analysis.plot_latent import (
+    plot_conv,
+    plot_latent,
+    plot_latent_heatmap,
+)
 from tank_game_agent.analysis.plot_observations import plot_observations
 
 import time
@@ -30,6 +35,8 @@ from stable_baselines3.common.callbacks import (
     EvalCallback,
 )
 from stable_baselines3.common.vec_env import DummyVecEnv
+
+import torch
 
 
 def train(checkpoint_path, map_name):
@@ -190,6 +197,7 @@ def eval(
     record_video,
     record_actions,
     record_observations,
+    record_features,
     num_episodes,
     deterministic,
 ):
@@ -203,6 +211,9 @@ def eval(
 
     if record_observations:
         print(f"Recording observations, saving to {record_observations}")
+
+    if record_features:
+        print(f"Recording features, saving to {record_features}")
 
     # Configuration variables
     seed = 100
@@ -230,6 +241,72 @@ def eval(
     # Load model
     print(f"Loading model {model_path}.")
     model = PPO.load(model_path, device=device, seed=seed)
+
+    # Log features
+    conv1 = []
+    conv2 = []
+    conv_mlp = []
+    extra = []
+
+    def log_features(locals_, _):
+        if record_features:
+
+            feature_extractor = model.policy.features_extractor
+
+            observations = torch.from_numpy(locals_["observations"])
+            observations = observations.to(device=model.device)
+
+            # Lidar Head.
+            x = feature_extractor.forward_conv_preprocess(observations)
+            x = feature_extractor.forward_conv_block1(x)
+            conv1.append(x.cpu().detach().numpy())
+            x = feature_extractor.forward_conv_block2(x)
+            conv2.append(x.cpu().detach().numpy())
+            cnn_features = feature_extractor.forward_conv_features(x)
+            conv_mlp.append(cnn_features.cpu().detach().numpy())
+
+            # Extra features Head.
+            x = feature_extractor.forward_extra_preprocess(observations)
+            extra_features = feature_extractor.forward_extra_mlp(x)
+            extra.append(extra_features.cpu().detach().numpy())
+
+            done = locals_["done"]
+            if done:
+                # Prepare plot
+                np_conv1 = np.squeeze(conv1)
+                np_conv2 = np.squeeze(conv2)
+                np_conv_mlp = np.squeeze(conv_mlp)
+                np_extra = np.squeeze(extra)
+
+                # Plot and save plot to disk
+                idx = locals_["episode_counts"][0]
+                base, ext = os.path.splitext(record_features)
+
+                filename_conv1 = f"{base}_conv1_{idx}.png"
+                filename_conv2 = f"{base}_conv2_{idx}.png"
+                filename_conv_mlp = f"{base}_conv_mlp_{idx}.png"
+                filename_extra = f"{base}_extra_{idx}.png"
+
+                plot_conv(np_conv1, save_path=filename_conv1)
+                plot_conv(np_conv2, save_path=filename_conv2)
+                plot_latent_heatmap(np_conv_mlp, save_path=filename_conv_mlp)
+                plot_latent(np_extra, save_path=filename_extra)
+
+                filename_conv1 = f"{base}_conv1_{idx}.pdf"
+                filename_conv2 = f"{base}_conv2_{idx}.pdf"
+                filename_conv_mlp = f"{base}_conv_mlp_{idx}.pdf"
+                filename_extra = f"{base}_extra_{idx}.pdf"
+
+                plot_conv(np_conv1, save_path=filename_conv1)
+                plot_conv(np_conv2, save_path=filename_conv2)
+                plot_latent_heatmap(np_conv_mlp, save_path=filename_conv_mlp)
+                plot_latent(np_extra, save_path=filename_extra)
+
+                # Clear buffers
+                conv1.clear()
+                conv2.clear()
+                conv_mlp.clear()
+                extra.clear()
 
     # Log observations
     observations = []
@@ -342,6 +419,7 @@ def eval(
 
     # Create callback list
     callbacks = [
+        log_features,
         log_observations,
         log_actions,
         log_win_stats_callback,
@@ -415,6 +493,12 @@ if __name__ == "__main__":
         help="Path to output plot files (e.g. observations.png or observations.pdf).",
     )
     eval_parser.add_argument(
+        "--record-features",
+        type=str,
+        default=None,
+        help="Path to output plot files (e.g. features.png or features.pdf).",
+    )
+    eval_parser.add_argument(
         "--episodes", type=int, default=20, help="Number of episodes to run."
     )
     eval_parser.add_argument(
@@ -437,6 +521,7 @@ if __name__ == "__main__":
             args.record_video,
             args.record_actions,
             args.record_observations,
+            args.record_features,
             args.episodes,
             not args.stochastic,
         )
