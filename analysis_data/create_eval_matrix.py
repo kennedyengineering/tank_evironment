@@ -35,21 +35,17 @@ if __name__ == "__main__":
         assert episodes == len(info["durations"])
         assert episodes == len(info["rewards"])
 
-        # --- compute statistics ---
-        wins = info["win_log"].count(1)
-        ties = info["durations"].count(1002)
-        losses = episodes - wins - ties
-
         # --- add to record ---
         records.append(
             {
                 "map": map_name,
                 "agent": agent_name,
-                "wins": wins,
-                "ties": ties,
-                "losses": losses,
-                "episodes": episodes,
+                "wins": info["win_log"].count(1),
+                "ties": info["tie_log"].count(1),
+                "losses": info["loss_log"].count(1),
+                "timeouts": info["timeout_log"].count(1),
                 "average_duration": np.mean(info["durations"]),
+                "episodes": episodes,
             }
         )
 

@@ -16,7 +16,7 @@ def parse_log_text(log_text):
     Returns a dict with keys:
       - rewards: list of float
       - durations: list of int
-      - win_log: list of int (0 or 1)
+      - win/tie/loss/timeout_log: list of int (0 or 1)
     """
 
     result = {}
@@ -31,11 +31,14 @@ def parse_log_text(log_text):
     if durations_match:
         result["durations"] = ast.literal_eval(durations_match.group(1))
 
-    # Win log: capture 0/1 entries (float or int)
-    win_match = re.search(r"Win Log:\s*\[([^\]]+)\]", log_text, re.DOTALL)
-    if win_match:
-        entries = re.findall(r"\b([01])(?:\.0*)?\b", win_match.group(1))
-        result["win_log"] = [int(e) for e in entries]
+    # Extract binary logs: win, tie, loss, timeout
+    for log_name in ["Win", "Tie", "Loss", "Timeout"]:
+        pattern = rf"{log_name}\s+Log:\s*\[([^\]]+)\]"
+        log_match = re.search(pattern, log_text, re.DOTALL)
+        if log_match:
+            # Find all 0 or 1 entries (with optional ".0" float format)
+            entries = re.findall(r"\b[01](?:\.0*)?\b", log_match.group(1))
+            result[f"{log_name.lower()}_log"] = [int(e) for e in entries]
 
     return result
 
@@ -69,20 +72,16 @@ if __name__ == "__main__":
         assert episodes == len(info["durations"])
         assert episodes == len(info["rewards"])
 
-        # --- compute statistics ---
-        wins = info["win_log"].count(1)
-        ties = info["durations"].count(1002)
-        losses = episodes - wins - ties
-
         # --- add to record ---
         records.append(
             {
                 "map": map_name,
                 "agent1": agent1_name,
                 "agent2": agent2_name,
-                "wins": wins,
-                "ties": ties,
-                "losses": losses,
+                "wins": info["win_log"].count(1),
+                "ties": info["tie_log"].count(1),
+                "losses": info["loss_log"].count(1),
+                "timeouts": info["timeout_log"].count(1),
                 "episodes": episodes,
             }
         )
@@ -115,9 +114,6 @@ if __name__ == "__main__":
 
         # pivot out losses, ties and episodes in the same layout
         loss_mat = sub.pivot(index="agent1", columns="agent2", values="losses").reindex(
-            index=agents, columns=agents
-        )
-        ties_mat = sub.pivot(index="agent1", columns="agent2", values="ties").reindex(
             index=agents, columns=agents
         )
         ep_mat = sub.pivot(index="agent1", columns="agent2", values="episodes").reindex(
