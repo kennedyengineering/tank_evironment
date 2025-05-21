@@ -11,6 +11,7 @@ from tank_game_agent.schedule.schedule_cosine import cosine_schedule
 from tank_game_agent.feature_extactor.feature_extractor_lidar import LidarCNN
 
 from tank_game_agent.analysis.plot_actions import plot_actions
+from tank_game_agent.analysis.plot_observations import plot_observations
 
 import time
 import os
@@ -184,7 +185,13 @@ def train(checkpoint_path, map_name):
 
 
 def eval(
-    model_path, map_name, record_video, record_actions, num_episodes, deterministic
+    model_path,
+    map_name,
+    record_video,
+    record_actions,
+    record_observations,
+    num_episodes,
+    deterministic,
 ):
     """Evaluate an agent."""
 
@@ -193,6 +200,9 @@ def eval(
 
     if record_actions:
         print(f"Recording actions, saving to {record_actions}")
+
+    if record_observations:
+        print(f"Recording observations, saving to {record_observations}")
 
     # Configuration variables
     seed = 100
@@ -220,6 +230,41 @@ def eval(
     # Load model
     print(f"Loading model {model_path}.")
     model = PPO.load(model_path, device=device, seed=seed)
+
+    # Log observations
+    observations = []
+
+    def log_observations(locals_, _):
+        if record_observations:
+            observations.append(locals_["observations"])
+
+            done = locals_["done"]
+            if done:
+                # Prepare plot
+                np_observations = np.array(observations)
+                np_observations = np.squeeze(observations)
+
+                # Plot and save plot to disk
+                idx = locals_["episode_counts"][0]
+
+                base, ext = os.path.splitext(record_observations)
+                filename_lidar = f"{base}_lidar_{idx}.png"
+                filename_extra = f"{base}_extra_{idx}.png"
+                plot_observations(
+                    np_observations,
+                    lidar_save_path=filename_lidar,
+                    extra_save_path=filename_extra,
+                )
+                filename_lidar = f"{base}_lidar_{idx}.pdf"
+                filename_extra = f"{base}_extra_{idx}.pdf"
+                plot_observations(
+                    np_observations,
+                    lidar_save_path=filename_lidar,
+                    extra_save_path=filename_extra,
+                )
+
+                # Clear buffer
+                observations.clear()
 
     # Log actions
     actions = []
@@ -296,7 +341,12 @@ def eval(
                 frames.clear()
 
     # Create callback list
-    callbacks = [log_actions, log_win_stats_callback, log_frames_callback]
+    callbacks = [
+        log_observations,
+        log_actions,
+        log_win_stats_callback,
+        log_frames_callback,
+    ]
     master_callback = lambda locals_, _: [fn(locals_, _) for fn in callbacks]
 
     # Run evaluation
@@ -359,6 +409,12 @@ if __name__ == "__main__":
         help="Path to output plot files (e.g. actions.png or actions.pdf).",
     )
     eval_parser.add_argument(
+        "--record-observations",
+        type=str,
+        default=None,
+        help="Path to output plot files (e.g. observations.png or observations.pdf).",
+    )
+    eval_parser.add_argument(
         "--episodes", type=int, default=20, help="Number of episodes to run."
     )
     eval_parser.add_argument(
@@ -380,6 +436,7 @@ if __name__ == "__main__":
             args.map,
             args.record_video,
             args.record_actions,
+            args.record_observations,
             args.episodes,
             not args.stochastic,
         )
