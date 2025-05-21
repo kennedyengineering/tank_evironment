@@ -65,8 +65,8 @@ eval() {
     # Deterministic Policy : Map RunCloseLTR, 1 Episode
     run_deterministic deterministic_run_close_ltr_1 1 RunCloseLTR
 
-    # Deterministic Policy : Map Random, 100 Episodes
-    run_deterministic deterministic_random_100 100 Random
+    # Deterministic Policy : Map Random, 400 Episodes
+    run_deterministic deterministic_random_400 400 Random
 
     # Deterministic Policy : Map Boulder, 1 Episode
     run_deterministic deterministic_boulder_1 1 Boulder
@@ -91,47 +91,47 @@ eval() {
 
     ### Stochastic ###
 
-    # Stochastic Policy : Map RunFarRTL, 100 Episodes
-    run_stochastic stochastic_run_far_rtl_100 100 RunFarRTL
+    # Stochastic Policy : Map RunFarRTL, 400 Episodes
+    run_stochastic stochastic_run_far_rtl_400 400 RunFarRTL
 
-    # Stochastic Policy : Map RunMediumRTL, 100 Episodes
-    run_stochastic stochastic_run_medium_rtl_100 100 RunMediumRTL
+    # Stochastic Policy : Map RunMediumRTL, 400 Episodes
+    run_stochastic stochastic_run_medium_rtl_400 400 RunMediumRTL
 
-    # Stochastic Policy : Map RunCloseRTL, 100 Episodes
-    run_stochastic stochastic_run_close_rtl_100 100 RunCloseRTL
+    # Stochastic Policy : Map RunCloseRTL, 400 Episodes
+    run_stochastic stochastic_run_close_rtl_400 400 RunCloseRTL
 
-    # Stochastic Policy : Map RunFarLTR, 100 Episodes
-    run_stochastic stochastic_run_far_ltr_100 100 RunFarLTR
+    # Stochastic Policy : Map RunFarLTR, 400 Episodes
+    run_stochastic stochastic_run_far_ltr_400 400 RunFarLTR
 
-    # Stochastic Policy : Map RunMediumLTR, 100 Episodes
-    run_stochastic stochastic_run_medium_ltr_100 100 RunMediumLTR
+    # Stochastic Policy : Map RunMediumLTR, 400 Episodes
+    run_stochastic stochastic_run_medium_ltr_400 400 RunMediumLTR
 
-    # Stochastic Policy : Map RunCloseLTR, 100 Episodes
-    run_stochastic stochastic_run_close_ltr_100 100 RunCloseLTR
+    # Stochastic Policy : Map RunCloseLTR, 400 Episodes
+    run_stochastic stochastic_run_close_ltr_400 400 RunCloseLTR
 
-    # Stochastic Policy : Map Random, 100 Episodes
-    run_stochastic stochastic_random_100 100 Random
+    # Stochastic Policy : Map Random, 400 Episodes
+    run_stochastic stochastic_random_400 400 Random
 
-    # Stochastic Policy : Map Boulder, 100 Episodes
-    run_stochastic stochastic_boulder_100 100 Boulder
+    # Stochastic Policy : Map Boulder, 400 Episodes
+    run_stochastic stochastic_boulder_400 400 Boulder
 
-    # Stochastic Policy : Map GridAligned, 100 Episodes
-    run_stochastic stochastic_grid_aligned_100 100 GridAligned
+    # Stochastic Policy : Map GridAligned, 400 Episodes
+    run_stochastic stochastic_grid_aligned_400 400 GridAligned
 
-    # Stochastic Policy : Map GridStaggered, 100 Episodes
-    run_stochastic stochastic_grid_staggered_100 100 GridStaggered
+    # Stochastic Policy : Map GridStaggered, 400 Episodes
+    run_stochastic stochastic_grid_staggered_400 400 GridStaggered
 
-    # Stochastic Policy : Map Quincunx, 100 Episodes
-    run_stochastic stochastic_quincunx_100 100 Quincunx
+    # Stochastic Policy : Map Quincunx, 400 Episodes
+    run_stochastic stochastic_quincunx_400 400 Quincunx
 
-    # Stochastic Policy : Map WallLarge, 100 Episodes
-    run_stochastic stochastic_wall_large_100 100 WallLarge
+    # Stochastic Policy : Map WallLarge, 400 Episodes
+    run_stochastic stochastic_wall_large_400 400 WallLarge
 
-    # Stochastic Policy : Map WallMedium, 100 Episodes
-    run_stochastic stochastic_wall_medium_100 100 WallMedium
+    # Stochastic Policy : Map WallMedium, 400 Episodes
+    run_stochastic stochastic_wall_medium_400 400 WallMedium
 
-    # Stochastic Policy : Map WallSmall, 100 Episodes
-    run_stochastic stochastic_wall_small_100 100 WallSmall
+    # Stochastic Policy : Map WallSmall, 400 Episodes
+    run_stochastic stochastic_wall_small_400 400 WallSmall
 }
 # Base Model - Train_v1_base                         : 20250417_053308
 eval weights/tank_game_environment_v1_20250417-053308/tank_game_environment_v1_20250417-053308.zip model_train_v1_base true

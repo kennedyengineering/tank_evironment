@@ -48,8 +48,8 @@ comp() {
 
     ### Deterministic ###
 
-    # Deterministic Policy : Map Random, 100 Episodes
-    run_deterministic deterministic_random_100 100 Random
+    # Deterministic Policy : Map Random, 400 Episodes
+    run_deterministic deterministic_random_400 400 Random
 
     # Deterministic Policy : Map Boulder, 1 Episode
     run_deterministic deterministic_boulder_1 1 Boulder
@@ -74,29 +74,29 @@ comp() {
 
     ### Stochastic ###
 
-    # Stochastic Policy : Map Random, 100 Episodes
-    run_stochastic stochastic_random_100 100 Random
+    # Stochastic Policy : Map Random, 400 Episodes
+    run_stochastic stochastic_random_400 400 Random
 
-    # Stochastic Policy : Map Boulder, 100 Episodes
-    run_stochastic stochastic_boulder_100 100 Boulder
+    # Stochastic Policy : Map Boulder, 400 Episodes
+    run_stochastic stochastic_boulder_400 400 Boulder
 
-    # Stochastic Policy : Map GridAligned, 100 Episodes
-    run_stochastic stochastic_grid_aligned_100 100 GridAligned
+    # Stochastic Policy : Map GridAligned, 400 Episodes
+    run_stochastic stochastic_grid_aligned_400 400 GridAligned
 
-    # Stochastic Policy : Map GridStaggered, 100 Episodes
-    run_stochastic stochastic_grid_staggered_100 100 GridStaggered
+    # Stochastic Policy : Map GridStaggered, 400 Episodes
+    run_stochastic stochastic_grid_staggered_400 400 GridStaggered
 
-    # Stochastic Policy : Map Quincunx, 100 Episodes
-    run_stochastic stochastic_quincunx_100 100 Quincunx
+    # Stochastic Policy : Map Quincunx, 400 Episodes
+    run_stochastic stochastic_quincunx_400 400 Quincunx
 
-    # Stochastic Policy : Map WallLarge, 100 Episodes
-    run_stochastic stochastic_wall_large_100 100 WallLarge
+    # Stochastic Policy : Map WallLarge, 400 Episodes
+    run_stochastic stochastic_wall_large_400 400 WallLarge
 
-    # Stochastic Policy : Map WallMedium, 100 Episodes
-    run_stochastic stochastic_wall_medium_100 100 WallMedium
+    # Stochastic Policy : Map WallMedium, 400 Episodes
+    run_stochastic stochastic_wall_medium_400 400 WallMedium
 
-    # Stochastic Policy : Map WallSmall, 100 Episodes
-    run_stochastic stochastic_wall_small_100 100 WallSmall
+    # Stochastic Policy : Map WallSmall, 400 Episodes
+    run_stochastic stochastic_wall_small_400 400 WallSmall
 }
 
 # Base Model - Train_v1_base                         : 20250417_053308
