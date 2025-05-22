@@ -138,19 +138,21 @@ eval() {
     run_stochastic stochastic_wall_small_400 400 WallSmall
 }
 # Base Model - Train_v1_base                         : 20250417_053308
-eval weights/tank_game_environment_v1_20250417-053308/tank_game_environment_v1_20250417-053308.zip model_train_v1_base true
+eval weights/tank_game_environment_v1_20250417-053308/tank_game_environment_v1_20250417-053308.zip model_train_v1_base true &
 
 # LSTM Model - Train_v1                              : 20250514_180254
-eval weights/tank_game_environment_v1_20250514-180254/tank_game_environment_v1_20250514-180254.zip model_train_v1
+eval weights/tank_game_environment_v1_20250514-180254/tank_game_environment_v1_20250514-180254.zip model_train_v1 &
 
 # LSTM Finetuned Model - Train_v0                    : 20250515_233239
-eval weights/tank_game_environment_v0_20250515-233239/tank_game_environment_v0_20250515-233239.zip model_finetuned_train_v0
+eval weights/tank_game_environment_v0_20250515-233239/tank_game_environment_v0_20250515-233239.zip model_finetuned_train_v0 &
 
 # LSTM Finetuned Model - Train_v0 - No Dense Rewards : 20250515_234037
-eval weights/tank_game_environment_v0_20250515-234037/tank_game_environment_v0_20250515-234037.zip model_finetuned_train_v0_no_dense
+eval weights/tank_game_environment_v0_20250515-234037/tank_game_environment_v0_20250515-234037.zip model_finetuned_train_v0_no_dense &
 
 # LSTM Finetuned Model - Train_v2                    : 20250521_013453
-eval weights/tank_game_environment_v1_20250521-013453/tank_game_environment_v1_20250521-013453.zip model_finetuned_train_v2
+eval weights/tank_game_environment_v1_20250521-013453/tank_game_environment_v1_20250521-013453.zip model_finetuned_train_v2 &
 
 # LSTM Finetuned Model - Train_v2 - No Dense Rewards : 20250521_013649
-eval weights/tank_game_environment_v1_20250521-013649/tank_game_environment_v1_20250521-013649.zip model_finetuned_train_v2_no_dense
+eval weights/tank_game_environment_v1_20250521-013649/tank_game_environment_v1_20250521-013649.zip model_finetuned_train_v2_no_dense &
+
+wait
