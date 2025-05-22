@@ -25,6 +25,8 @@ from stable_baselines3.common.torch_layers import FlattenExtractor
 
 from sb3_contrib import RecurrentPPO
 
+import torch
+
 
 def eval(
     base_model_path,
@@ -39,6 +41,8 @@ def eval(
     """
     Compare a base agent to a derived LSTM agent (where the feature extractors are identical).
     """
+
+    torch.set_num_threads(1)
 
     if record_video is not None:
         print(f"Recording video, saving to {record_video}")

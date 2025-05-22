@@ -218,6 +218,8 @@ def eval(
 ):
     """Evaluate an agent."""
 
+    torch.set_num_threads(1)
+
     if record_video is not None:
         print(f"Recording video, saving to {record_video}")
 
