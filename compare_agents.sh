@@ -122,26 +122,28 @@ model_finetuned_train_v2_weights=weights/tank_game_environment_v1_20250521-01345
 model_finetuned_train_v2_no_dense_weights=weights/tank_game_environment_v1_20250521-013649/tank_game_environment_v1_20250521-013649.zip
 
 # Base Model vs *
-comp "${model_train_v1_base_weights}" "${model_train_v1_weights}" model_train_v1_base_vs_model_train_v1 true
-comp "${model_train_v1_base_weights}" "${model_finetuned_train_v0_weights}" model_train_v1_base_vs_model_finetuned_train_v0 true
-comp "${model_train_v1_base_weights}" "${model_finetuned_train_v0_no_dense_weights}" model_train_v1_base_vs_model_finetuned_train_v0_no_dense true
-comp "${model_train_v1_base_weights}" "${model_finetuned_train_v2_weights}" model_train_v1_base_vs_model_finetuned_train_v2 true
-comp "${model_train_v1_base_weights}" "${model_finetuned_train_v2_no_dense_weights}" model_train_v1_base_vs_model_finetuned_train_v2_no_dense true
+comp "${model_train_v1_base_weights}" "${model_train_v1_weights}" model_train_v1_base_vs_model_train_v1 true &
+comp "${model_train_v1_base_weights}" "${model_finetuned_train_v0_weights}" model_train_v1_base_vs_model_finetuned_train_v0 true &
+comp "${model_train_v1_base_weights}" "${model_finetuned_train_v0_no_dense_weights}" model_train_v1_base_vs_model_finetuned_train_v0_no_dense true &
+comp "${model_train_v1_base_weights}" "${model_finetuned_train_v2_weights}" model_train_v1_base_vs_model_finetuned_train_v2 true &
+comp "${model_train_v1_base_weights}" "${model_finetuned_train_v2_no_dense_weights}" model_train_v1_base_vs_model_finetuned_train_v2_no_dense true &
 
 # LSTM Model vs **
-comp "${model_train_v1_weights}" "${model_finetuned_train_v0_weights}" model_train_v1_vs_model_finetuned_train_v0
-comp "${model_train_v1_weights}" "${model_finetuned_train_v0_no_dense_weights}" model_train_v1_vs_model_finetuned_train_v0_no_dense
-comp "${model_train_v1_weights}" "${model_finetuned_train_v2_weights}" model_train_v1_vs_model_finetuned_train_v2
-comp "${model_train_v1_weights}" "${model_finetuned_train_v2_no_dense_weights}" model_train_v1_vs_model_finetuned_train_v2_no_dense
+comp "${model_train_v1_weights}" "${model_finetuned_train_v0_weights}" model_train_v1_vs_model_finetuned_train_v0 &
+comp "${model_train_v1_weights}" "${model_finetuned_train_v0_no_dense_weights}" model_train_v1_vs_model_finetuned_train_v0_no_dense &
+comp "${model_train_v1_weights}" "${model_finetuned_train_v2_weights}" model_train_v1_vs_model_finetuned_train_v2 &
+comp "${model_train_v1_weights}" "${model_finetuned_train_v2_no_dense_weights}" model_train_v1_vs_model_finetuned_train_v2_no_dense &
 
 # LSTM Finetuned Model - Train_v0 vs ***
-comp "${model_finetuned_train_v0_weights}" "${model_finetuned_train_v0_no_dense_weights}" model_finetuned_train_v0_vs_model_finetuned_train_v0_no_dense
-comp "${model_finetuned_train_v0_weights}" "${model_finetuned_train_v2_weights}" model_finetuned_train_v0_vs_model_finetuned_train_v2
-comp "${model_finetuned_train_v0_weights}" "${model_finetuned_train_v2_no_dense_weights}" model_finetuned_train_v0_vs_model_finetuned_train_v2_no_dense
+comp "${model_finetuned_train_v0_weights}" "${model_finetuned_train_v0_no_dense_weights}" model_finetuned_train_v0_vs_model_finetuned_train_v0_no_dense &
+comp "${model_finetuned_train_v0_weights}" "${model_finetuned_train_v2_weights}" model_finetuned_train_v0_vs_model_finetuned_train_v2 &
+comp "${model_finetuned_train_v0_weights}" "${model_finetuned_train_v2_no_dense_weights}" model_finetuned_train_v0_vs_model_finetuned_train_v2_no_dense &
 
 # LSTM Finetuned Model - Train_v0 - No Dense Rewards vs ****
-comp "${model_finetuned_train_v0_no_dense_weights}" "${model_finetuned_train_v2_weights}" model_finetuned_train_v0_no_dense_vs_model_finetuned_train_v2
-comp "${model_finetuned_train_v0_no_dense_weights}" "${model_finetuned_train_v2_no_dense_weights}" model_finetuned_train_v0_no_dense_vs_model_finetuned_train_v2_no_dense
+comp "${model_finetuned_train_v0_no_dense_weights}" "${model_finetuned_train_v2_weights}" model_finetuned_train_v0_no_dense_vs_model_finetuned_train_v2 &
+comp "${model_finetuned_train_v0_no_dense_weights}" "${model_finetuned_train_v2_no_dense_weights}" model_finetuned_train_v0_no_dense_vs_model_finetuned_train_v2_no_dense &
 
 # LSTM Finetuned Model - Train_v2 vs *****
-comp "${model_finetuned_train_v2_weights}" "${model_finetuned_train_v2_no_dense_weights}" model_finetuned_train_v2_vs_model_finetuned_train_v2_no_dense
+comp "${model_finetuned_train_v2_weights}" "${model_finetuned_train_v2_no_dense_weights}" model_finetuned_train_v2_vs_model_finetuned_train_v2_no_dense &
+
+wait
