@@ -48,3 +48,5 @@ def plot_actions(actions: NDArray[np.float64], save_path=None) -> None:
         plt.show()
     else:
         plt.savefig(save_path)
+
+    plt.close(fig)

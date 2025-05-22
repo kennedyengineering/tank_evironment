@@ -13,6 +13,7 @@ comp() {
     local output_path="${OUTPUT_PATH}/${name}"
     local log_output_path="${output_path}/logs"
     local video_output_path="${output_path}/videos"
+    local action_output_path="${output_path}/actions"
 
     local python_script="python/train_v2.py"
     if [[ "$is_base" == "true" ]]; then
@@ -27,6 +28,7 @@ comp() {
     mkdir "${output_path}"
     mkdir "${log_output_path}"
     mkdir "${video_output_path}"
+    mkdir "${action_output_path}"
 
     run_deterministic() {
         local run_name="$1"
@@ -34,7 +36,8 @@ comp() {
         local map="$3"
 
         mkdir "${video_output_path}/${run_name}"
-        python3 "${python_script}" eval "${weights}" "${opponent_weights}" --episodes "${episodes}" --map "${map}" --record-video "${video_output_path}/${run_name}/${run_name}.mp4" > "${log_output_path}/${run_name}.txt"
+        mkdir "${action_output_path}/${run_name}"
+        python3 "${python_script}" eval "${weights}" "${opponent_weights}" --episodes "${episodes}" --map "${map}" --record-video "${video_output_path}/${run_name}/${run_name}.mp4" --record-actions "${action_output_path}/${run_name}/${run_name}.unused" > "${log_output_path}/${run_name}.txt"
     }
 
     run_stochastic() {
@@ -43,7 +46,8 @@ comp() {
         local map="$3"
 
         mkdir "${video_output_path}/${run_name}"
-        python3 "${python_script}" eval "${weights}" "${opponent_weights}" --episodes "${episodes}" --map "${map}" --record-video "${video_output_path}/${run_name}/${run_name}.mp4" --stochastic --opponent-stochastic > "${log_output_path}/${run_name}.txt"
+        mkdir "${action_output_path}/${run_name}"
+        python3 "${python_script}" eval "${weights}" "${opponent_weights}" --episodes "${episodes}" --map "${map}" --record-video "${video_output_path}/${run_name}/${run_name}.mp4" --record-actions "${action_output_path}/${run_name}/${run_name}.unused" --stochastic --opponent-stochastic > "${log_output_path}/${run_name}.txt"
     }
 
     ### Deterministic ###
