@@ -139,10 +139,10 @@ while running:
     ]
     pygame.draw.line(image, (255, 0, 0), start_pixels, end_pixels)
 
-    end_pixels = [
-        config.pixelDensity * x + start_pixels[i] for i, x in enumerate(vel_l)
-    ]
-    pygame.draw.line(image, (0, 255, 0), start_pixels, end_pixels)
+    # end_pixels = [
+    #     config.pixelDensity * x + start_pixels[i] for i, x in enumerate(vel_l)
+    # ]
+    # pygame.draw.line(image, (0, 255, 0), start_pixels, end_pixels)
 
     arc_radius = 10
     arc_radius_pixels = arc_radius * config.pixelDensity
@@ -160,9 +160,9 @@ while running:
     screen.blit(image, (0, 0))
 
     # Display FPS
-    fps = clock.get_fps()  # Get the current FPS
-    fps_text = font.render(f"FPS: {fps:.2f}", True, (255, 0, 0))  # Render FPS text
-    screen.blit(fps_text, (10, 10))  # Draw FPS on the screen
+    # fps = clock.get_fps()  # Get the current FPS
+    # fps_text = font.render(f"FPS: {fps:.2f}", True, (255, 0, 0))  # Render FPS text
+    # screen.blit(fps_text, (10, 10))  # Draw FPS on the screen
 
     # Update the display
     pygame.display.flip()

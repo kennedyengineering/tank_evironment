@@ -103,6 +103,24 @@ if __name__ == "__main__":
         "model_finetuned_train_v2_no_dense",
     ]
 
+    # aliases = {
+    #     "model_train_v1_base": "non-LSTM",
+    #     "model_train_v1": "LSTM",
+    #     "model_finetuned_train_v0": "LSTM+self-dense",
+    #     "model_finetuned_train_v0_no_dense": "LSTM+self-sparse",
+    #     "model_finetuned_train_v2": "LSTM+ckpt-dense",
+    #     "model_finetuned_train_v2_no_dense": "LSTM+ckpt-sparse",
+    # }
+
+    aliases = {
+        "model_train_v1_base": "non-LSTM",
+        "model_train_v1": "LSTM",
+        "model_finetuned_train_v0": "LSTM+SD",
+        "model_finetuned_train_v0_no_dense": "LSTM+SP",
+        "model_finetuned_train_v2": "LSTM+CD",
+        "model_finetuned_train_v2_no_dense": "LSTM+CS",
+    }
+
     for map_name in df["map"].unique():
 
         sub = df[df["map"] == map_name]
@@ -149,16 +167,23 @@ if __name__ == "__main__":
                         ha="center",
                         va="center",
                         color=color,
-                        fontsize=7,
+                        fontsize=10,
                     )
 
         ax.set_xticks(np.arange(len(agents)))
         ax.set_yticks(np.arange(len(agents)))
-        ax.set_xticklabels(agents, rotation=45, ha="right", fontsize=8)
-        ax.set_yticklabels(agents, fontsize=8)
+        ax.set_xticklabels(
+            [aliases[agent] for agent in agents], rotation=45, ha="right", fontsize=8
+        )
+        ax.set_yticklabels([aliases[agent] for agent in agents], fontsize=8)
         ax.set_xlabel("Opponent")
         ax.set_ylabel("Agent")
-        ax.set_title(f"Win-rate on {map_name}")
+
+        map_name_title = ""
+        for thing in map_name.split("_")[1:]:
+            map_name_title += thing.capitalize() + " "
+        map_name_title += f"({map_name.split('_')[0].capitalize()})"
+        ax.set_title(f"Win-Rate on Map {map_name_title}")
 
         fig.colorbar(
             cax,
@@ -166,7 +191,7 @@ if __name__ == "__main__":
             orientation="vertical",
             fraction=0.04,
             pad=0.02,
-            label="Win Rate",
+            label="Win-Rate",
         )
         plt.tight_layout(rect=[0, 0, 0.9, 1])
         plt.savefig(os.path.join(output_dir, f"comp_matrix_{map_name}.png"))

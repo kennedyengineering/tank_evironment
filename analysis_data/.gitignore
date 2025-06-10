@@ -6,3 +6,4 @@ comp_matrix
 eval_matrix
 
 *.gz
+comp_matrix_diff

@@ -7,6 +7,14 @@ import numpy as np
 from create_comp_matrix import parse_log_text
 
 
+def get_map_name(brr):
+    map_name_title = ""
+    for thing in brr.split("_")[1:]:
+        map_name_title += thing.capitalize() + " "
+    # map_name_title += f"({map_name.split('_')[0].capitalize()})"
+    return map_name_title
+
+
 if __name__ == "__main__":
 
     output_dir = "analysis_data/eval_matrix/"
@@ -66,6 +74,24 @@ if __name__ == "__main__":
         "model_finetuned_train_v2_no_dense",
     ]
 
+    # aliases = {
+    #     "model_train_v1_base": "non-LSTM",
+    #     "model_train_v1": "LSTM",
+    #     "model_finetuned_train_v0": "LSTM+self-dense",
+    #     "model_finetuned_train_v0_no_dense": "LSTM+self-sparse",
+    #     "model_finetuned_train_v2": "LSTM+ckpt-dense",
+    #     "model_finetuned_train_v2_no_dense": "LSTM+ckpt-sparse",
+    # }
+
+    aliases = {
+        "model_train_v1_base": "non-LSTM",
+        "model_train_v1": "LSTM",
+        "model_finetuned_train_v0": "LSTM+SD",
+        "model_finetuned_train_v0_no_dense": "LSTM+SP",
+        "model_finetuned_train_v2": "LSTM+CD",
+        "model_finetuned_train_v2_no_dense": "LSTM+CS",
+    }
+
     maps = sorted(df["map"].unique())
 
     deterministic_maps = [m for m in maps if m.startswith("deterministic_")]
@@ -95,17 +121,22 @@ if __name__ == "__main__":
                     ax.text(
                         j,
                         i,
-                        str(value),
+                        f"{value:.2f}",
                         ha="center",
                         va="center",
                         color=color,
-                        fontsize=3.5,
+                        fontsize=7,
                     )
 
         ax.set_xticks(np.arange(len(subset_maps)))
         ax.set_yticks(np.arange(len(agents)))
-        ax.set_xticklabels(subset_maps, rotation=45, ha="right", fontsize=8)
-        ax.set_yticklabels(agents, fontsize=8)
+        ax.set_xticklabels(
+            [get_map_name(brr) for brr in subset_maps],
+            rotation=45,
+            ha="right",
+            fontsize=8,
+        )
+        ax.set_yticklabels([aliases[agent] for agent in agents], fontsize=8)
         ax.set_ylabel("Agent")
         ax.set_title(title)
 
@@ -144,17 +175,23 @@ if __name__ == "__main__":
                     ax.text(
                         j,
                         i,
-                        str(value),
+                        f"{value:.1f}",
                         ha="center",
                         va="center",
                         color=color,
-                        fontsize=3.5,
+                        fontsize=6,
                     )
 
         ax.set_xticks(np.arange(len(subset_maps)))
         ax.set_yticks(np.arange(len(agents)))
-        ax.set_xticklabels(subset_maps, rotation=45, ha="right", fontsize=8)
-        ax.set_yticklabels(agents, fontsize=8)
+
+        ax.set_xticklabels(
+            [get_map_name(brr) for brr in subset_maps],
+            rotation=45,
+            ha="right",
+            fontsize=8,
+        )
+        ax.set_yticklabels([aliases[agent] for agent in agents], fontsize=8)
         ax.set_ylabel("Agent")
         ax.set_title(title)
 
